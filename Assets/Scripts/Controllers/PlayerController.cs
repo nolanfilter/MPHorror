@@ -5,25 +5,55 @@ public class PlayerController : MonoBehaviour {
 
 	public float speed;
 
+	private InputController inputController;
+
+	private Vector3 movementVector;
+
+	private Transform cameraTransform;
+	private Vector3 cameraPositionOffset = new Vector3( 0f, 1.5f, -2.5f );
+	private Quaternion cameraRotationOffset = Quaternion.Euler( new Vector3( 15f, 0f, 0f ) );
+
+	void Awake()
+	{
+		inputController = GetComponent<InputController>();
+
+		if( inputController == null )
+		{
+			Debug.LogError( "No input controller." );
+			enabled = false;
+		}
+
+		cameraTransform = Camera.main.transform;
+	}
+
+	void OnEnable()
+	{
+		inputController.OnButtonDown += OnButtonDown;
+		inputController.OnButtonHeld += OnButtonHeld;
+		inputController.OnButtonUp += OnButtonUp;
+	}
+	
+	void OnDisable()
+	{
+		inputController.OnButtonDown -= OnButtonDown;
+		inputController.OnButtonHeld -= OnButtonHeld;
+		inputController.OnButtonUp -= OnButtonUp;
+	}
+
 	void Update()
 	{
-		Vector3 movement = Vector2.zero;
+		if( movementVector != Vector3.zero )
+		{
+			movementVector = movementVector.normalized * speed * Time.deltaTime;
 
-		if( Input.GetKey( KeyCode.RightArrow ) )
-			movement += Vector3.right;
+			transform.position += movementVector;
+			transform.rotation = Quaternion.Lerp( transform.rotation, Quaternion.LookRotation( movementVector ), 0.1f );
 
-		if( Input.GetKey( KeyCode.LeftArrow ) )
-			movement += Vector3.left;
+			cameraTransform.position = transform.TransformPoint( cameraPositionOffset );
+			cameraTransform.rotation = transform.rotation * cameraRotationOffset;
+		}
 
-		if( Input.GetKey( KeyCode.UpArrow ) )
-			movement += Vector3.forward;
-
-		if( Input.GetKey( KeyCode.DownArrow ) )
-			movement += Vector3.back;
-
-		movement = movement.normalized * speed * Time.deltaTime;
-
-		transform.position += movement;
+		movementVector = Vector3.zero;
 	}
 
 	void OnTriggerEnter( Collider collider )
@@ -47,6 +77,65 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
+	//event handlers
+	private void OnButtonDown( InputController.ButtonType button )
+	{	
+		switch( button )
+		{
+			case InputController.ButtonType.Left:
+			{	
+				movementVector += Vector3.left;
+			} break;
+				
+			case InputController.ButtonType.Right: 
+			{
+				movementVector += Vector3.right;
+			} break;
+
+			case InputController.ButtonType.Up: 
+			{
+				movementVector += Vector3.forward;
+			} break;
+
+			case InputController.ButtonType.Down: 
+			{
+				movementVector += Vector3.back;
+			} break;
+		}
+	}
+	
+	private void OnButtonHeld( InputController.ButtonType button )
+	{	
+		switch( button )
+		{
+			case InputController.ButtonType.Left:
+			{	
+				movementVector += Vector3.left;
+			} break;
+				
+			case InputController.ButtonType.Right: 
+			{
+				movementVector += Vector3.right;
+			} break;
+				
+			case InputController.ButtonType.Up: 
+			{
+				movementVector += Vector3.forward;
+			} break;
+				
+			case InputController.ButtonType.Down: 
+			{
+				movementVector += Vector3.back;
+			} break;
+		}
+	}
+	
+	private void OnButtonUp( InputController.ButtonType button )
+	{
+
+	}
+	//end event handlers
+	
 	/*
 	public float speed = 10f;
 	
