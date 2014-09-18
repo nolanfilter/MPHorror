@@ -8,10 +8,11 @@ public class PlayerController : MonoBehaviour {
 	private InputController inputController;
 
 	private Vector3 movementVector;
+	private float height = 0.5f;
 
 	private Transform cameraTransform;
 	private Vector3 cameraPositionOffset = new Vector3( 0f, 1.5f, -2.5f );
-	private Quaternion cameraRotationOffset = Quaternion.Euler( new Vector3( 15f, 0f, 0f ) );
+	private Quaternion cameraRotationOffset = Quaternion.Euler( new Vector3( 10f, 0f, 0f ) );
 
 	void Awake()
 	{
@@ -48,30 +49,41 @@ public class PlayerController : MonoBehaviour {
 
 			transform.position += movementVector;
 			transform.rotation = Quaternion.Lerp( transform.rotation, Quaternion.LookRotation( movementVector ), 0.1f );
-
-			cameraTransform.position = transform.TransformPoint( cameraPositionOffset );
-			cameraTransform.rotation = transform.rotation * cameraRotationOffset;
 		}
+			
+		cameraTransform.position = transform.TransformPoint( cameraPositionOffset );
+		cameraTransform.rotation = transform.rotation * cameraRotationOffset;
 
 		movementVector = Vector3.zero;
 	}
 
 	void OnTriggerEnter( Collider collider )
 	{
+		CheckForDoor( collider );
+	}
+
+	void OnTriggerStay( Collider collider )
+	{
+		CheckForDoor( collider );
+	}
+
+	private void CheckForDoor( Collider collider )
+	{
 		if( collider.tag == "Door" )
 		{
 			DoorController doorController = collider.GetComponent<DoorController>();
-
+			
 			Transform fromDoorTransform = null;
-
+			
 			if( doorController )
 			{
 				fromDoorTransform = DoorAgent.GetToDoorTransform( doorController.getUniqueID() );
 			}
-
+			
 			if( fromDoorTransform )
 			{
-				transform.position = fromDoorTransform.position + fromDoorTransform.forward * 1.5f;
+				transform.position = fromDoorTransform.position + fromDoorTransform.forward * 2.5f;
+				transform.position = new Vector3( transform.position.x, height, transform.position.z );
 				transform.LookAt( transform.position + fromDoorTransform.forward, Vector3.up );
 			}
 		}
@@ -84,22 +96,22 @@ public class PlayerController : MonoBehaviour {
 		{
 			case InputController.ButtonType.Left:
 			{	
-				movementVector += Vector3.left;
+				movementVector -= transform.right;
 			} break;
 				
 			case InputController.ButtonType.Right: 
 			{
-				movementVector += Vector3.right;
+				movementVector += transform.right;
 			} break;
-
+				
 			case InputController.ButtonType.Up: 
 			{
-				movementVector += Vector3.forward;
+				movementVector += transform.forward;
 			} break;
-
+				
 			case InputController.ButtonType.Down: 
 			{
-				movementVector += Vector3.back;
+				movementVector -= transform.forward;
 			} break;
 		}
 	}
@@ -110,22 +122,22 @@ public class PlayerController : MonoBehaviour {
 		{
 			case InputController.ButtonType.Left:
 			{	
-				movementVector += Vector3.left;
+				movementVector -= transform.right;
 			} break;
 				
 			case InputController.ButtonType.Right: 
 			{
-				movementVector += Vector3.right;
+				movementVector += transform.right;
 			} break;
 				
 			case InputController.ButtonType.Up: 
 			{
-				movementVector += Vector3.forward;
+				movementVector += transform.forward;
 			} break;
 				
 			case InputController.ButtonType.Down: 
 			{
-				movementVector += Vector3.back;
+				movementVector -= transform.forward;
 			} break;
 		}
 	}
