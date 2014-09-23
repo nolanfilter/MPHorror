@@ -1,138 +1,156 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerController : MonoBehaviour {
+public class PlayerController : Photon.MonoBehaviour {
 
 	public float speed;
 
+	private InputController inputController;
+
+	private Vector3 movementVector;
+	private float height = 0.5f;
+
+	private Transform cameraTransform;
+	private Vector3 cameraPositionOffset = new Vector3( 0f, 1.5f, -2.5f );
+	private Quaternion cameraRotationOffset = Quaternion.Euler( new Vector3( 10f, 0f, 0f ) );
+
+	void Awake()
+	{
+		inputController = GetComponent<InputController>();
+
+		if( inputController == null )
+		{
+			Debug.LogError( "No input controller." );
+			enabled = false;
+		}
+
+		cameraTransform = Camera.main.transform;
+	}
+
+	void OnEnable()
+	{
+		inputController.OnButtonDown += OnButtonDown;
+		inputController.OnButtonHeld += OnButtonHeld;
+		inputController.OnButtonUp += OnButtonUp;
+	}
+	
+	void OnDisable()
+	{
+		inputController.OnButtonDown -= OnButtonDown;
+		inputController.OnButtonHeld -= OnButtonHeld;
+		inputController.OnButtonUp -= OnButtonUp;
+	}
+
 	void Update()
 	{
-		Vector3 movement = Vector2.zero;
-
-		if( Input.GetKey( KeyCode.RightArrow ) )
-			movement += Vector3.right;
-
-		if( Input.GetKey( KeyCode.LeftArrow ) )
-			movement += Vector3.left;
-
-		if( Input.GetKey( KeyCode.UpArrow ) )
-			movement += Vector3.forward;
-
-		if( Input.GetKey( KeyCode.DownArrow ) )
-			movement += Vector3.back;
-
-		movement = movement.normalized * speed * Time.deltaTime;
-
-		transform.position += movement;
+		InputMovement();
 	}
 
 	void OnTriggerEnter( Collider collider )
 	{
+		CheckForDoor( collider );
+	}
+
+	void OnTriggerStay( Collider collider )
+	{
+		CheckForDoor( collider );
+	}
+
+	private void CheckForDoor( Collider collider )
+	{
 		if( collider.tag == "Door" )
 		{
 			DoorController doorController = collider.GetComponent<DoorController>();
-
+			
 			Transform fromDoorTransform = null;
-
+			
 			if( doorController )
 			{
 				fromDoorTransform = DoorAgent.GetToDoorTransform( doorController.getUniqueID() );
 			}
-
+			
 			if( fromDoorTransform )
 			{
-				transform.position = fromDoorTransform.position + fromDoorTransform.forward * 1.5f;
+				transform.position = fromDoorTransform.position + fromDoorTransform.forward * 2.5f;
+				transform.position = new Vector3( transform.position.x, height, transform.position.z );
 				transform.LookAt( transform.position + fromDoorTransform.forward, Vector3.up );
 			}
 		}
 	}
 
-	/*
-	public float speed = 10f;
-	
-	private float lastSynchronizationTime = 0f;
-	private float syncDelay = 0f;
-	private float syncTime = 0f;
-	private Vector3 syncStartPosition = Vector3.zero;
-	private Vector3 syncEndPosition = Vector3.zero;
-
-	void Awake()
-	{
-		lastSynchronizationTime = Time.time;
-	}
-
-	void Update()
-	{
-		if( networkView.isMine )
-		{
-			InputMovement();
-			InputColorChange();
-		}
-		else
-		{
-			SyncedMovement();
-		}
-	}
-
 	private void InputMovement()
 	{
-		if( Input.GetKey( KeyCode.UpArrow ) )
-			rigidbody.MovePosition( rigidbody.position + Vector3.forward * speed * Time.deltaTime );
-
-		if( Input.GetKey( KeyCode.DownArrow ) )
-			rigidbody.MovePosition( rigidbody.position - Vector3.forward * speed * Time.deltaTime );
-
-		if( Input.GetKey( KeyCode.RightArrow ) )
-			rigidbody.MovePosition( rigidbody.position + Vector3.right * speed * Time.deltaTime );
-
-		if( Input.GetKey( KeyCode.LeftArrow ) )
-			rigidbody.MovePosition( rigidbody.position - Vector3.right * speed * Time.deltaTime );
-	}
-
-	void OnSerializeNetworkView( BitStream stream, NetworkMessageInfo info )
-	{
-		Vector3 syncPosition = Vector3.zero;
-		Vector3 syncVelocity = Vector3.zero;
-		if (stream.isWriting)
+		if( movementVector != Vector3.zero )
 		{
-			syncPosition = rigidbody.position;
-			stream.Serialize(ref syncPosition);
+			movementVector = movementVector.normalized * speed * Time.deltaTime;
 			
-			syncPosition = rigidbody.velocity;
-			stream.Serialize(ref syncVelocity);
+			transform.position += movementVector;
+
+			transform.rotation = Quaternion.Lerp( transform.rotation, Quaternion.LookRotation( movementVector ), 0.1f );
 		}
-		else
+
+		cameraTransform.position = transform.TransformPoint( cameraPositionOffset );
+		cameraTransform.rotation = transform.rotation * cameraRotationOffset;
+		
+		movementVector = Vector3.zero;
+	}
+
+	//event handlers
+	private void OnButtonDown( InputController.ButtonType button )
+	{	
+		switch( button )
 		{
-			stream.Serialize(ref syncPosition);
-			stream.Serialize(ref syncVelocity);
-			
-			syncTime = 0f;
-			syncDelay = Time.time - lastSynchronizationTime;
-			lastSynchronizationTime = Time.time;
-			
-			syncEndPosition = syncPosition + syncVelocity * syncDelay;
-			syncStartPosition = rigidbody.position;
+			case InputController.ButtonType.Left:
+			{	
+				movementVector -= transform.right;
+			} break;
+				
+			case InputController.ButtonType.Right: 
+			{
+				movementVector += transform.right;
+			} break;
+				
+			case InputController.ButtonType.Up: 
+			{
+				movementVector += transform.forward;
+			} break;
+				
+			case InputController.ButtonType.Down: 
+			{
+				movementVector -= transform.forward;
+			} break;
 		}
 	}
-
-	private void SyncedMovement()
-	{
-		syncTime += Time.deltaTime;
-		rigidbody.position = Vector3.Lerp(syncStartPosition, syncEndPosition, syncTime / syncDelay);
+	
+	private void OnButtonHeld( InputController.ButtonType button )
+	{	
+		switch( button )
+		{
+			case InputController.ButtonType.Left:
+			{	
+				movementVector -= transform.right;
+			} break;
+				
+			case InputController.ButtonType.Right: 
+			{
+				movementVector += transform.right;
+			} break;
+				
+			case InputController.ButtonType.Up: 
+			{
+				movementVector += transform.forward;
+			} break;
+				
+			case InputController.ButtonType.Down: 
+			{
+				movementVector -= transform.forward;
+			} break;
+		}
 	}
-
-	private void InputColorChange()
+	
+	private void OnButtonUp( InputController.ButtonType button )
 	{
-		if( Input.GetKeyDown( KeyCode.C ) )
-			ChangeColorTo( new Vector3( Random.value, Random.value, Random.value ) );
-	}
 
-	[RPC] void ChangeColorTo( Vector3 color )
-	{
-		renderer.material.color = new Color( color.x, color.y, color.z, 1f );
-
-		if( networkView.isMine )
-			networkView.RPC( "ChangeColorTo", RPCMode.Others, color );
 	}
-	*/
+	//end event handlers
 }
