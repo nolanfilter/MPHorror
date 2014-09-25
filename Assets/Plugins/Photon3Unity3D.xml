@@ -793,8 +793,8 @@
              <example>
              You could replace Service by:
             
-               while (DispatchIncomingCommands()); //Dispatch until everything is Dispatched...
-               SendOutgoingCommands(); //Send a UDP/TCP package with outgoing messages
+                 while (DispatchIncomingCommands()); //Dispatch until everything is Dispatched...
+                 SendOutgoingCommands(); //Send a UDP/TCP package with outgoing messages
              </example>
              <seealso cref="M:ExitGames.Client.Photon.PhotonPeer.DispatchIncomingCommands"/>
              <seealso cref="M:ExitGames.Client.Photon.PhotonPeer.SendOutgoingCommands"/>

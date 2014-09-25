@@ -1,6 +1,3 @@
-#if !(UNITY_PS3 || UNITY_WIIU)
-// was: #if !(UNITY_WINRT || UNITY_WP8 || UNITY_PS3 || UNITY_WIIU)
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -252,5 +249,3 @@ public class PhotonPingManager
     }
 #endif
 }
-
-#endif

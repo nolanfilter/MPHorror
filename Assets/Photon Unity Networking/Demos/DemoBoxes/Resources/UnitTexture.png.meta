@@ -1,10 +1,5 @@
 fileFormatVersion: 2
 guid: f64bcca960c279c4da8509f61a33db8f
-labels:
-- ExitGames
-- PUN
-- Photon
-- Networking
 TextureImporter:
   fileIDToRecycleName: {}
   serializedVersion: 2

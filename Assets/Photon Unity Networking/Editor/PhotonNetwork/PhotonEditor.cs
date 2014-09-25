@@ -267,6 +267,13 @@ public class PhotonEditor : EditorWindow
         #endif
     }
 
+    [MenuItem("Window/Photon Unity Networking/Locate Settings Asset %#&p")]
+    protected static void Inspect()
+    {
+        EditorGUIUtility.PingObject(PhotonNetwork.PhotonServerSettings);
+        Selection.activeObject = PhotonNetwork.PhotonServerSettings;
+    }
+
     [MenuItem("Window/Photon Unity Networking/PUN Wizard &p")]
     protected static void Init()
     {
@@ -692,8 +699,7 @@ public class PhotonEditor : EditorWindow
                                                 : ServerSettings.HostingOption.PhotonCloud;
             PhotonEditor.Save();
 
-            EditorGUIUtility.PingObject(PhotonEditor.Current);
-            Selection.activeObject = PhotonEditor.Current;
+            Inspect();
             EditorUtility.DisplayDialog(CurrentLang.SettingsSavedTitle, CurrentLang.SettingsSavedMessage, CurrentLang.OkButton);
         }
 
@@ -744,8 +750,7 @@ public class PhotonEditor : EditorWindow
             PhotonEditor.Current.Protocol = this.photonProtocol;
             PhotonEditor.Save();
 
-            EditorGUIUtility.PingObject(PhotonEditor.Current);
-            Selection.activeObject = PhotonEditor.Current;
+            Inspect();
             EditorUtility.DisplayDialog(CurrentLang.SettingsSavedTitle, CurrentLang.SettingsSavedMessage, CurrentLang.OkButton);
         }
 
