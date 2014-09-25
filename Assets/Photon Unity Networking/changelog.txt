@@ -1,3 +1,11 @@
+v1.28 (23. September 2014)
+Changed: Compile conditions for WII U should work now! The demos don't run out of the box on Wii U though. You need to adjust some screen settings to get the GUI and input right.
+Changed: Ping on native platforms does not disconnect PUN anymore.
+Updated: FindFriends documentation.
+Added: PunSceneSettings. This allows you to define the minimum value for ViewIDs per scene-file name. This helps to avoid clashes between ViewIDs when switching scenes or loading multiple incrementally. A PunSceneSettingsFile is created and only used in the Editor. Add names of scenes and their minimum ViewID value. Any scene that is not entered, begins at 0. You must edit at any PhotonView in each scene to correct the scene-views! Save the scenes.
+Updated: To library v4.0.0.5 which fixes a problem with CRC Checking and reduces the amount of logging it does. See details in the separate release history file.
+
+
 v1.27 (15. September 2014)
 Updated: Chat can now be used with PUN+ (after a Chat API update)! Updated assemblies and native plugins for PUN+.
 Added: ServerSettings for PUN+ will not allow you to use TCP. PUN+ uses reliable UDP. Added a note about this fact in the inspector for ServerSettings files.
@@ -9,7 +17,6 @@ Internal: The two internal cleanup methods LeftRoomCleanup() and LeftLobbyCleanu
 Added: OnConnectionFail callback with the case DisconnectCause.AuthenticationTicketExpired. This is a rare disconnect cause which usually means our server's timing is mixed up or your client uses a very (!) old authentication ticket. Handle this by connecting again (which will do a fresh authenticate).
 Changed: The callback OnPhotonInstantiate is now called via GameObject.SendMessage() like any other callback (as listed by enum PhotonNetworkingMessage). OnPhotonInstantiate can be a coroutine. If your implementation has 0 parameters it will be fine, too.
 Updated: To latest Photon Unity dll v4.0.0.3. This now tries to tell the server when the client timed out (used in counters to analyze issues) and it uses a newer native-socket-api. This is incompatible with older libs in Assets\Plugins\Android and Assets\Plugins\iOS! Update all when you use PUN+.
-
 
 v1.26.1 (11. August 2014)
 Fixed: Nullreference Exception on import (due to ServerSettings RPC List).
