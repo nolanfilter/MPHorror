@@ -250,18 +250,18 @@ internal class PhotonHandler : Photon.MonoBehaviour, IPhotonPeerListener
             yield break; // break if we don't get regions at all
         }
 
-        #if !UNITY_EDITOR && (UNITY_ANDROID || UNITY_IPHONE)
-        #pragma warning disable 0162    // the library variant defines if we should use PUN's SocketUdp variant (at all)
-        if (PhotonPeer.NoSocket)
-        {
-            if (PhotonNetwork.logLevel >= PhotonLogLevel.Informational)
-            {
-                Debug.Log("PUN disconnects to re-use native sockets for pining servers and to find the best.");
-            }
-            PhotonNetwork.Disconnect();
-        }
-        #pragma warning restore 0162
-        #endif
+        //#if !UNITY_EDITOR && (UNITY_ANDROID || UNITY_IPHONE)
+        //#pragma warning disable 0162    // the library variant defines if we should use PUN's SocketUdp variant (at all)
+        //if (PhotonPeer.NoSocket)
+        //{
+        //    if (PhotonNetwork.logLevel >= PhotonLogLevel.Informational)
+        //    {
+        //        Debug.Log("PUN disconnects to re-use native sockets for pining servers and to find the best.");
+        //    }
+        //    PhotonNetwork.Disconnect();
+        //}
+        //#pragma warning restore 0162
+        //#endif
 
         PhotonPingManager pingManager = new PhotonPingManager();
         foreach (Region region in PhotonNetwork.networkingPeer.AvailableRegions)
@@ -271,7 +271,7 @@ internal class PhotonHandler : Photon.MonoBehaviour, IPhotonPeerListener
 
         while (!pingManager.Done)
         {
-            yield return 0; // wait until pinging finished (offline mode won't ping)
+            yield return new WaitForSeconds(0.1f); // wait until pinging finished (offline mode won't ping)
         }
 
 

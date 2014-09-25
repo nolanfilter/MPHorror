@@ -23,7 +23,7 @@ using UnityEditor;
 public static class PhotonNetwork
 {
     /// <summary>Version number of PUN. Also used in GameVersion to separate client version from each other.</summary>
-    public const string versionPUN = "1.27";
+    public const string versionPUN = "1.28";
 
     public static string gameVersion
     {
@@ -359,14 +359,14 @@ public static class PhotonNetwork
     /// </summary>
     /// <remarks>
     /// Do not modify this list!
-    /// It's internally handles by FindFriends and only useful to read the values.
+    /// It is internally handled by FindFriends and only available to read the values.
     /// The value of FriendsListAge tells you how old the data is in milliseconds.
     ///
     /// Don't get this list more often than useful (> 10 seconds). In best case, keep the list you fetch really short.
     /// You could (e.g.) get the full list only once, then request a few updates only for friends who are online.
     /// After a while (e.g. 1 minute), you can get the full list again (to update online states).
     /// </remarks>
-    public static List<FriendInfo> Friends { get; set; }
+    public static List<FriendInfo> Friends { get; internal set; }
 
     /// <summary>
     /// Age of friend list info (in milliseconds). It's 0 until a friend list is fetched.
@@ -1261,21 +1261,24 @@ public static class PhotonNetwork
     }
 
     /// <summary>
-    /// Requests the rooms and online status for a list of friends (with PlayerName) and saves the result in PhotonNetwork.Friends.
+    /// Requests the rooms and online status for a list of friends and saves the result in PhotonNetwork.Friends.
     /// </summary>
     /// <remarks>
     /// Works only on Master Server to find the rooms played by a selected list of users.
-    /// All client must set a unique username via PlayerName property or CustomAuthValues.
     ///
-    /// The result will be mapped to LoadBalancingClient.Friends when available.
-    /// The list is initialized by OpFindFriends on first use (before that, it is null).
-    /// To refresh the list, call FindFriends again (but not too frequently).
+    /// The result will be stored in PhotonNetwork.Friends when available.
+    /// That list is initialized on first use of OpFindFriends (before that, it is null).
+    /// To refresh the list, call FindFriends again (in 5 seconds or 10 or 20).
     ///
-    /// Users identify themselves by setting a PlayerName in the LoadBalancingClient instance.
-    /// This in turn will send the name in OpAuthenticate after each connect (to master and game servers).
+    /// Users identify themselves by setting a unique username via PhotonNetwork.playerName
+    /// or by PhotonNetwork.AuthValues. The user id set in AuthValues overrides the playerName,
+    /// so make sure you know the ID your friends use to authenticate.
+    /// The AuthValues are sent in OpAuthenticate when you connect, so the AuthValues must be
+    /// set before you connect!
+    /// 
     /// Note: Changing a player's name doesn't make sense when using a friend list.
     ///
-    /// The list of usernames must be fetched from some other source (not provided by Photon).
+    /// The list of friends must be fetched from some other source (not provided by Photon).
     ///
     ///
     /// Internal:
@@ -1283,7 +1286,7 @@ public static class PhotonNetwork
     /// ParameterCode.FindFriendsResponseOnlineList = bool[] of online states
     /// ParameterCode.FindFriendsResponseRoomIdList = string[] of room names (empty string if not in a room)
     /// </remarks>
-    /// <param name="friendsToFind">Array of friend's names (make sure they are unique).</param>
+    /// <param name="friendsToFind">Array of friend (make sure to use unique playerName or AuthValues).</param>
     /// <returns>If the operation could be sent (requires connection, only one request is allowed at any time). Always false in offline mode.</returns>
     public static bool FindFriends(string[] friendsToFind)
     {
