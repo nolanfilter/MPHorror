@@ -14,6 +14,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	private Quaternion syncEndRotation = Quaternion.identity;
 	
 	private InputController inputController;
+	private CharacterController characterController;
 	
 	private Vector3 movementVector;
 	private float height = 0.5f;
@@ -32,6 +33,14 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( inputController == null )
 		{
 			Debug.LogError( "No input controller." );
+			enabled = false;
+		}
+
+		characterController = GetComponent<CharacterController>();
+		
+		if( characterController == null )
+		{
+			Debug.LogError( "No character controller." );
 			enabled = false;
 		}
 		
@@ -75,9 +84,9 @@ public class PlayerController : Photon.MonoBehaviour {
 		else
 		{
 			InputMovement();
-			
-			//SnapCamera();
 		}
+
+		SnapCamera();
 	}
 	
 	void OnTriggerEnter( Collider collider )
@@ -137,6 +146,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	
 	private void InputMovement()
 	{
+		/*
 		Vector3 adjustedPlayerPosition = new Vector3( transform.position.x, cameraTransform.position.y, transform.position.z );
 		
 		Vector3 projectedVector = Vector3.Project( adjustedPlayerPosition - cameraTransform.position, cameraTransform.right );
@@ -144,35 +154,42 @@ public class PlayerController : Photon.MonoBehaviour {
 		float distanceBetweenPlayerAndCamera = Vector3.Distance( adjustedPlayerPosition, cameraTransform.position + projectedVector  );
 
 		float playerScreenPositionX = cameraTransform.camera.WorldToScreenPoint( transform.position ).x / Screen.width;
-		
+
 		if( playerScreenPositionX < 0.3f )
 			cameraTransform.RotateAround( cameraTransform.position, Vector3.up, cameraRotationRate * -1f );
 		
 		if( playerScreenPositionX > 0.7f )
 			cameraTransform.RotateAround( cameraTransform.position, Vector3.up, cameraRotationRate );
-
+		*/
 
 		if( movementVector != Vector3.zero )
 		{
 			movementVector = movementVector.normalized * speed * Time.deltaTime;
 
 			//update player
-			transform.position += movementVector;
-			transform.rotation = Quaternion.Lerp( transform.rotation, Quaternion.LookRotation( movementVector ), 0.1f );
+			characterController.Move( movementVector );
+
+			Quaternion movementVectorRotation = Quaternion.LookRotation( movementVector );
+			if( Quaternion.Angle( movementVectorRotation, transform.rotation ) <= 120f )
+				transform.rotation = Quaternion.Lerp( transform.rotation, movementVectorRotation, 0.1f );
+
 
 			//update camera		
-			if( distanceBetweenPlayerAndCamera > 5f || distanceBetweenPlayerAndCamera < 2.5f )
-				cameraTransform.position += movementVector;
+			//if( distanceBetweenPlayerAndCamera > 5f || distanceBetweenPlayerAndCamera < 2.5f )
+			//	cameraTransform.position += movementVector;
 		}
 		else
 		{
-			if( distanceBetweenPlayerAndCamera > 5f )
-				cameraTransform.position += ( adjustedPlayerPosition - cameraTransform.position ).normalized * speed * Time.deltaTime * 0.1f;
+			//if( distanceBetweenPlayerAndCamera > 5f )
+			//	cameraTransform.position += ( adjustedPlayerPosition - cameraTransform.position ).normalized * speed * Time.deltaTime * 0.1f;
 
-			if( distanceBetweenPlayerAndCamera < 2.5f )
-				cameraTransform.position -= ( adjustedPlayerPosition - cameraTransform.position ).normalized * speed * Time.deltaTime * 0.1f;
+			//if( distanceBetweenPlayerAndCamera < 2.5f )
+			//	cameraTransform.position -= ( adjustedPlayerPosition - cameraTransform.position ).normalized * speed * Time.deltaTime * 0.1f;
 		}
-		
+
+		//cameraTransform.position = Vector3.Lerp( cameraTransform.position, transform.TransformPoint( cameraPositionOffset ), 0.1f );
+		//cameraTransform.rotation = Quaternion.Lerp( cameraTransform.rotation, transform.rotation * cameraRotationOffset, 0.1f );
+
 		movementVector = Vector3.zero;
 	}
 	
