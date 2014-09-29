@@ -1,3 +1,6 @@
+v1.28.1 (26. September 2014)
+Fixed: PhotonViewID assignment. This got broken in a subtle way when we added the PunSceneSettings file. Please update. For each scene with any PhotonView in, edit at least one PhotonView.viewID in the inspector and save the scene.
+
 v1.28 (23. September 2014)
 Changed: Compile conditions for WII U should work now! The demos don't run out of the box on Wii U though. You need to adjust some screen settings to get the GUI and input right.
 Changed: Ping on native platforms does not disconnect PUN anymore.

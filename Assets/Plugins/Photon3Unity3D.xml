@@ -1246,6 +1246,7 @@
             The ServerAddress can only be changed for HTTP connections (to replace one that goes through a Loadbalancer with a direct URL).
             </remarks>
         </member>
+        <!-- Badly formed XML comment ignored for member "P:ExitGames.Client.Photon.PhotonPeer.HttpUrlParameters" -->
         <member name="P:ExitGames.Client.Photon.PhotonPeer.UsedProtocol">
             <summary>The protocol this Peer uses to connect to Photon.</summary>
         </member>
@@ -1818,6 +1819,9 @@
         </member>
         <member name="F:ExitGames.Client.Photon.ConnectionProtocol.Tcp">
             <summary>Use TCP to connect to Photon.</summary>
+        </member>
+        <member name="F:ExitGames.Client.Photon.ConnectionProtocol.RHttp">
+            <summary>Use Realtime HTTP connections to connect a Photon Master (not available in regular Photon SDK).</summary>
         </member>
         <member name="T:ExitGames.Client.Photon.DebugLevel">
             <summary>
@@ -2405,6 +2409,42 @@
         </member>
         <member name="P:ExitGames.Client.Photon.TrafficStats.TimestampOfLastReliableCommand">
             <summary>Timestamp of last incoming reliable command (every second we expect a PING).</summary>
+        </member>
+        <member name="T:ExitGames.Client.Photon.HttpBase3">
+             <summary>
+             Class to handle Http based connections to a Photon server.
+             Requests are done asynchronous and not queued at all.
+            
+             All responses are put into the game's thread-context and 
+             all results and state changes are done within calls of
+             Service() or DispatchIncomingCommands().
+             </summary>
+        </member>
+        <member name="F:ExitGames.Client.Photon.HttpBase3._rnd">
+            TODO: ask how to setup this parameters
+        </member>
+        <member name="M:ExitGames.Client.Photon.HttpBase3.Request(System.Byte[],System.String)">
+            <summary>
+            The initial request uses "?init" as UrlParameters and the binary data is the app-id (binary in up to 32 bytes).
+            Init returns a GUID for use in following requests as UrlParameters "?pid=GUID".
+            </summary>
+            <param name="data"></param>
+            <param name="urlParamter">The url paramters to append to the server adress uri.</param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:ExitGames.Client.Photon.HttpBase3.Request(System.Byte[],System.String,ExitGames.Client.Photon.HttpBase3.MessageType)" -->
+        <member name="M:ExitGames.Client.Photon.HttpBase3.EnqueueErrorDisconnect(ExitGames.Client.Photon.StatusCode)">
+            <summary>
+            Called internally when some error (or timeout) causes a disconnect. this takes care state is set and callbacks are done (once)
+            </summary>
+        </member>
+        <member name="P:ExitGames.Client.Photon.HttpBase3.PeerID">
+            <summary>
+            The *pid* for this peer, which is assigned by the server on connect (init).
+            Initially this is Guid.Empty.
+            </summary>
+        </member>
+        <member name="F:ExitGames.Client.Photon.HttpBase3.AsyncRequestState.restarting">
+            how many times we have rererequested this request already
         </member>
     </members>
 </doc>
