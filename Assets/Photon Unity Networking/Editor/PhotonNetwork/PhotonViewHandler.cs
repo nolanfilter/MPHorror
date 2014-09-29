@@ -96,7 +96,7 @@ public class PhotonViewHandler : EditorWindow
         }
 
         // third pass: anything that's now 0 must get a new (not yet used) subId number
-        int lastUsedId = minViewIdInThisScene - 1;
+        int lastUsedId = (minViewIdInThisScene > 0) ? minViewIdInThisScene - 1 : 0;
         foreach (PhotonView view in pvInstances)
         {
             if (view.subId == 0)
