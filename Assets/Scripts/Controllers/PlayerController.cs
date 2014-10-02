@@ -97,6 +97,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		{
 			InputMovement();
 		}
+	
+		SnapCamera();
 
 		currentTimeLived += Time.deltaTime;
 
@@ -108,7 +110,17 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		int timeLeft = Mathf.RoundToInt( lifeLength - currentTimeLived );
 
-		GUI.Label( timerRect, "" + timeLeft, textStyle );
+		if( networkView != null && networkView.enabled )
+		{
+			if( photonView.isMine )
+			{
+				GUI.Label( timerRect, "" + timeLeft, textStyle );
+			}
+		}
+		else
+		{
+			GUI.Label( timerRect, "" + timeLeft, textStyle );
+		}
 	}
 
 	void OnTriggerEnter( Collider collider )
@@ -212,8 +224,6 @@ public class PlayerController : Photon.MonoBehaviour {
 		//cameraTransform.position = Vector3.Lerp( cameraTransform.position, transform.TransformPoint( cameraPositionOffset ), 0.1f );
 		//cameraTransform.rotation = Quaternion.Lerp( cameraTransform.rotation, transform.rotation * cameraRotationOffset, 0.1f );
 
-		SnapCamera();
-
 		movementVector = Vector3.zero;
 	}
 	
@@ -246,8 +256,19 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private void SnapCamera()
 	{
-		cameraTransform.position = transform.TransformPoint( cameraPositionOffset );
-		cameraTransform.rotation = transform.rotation * cameraRotationOffset;
+		if( networkView != null && networkView.enabled )
+		{
+			if( photonView.isMine )
+			{
+				cameraTransform.position = transform.TransformPoint( cameraPositionOffset );
+				cameraTransform.rotation = transform.rotation * cameraRotationOffset;
+			}
+		}
+		else
+		{
+			cameraTransform.position = transform.TransformPoint( cameraPositionOffset );
+			cameraTransform.rotation = transform.rotation * cameraRotationOffset;
+		}
 	}
 	
 	//event handlers
