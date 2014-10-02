@@ -68,9 +68,9 @@ public class NetworkAgent : MonoBehaviour {
 		else if( PhotonNetwork.room == null )
 		{
 			// Create Room
-			if( GUI.Button( new Rect( 100, 100, 250, 100 ), "Start Server" ) )
+			if( GUI.Button( new Rect( 100, 100, 300, 100 ), "Start Server" ) )
 			{
-				PhotonNetwork.CreateRoom( roomName + System.Guid.NewGuid().ToString( "N" ), true, true, 5 );
+				PhotonNetwork.CreateRoom( roomName + System.Guid.NewGuid().ToString( "N" ), true, true, 4 );
 			}
 				
 			// Join Room
@@ -78,7 +78,7 @@ public class NetworkAgent : MonoBehaviour {
 			{
 				for (int i = 0; i < roomsList.Length; i++ )
 				{
-					if( GUI.Button( new Rect( 250, 100 + ( 110 * i ), 250, 100 ), "Join " + roomsList[i].name ) )
+					if( GUI.Button( new Rect( Screen.width * 0.5f, 100 + ( 110 * i ), 300, 100 ), "Join\n" + roomsList[i].name ) )
 						PhotonNetwork.JoinRoom( roomsList[i].name );
 				}
 			}
