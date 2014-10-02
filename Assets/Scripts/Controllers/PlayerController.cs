@@ -98,8 +98,6 @@ public class PlayerController : Photon.MonoBehaviour {
 			InputMovement();
 		}
 
-		SnapCamera();
-
 		currentTimeLived += Time.deltaTime;
 
 		if( currentTimeLived > lifeLength )
@@ -213,6 +211,8 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		//cameraTransform.position = Vector3.Lerp( cameraTransform.position, transform.TransformPoint( cameraPositionOffset ), 0.1f );
 		//cameraTransform.rotation = Quaternion.Lerp( cameraTransform.rotation, transform.rotation * cameraRotationOffset, 0.1f );
+
+		SnapCamera();
 
 		movementVector = Vector3.zero;
 	}
