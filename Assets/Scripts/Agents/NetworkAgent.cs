@@ -70,7 +70,7 @@ public class NetworkAgent : MonoBehaviour {
 			// Create Room
 			if( GUI.Button( new Rect( 100, 100, 250, 100 ), "Start Server" ) )
 			{
-				PhotonNetwork.CreateRoom( roomName + System.Guid.NewGuid().ToString( "N" ), true, true, 5 );
+				PhotonNetwork.CreateRoom( roomName + System.Guid.NewGuid().ToString( "N" ), true, true, 4 );
 			}
 				
 			// Join Room
