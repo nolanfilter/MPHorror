@@ -66,6 +66,10 @@ MonoBehaviour:
   playerPrefab: {fileID: 100000, guid: afb5c7e6a90424178a67485185db9d18, type: 2}
   networkBackgroundPrefab: {fileID: 100000, guid: 31af3ae2df7ba4ae8b37d917edabeec6,
     type: 2}
+  playerStartPositions:
+  - {x: -3, y: .5, z: 12.25}
+  playerStartRotations:
+  - {x: 0, y: 0, z: 0}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
