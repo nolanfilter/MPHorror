@@ -13,11 +13,10 @@ GameObject:
   - 114: {fileID: 11400004}
   - 114: {fileID: 11400002}
   - 114: {fileID: 11400000}
-  - 54: {fileID: 5400000}
   - 143: {fileID: 14300000}
   m_Layer: 0
   m_Name: MPHorrorPlayer
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -268,21 +267,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100000}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!54 &5400000
-Rigidbody:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100000}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: .0500000007
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 126
-  m_CollisionDetection: 0
 --- !u!108 &10800000
 Light:
   m_ObjectHideFlags: 1
@@ -479,7 +463,7 @@ MonoBehaviour:
       textureVariables: []
     description: 
     docUrl: 
-    showStateLabel: 1
+    showStateLabel: 0
     maxLoopCount: 0
     watermark: 
     version: 0
@@ -656,7 +640,7 @@ MonoBehaviour:
       textureVariables: []
     description: 
     docUrl: 
-    showStateLabel: 1
+    showStateLabel: 0
     maxLoopCount: 0
     watermark: 
     version: 0
@@ -935,7 +919,7 @@ MonoBehaviour:
       textureVariables: []
     description: 
     docUrl: 
-    showStateLabel: 1
+    showStateLabel: 0
     maxLoopCount: 0
     watermark: 
     version: 0
@@ -1107,7 +1091,7 @@ MonoBehaviour:
       textureVariables: []
     description: 
     docUrl: 
-    showStateLabel: 1
+    showStateLabel: 0
     maxLoopCount: 0
     watermark: 
     version: 0
@@ -1263,7 +1247,7 @@ CharacterController:
   m_GameObject: {fileID: 100000}
   serializedVersion: 2
   m_Height: 1
-  m_Radius: .5
+  m_Radius: .600000024
   m_SlopeLimit: 45
   m_StepOffset: .300000012
   m_SkinWidth: .0799999982
