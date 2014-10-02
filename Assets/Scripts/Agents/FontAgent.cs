@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class GameAgent : MonoBehaviour {
+public class FontAgent : MonoBehaviour {
 
-	private static GameAgent mInstance = null;
-	public static GameAgent instance
+	public Font font;
+
+	private static FontAgent mInstance = null;
+	public static FontAgent instance
 	{
 		get
 		{
@@ -23,18 +25,16 @@ public class GameAgent : MonoBehaviour {
 		mInstance = this;
 	}
 
-	/*
-	void Start()
+	public static Font GetFont()
 	{
-		DoorAgent.RandomizeDoorConnections();
+		if( instance )
+			return instance.internalGetFont();
+
+		return null;
 	}
-	
-	void Update()
+
+	private Font internalGetFont()
 	{
-		if( Input.GetKeyDown( KeyCode.Space ) )
-		{
-			DoorAgent.RandomizeDoorConnections();
-		}
+		return font;
 	}
-	*/
 }
