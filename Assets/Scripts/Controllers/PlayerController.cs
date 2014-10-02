@@ -17,7 +17,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	private CharacterController characterController;
 	
 	private Vector3 movementVector;
-	private float height = 0.5f;
+	private float height = 0.68f;
 	
  	private Transform cameraTransform;
 	private Vector3 cameraPositionOffset = new Vector3( 0f, 1.5f, -2.5f );

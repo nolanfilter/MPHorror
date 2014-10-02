@@ -48,13 +48,15 @@ public class NetworkAgent : MonoBehaviour {
 
 	void Update()
 	{
-		if( Input.GetKeyDown( KeyCode.Return ) )
+		if( Input.GetKeyDown( KeyCode.Alpha1 ) )
 		{
 			LeaveRoom();
 		}
 
 		if( networkBackground != null )
+		{
 			networkBackground.renderer.enabled = ( PhotonNetwork.room == null );
+		}
 	}
 
 	void OnGUI()
@@ -67,7 +69,9 @@ public class NetworkAgent : MonoBehaviour {
 		{
 			// Create Room
 			if( GUI.Button( new Rect( 100, 100, 250, 100 ), "Start Server" ) )
+			{
 				PhotonNetwork.CreateRoom( roomName + System.Guid.NewGuid().ToString( "N" ), true, true, 5 );
+			}
 				
 			// Join Room
 			if( roomsList != null )
@@ -88,6 +92,8 @@ public class NetworkAgent : MonoBehaviour {
 
 	void OnJoinedRoom()
 	{
+		DoorAgent.RandomizeDoorConnections();
+
 		if( playerStartPositions.Length == 0 )
 		{
 			Debug.LogError( "No player start positions." );
