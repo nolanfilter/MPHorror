@@ -17,12 +17,17 @@ public class PlayerController : Photon.MonoBehaviour {
 	private CharacterController characterController;
 	
 	private Vector3 movementVector;
-	private float height = 0.5f;
+	private float height = 0.68f;
 	
  	private Transform cameraTransform;
 	private Vector3 cameraPositionOffset = new Vector3( 0f, 1.5f, -2.5f );
 	private Quaternion cameraRotationOffset = Quaternion.Euler( new Vector3( 10f, 0f, 0f ) );
 	private float cameraRotationRate = 1f;
+
+	private float lifeLength = 120f;
+	private float currentTimeLived = 0f;
+	private Rect timerRect;
+	private GUIStyle textStyle;
 
 	private NetworkView networkView;
 	
@@ -51,6 +56,13 @@ public class PlayerController : Photon.MonoBehaviour {
 	
 	void Start()
 	{
+		timerRect = new Rect( 0f, 0f, Screen.width, Screen.height * 0.1f );
+
+		textStyle = new GUIStyle();
+		textStyle.font = FontAgent.GetFont();
+		textStyle.normal.textColor = Color.white;
+		textStyle.alignment = TextAnchor.MiddleCenter;
+
 		SnapCamera();
 	}
 	
@@ -87,8 +99,20 @@ public class PlayerController : Photon.MonoBehaviour {
 		}
 
 		SnapCamera();
+
+		currentTimeLived += Time.deltaTime;
+
+		if( currentTimeLived > lifeLength )
+			Destroy( gameObject );
 	}
-	
+
+	void OnGUI()
+	{
+		int timeLeft = Mathf.RoundToInt( lifeLength - currentTimeLived );
+
+		GUI.Label( timerRect, "" + timeLeft, textStyle );
+	}
+
 	void OnTriggerEnter( Collider collider )
 	{
 		CheckForDoor( collider );

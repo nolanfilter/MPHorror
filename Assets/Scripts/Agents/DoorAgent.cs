@@ -88,8 +88,26 @@ public class DoorAgent : MonoBehaviour {
 		doorConnections.Clear();
 		
 		List<int> doorIDs = new List<int>( doorsById.Keys );
-		
-		for( int i = 0; i < doorIDs.Count; i++ )
-			doorConnections.Add( doorIDs[i], doorIDs[ Random.Range( 0, doorIDs.Count ) ] );
+
+		int numDoors = doorIDs.Count;
+		int currentDoorID = 0;
+		int nextDoorID;
+
+		while( doorConnections.Count < numDoors - 1 )
+		{
+			nextDoorID = Random.Range( 0, numDoors );
+
+			while( nextDoorID == currentDoorID || doorConnections.ContainsKey( nextDoorID ) )
+				nextDoorID = ( nextDoorID + 1 )%numDoors;
+
+			doorConnections.Add( currentDoorID, nextDoorID );
+
+			currentDoorID = nextDoorID;
+		}
+
+		doorConnections.Add( currentDoorID, 0 );
+
+		//for( int i = 0; i < numDoors; i++ )
+		//	Debug.Log( "" + i + " -> " + doorConnections[i] );
 	}
 }
