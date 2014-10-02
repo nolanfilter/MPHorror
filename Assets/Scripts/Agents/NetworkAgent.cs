@@ -2,9 +2,11 @@
 using System.Collections;
 
 public class NetworkAgent : MonoBehaviour {
-
+	
 	public GameObject playerPrefab;
 	public GameObject networkBackgroundPrefab;
+	public Vector3[] playerStartPositions;
+	public Vector3[] playerStartRotations;
 
 	private const string roomName = "MPHorror_";
 	private RoomInfo[] roomsList;
@@ -86,9 +88,25 @@ public class NetworkAgent : MonoBehaviour {
 
 	void OnJoinedRoom()
 	{
+		if( playerStartPositions.Length == 0 )
+		{
+			Debug.LogError( "No player start positions." );
+			return;
+		}
+
+		if( playerStartRotations.Length == 0 )
+		{
+			Debug.LogError( "No player start rotations." );
+			return;
+		}
+
 		// Spawn player
 		if( playerPrefab != null )
-			PhotonNetwork.Instantiate ( playerPrefab.name, Vector3.up * 5, Quaternion.identity, 0 );
+		{
+			int playerNumber = PhotonNetwork.otherPlayers.Length;
+
+			PhotonNetwork.Instantiate ( playerPrefab.name, playerStartPositions[ playerNumber%playerStartPositions.Length ], Quaternion.Euler( playerStartRotations[ playerNumber%playerStartRotations.Length ] ), 0 );
+		}
 	}
 
 	public static void LeaveRoom()
