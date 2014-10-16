@@ -12,35 +12,29 @@ MonoBehaviour:
   m_Name: PlayMakerGlobals
   m_EditorClassIdentifier: 
   variables:
-    floatVariables:
-    - useVariable: 1
-      name: BatterMax
-      tooltip: 
-      showInInspector: 0
-      networkSync: 0
-      value: 60
-    - useVariable: 1
-      name: battery
-      tooltip: 
-      showInInspector: 0
-      networkSync: 0
-      value: 60
-    intVariables:
-    - useVariable: 1
-      name: sanity
-      tooltip: 
-      showInInspector: 0
-      networkSync: 0
-      value: 100
+    floatVariables: []
+    intVariables: []
     boolVariables:
     - useVariable: 1
-      name: isEXIT
+      name: getKey1
       tooltip: 
       showInInspector: 0
       networkSync: 0
       value: 0
     - useVariable: 1
-      name: spawnGhost
+      name: getKey2
+      tooltip: 
+      showInInspector: 0
+      networkSync: 0
+      value: 0
+    - useVariable: 1
+      name: isExit
+      tooltip: 
+      showInInspector: 0
+      networkSync: 0
+      value: 0
+    - useVariable: 1
+      name: secretWall
       tooltip: 
       showInInspector: 0
       networkSync: 0
