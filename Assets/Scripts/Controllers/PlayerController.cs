@@ -2,8 +2,40 @@
 using System.Collections;
 
 public class PlayerController : Photon.MonoBehaviour {
-	
-	public float speed;
+
+	public enum State
+	{
+		Normal = 0,
+		Monster = 1,
+		Dead = 2,
+	}
+	private State currentState = State.Normal;
+
+	private bool isZoomedIn = false;
+
+	private float currentFear = 1f;
+	private float currentSanity = 1f;
+
+	private float fearIncreaseRate = 0.005f;
+	private float fearAttack = 0.3f;
+	private float fearAttackTimeBuffer = 2f;
+	private float fearAttackLastTime = Time.time;
+
+	//random between 90 and 150 seconds
+	private float sanityDecreaseRate = Random.Range( 0.011f, 0.0066f );
+
+	private float fearThreshold = 0.5f;
+
+	private Rect fearMeterRect;
+	private Rect sanityMeterRect;
+
+	private Color fearColor = new Color( 1f, 0.5f, 0f, 1f );
+	private Color sanityColor = new Color( 0f, 0.5f, 1f, 1f );
+
+	private bool hasReRandomized = false;
+
+	private float speed = 5f;
+	public Texture2D meterTexture;
 	
 	private float lastSynchronizationTime = 0f;
 	private float syncDelay = 0f;
@@ -20,9 +52,17 @@ public class PlayerController : Photon.MonoBehaviour {
 	private float height = 0.68f;
 	
  	private Transform cameraTransform;
-	private Vector3 cameraPositionOffset = new Vector3( 0f, 1.5f, -2.5f );
+	private Vector3 cameraPositionOffset = new Vector3( 0f, 1.5f, -1.75f );
+	private Vector3 cameraPositionZoomOffset = new Vector3( 0f, 1.5f, -1.5f );
+	private float cameraFoV = 60f;
+	private float cameraZoomFoV = 30f;
 	private Quaternion cameraRotationOffset = Quaternion.Euler( new Vector3( 10f, 0f, 0f ) );
-	private float cameraRotationRate = 1f;
+	private float cameraRotationRate = 0.025f;
+
+	private float zoomDuration = 0.1f;
+	private float zoomProgress = 0f;
+	private float oldZoomProgress;
+	private float zoomSpeedScale = 0.5f;
 
 	private float lifeLength = 120f;
 	private float currentTimeLived = 0f;
@@ -82,44 +122,66 @@ public class PlayerController : Photon.MonoBehaviour {
 	
 	void Update()
 	{
-		if( networkView != null && networkView.enabled )
+		if( photonView.isMine )
 		{
-			if( photonView.isMine )
-			{
-				InputMovement();
-			}
-			else
-			{
-				SyncedMovement();
-			}
+			InputMovement();
 		}
 		else
 		{
-			InputMovement();
+			SyncedMovement();
 		}
 	
 		SnapCamera();
 
+		if (transform.position.y != height)
+			transform.position = new Vector3( transform.position.x, height, transform.position.z );
+
+		if( currentState == State.Normal )
+		{
+			currentSanity -= sanityDecreaseRate * Time.deltaTime;
+
+			if( currentSanity < 0.25f && !hasReRandomized )
+			{
+				DoorAgent.RandomizeDoorConnections();
+				hasReRandomized = true;
+			}
+
+			if( currentSanity < 0f )
+				currentSanity = 0f;
+
+			if( currentSanity == 0f )
+			{
+				ChangeState( (int)State.Monster );
+				ChangeColor( new Vector3( 1f, 0f, 0f ) );
+				currentFear = 1.25f;
+			}
+
+			float deltaFear = fearIncreaseRate * Time.deltaTime;
+
+			if( currentFear < fearThreshold - deltaFear )
+				currentFear += deltaFear;
+			else if( currentFear < fearThreshold )
+				currentFear = fearThreshold;
+			
+			if( currentFear < 0f )
+			{
+				ChangeState( (int)State.Dead );
+				ChangeColor( new Vector3( 0.5f, 0.5f, 0.5f ) );
+				currentFear = 0f;
+			}
+		}
+
 		currentTimeLived += Time.deltaTime;
 
-		if( currentTimeLived > lifeLength )
-			Destroy( gameObject );
+		//if( currentTimeLived > lifeLength )
+		//	Destroy( gameObject );
 	}
 
 	void OnGUI()
 	{
-		int timeLeft = Mathf.RoundToInt( lifeLength - currentTimeLived );
-
-		if( networkView != null && networkView.enabled )
+		if( photonView.isMine )
 		{
-			if( photonView.isMine )
-			{
-				GUI.Label( timerRect, "" + timeLeft, textStyle );
-			}
-		}
-		else
-		{
-			GUI.Label( timerRect, "" + timeLeft, textStyle );
+			DisplayGUI();
 		}
 	}
 
@@ -158,6 +220,8 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		if( collider.tag == "Door" )
 		{
+			Debug.Log( collider.name );
+
 			DoorController doorController = collider.GetComponent<DoorController>();
 			
 			Transform fromDoorTransform = null;
@@ -169,7 +233,7 @@ public class PlayerController : Photon.MonoBehaviour {
 			
 			if( fromDoorTransform )
 			{
-				transform.position = fromDoorTransform.position + fromDoorTransform.forward * 2.5f;
+				transform.position = fromDoorTransform.position + fromDoorTransform.forward * 1.25f;
 				transform.position = new Vector3( transform.position.x, height, transform.position.z );
 				transform.LookAt( transform.position + fromDoorTransform.forward, Vector3.up );
 
@@ -180,6 +244,9 @@ public class PlayerController : Photon.MonoBehaviour {
 	
 	private void InputMovement()
 	{
+		if( currentState == State.Dead )
+			return;
+
 		/*
 		Vector3 adjustedPlayerPosition = new Vector3( transform.position.x, cameraTransform.position.y, transform.position.z );
 		
@@ -198,14 +265,17 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		if( movementVector != Vector3.zero )
 		{
-			movementVector = movementVector.normalized * speed * Time.deltaTime;
+			float fearFactor = Mathf.Clamp01( currentFear );
+			float zoomFactor = ( isZoomedIn ? zoomSpeedScale : 1f );
+
+			movementVector = movementVector.normalized * speed * fearFactor * zoomFactor * Time.deltaTime;
 
 			//update player
 			characterController.Move( movementVector );
-
+		
 			Quaternion movementVectorRotation = Quaternion.LookRotation( movementVector );
 			if( Quaternion.Angle( movementVectorRotation, transform.rotation ) <= 120f )
-				transform.rotation = Quaternion.Lerp( transform.rotation, movementVectorRotation, 0.1f );
+				transform.rotation = Quaternion.Lerp( transform.rotation, movementVectorRotation, cameraRotationRate * fearFactor * zoomFactor );
 
 
 			//update camera		
@@ -256,21 +326,65 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private void SnapCamera()
 	{
-		if( networkView != null && networkView.enabled )
+		if( photonView.isMine )
 		{
-			if( photonView.isMine )
-			{
-				cameraTransform.position = transform.TransformPoint( cameraPositionOffset );
-				cameraTransform.rotation = transform.rotation * cameraRotationOffset;
-			}
-		}
-		else
-		{
-			cameraTransform.position = transform.TransformPoint( cameraPositionOffset );
+			if( isZoomedIn )
+				zoomProgress = Mathf.Clamp01( zoomProgress + Time.deltaTime / zoomDuration );
+			else
+				zoomProgress = Mathf.Clamp01( zoomProgress - Time.deltaTime / zoomDuration );
+
+			//check for jumps
+			if( Mathf.Abs( oldZoomProgress - zoomProgress ) > 0.5f )
+				zoomProgress = oldZoomProgress + 0.1f * Mathf.Sign( oldZoomProgress - zoomProgress );
+
+			cameraTransform.position = Vector3.Lerp( transform.TransformPoint( cameraPositionOffset ), transform.TransformPoint( cameraPositionZoomOffset ), zoomProgress );
+			cameraTransform.camera.fieldOfView = Mathf.RoundToInt( Mathf.Lerp( cameraFoV, cameraZoomFoV, zoomProgress ) );
 			cameraTransform.rotation = transform.rotation * cameraRotationOffset;
+
+			oldZoomProgress = zoomProgress;
 		}
 	}
+
+	private void DisplayGUI()
+	{
+		if( currentState == State.Monster )
+			return;
+
+		GUI.color = fearColor;
+		GUI.DrawTexture( new Rect( 0f, Screen.height * currentFear, Screen.width * 0.05f, Screen.height * ( 1f- currentFear ) ), meterTexture );
+
+		GUI.color = sanityColor;
+		GUI.DrawTexture( new Rect( Screen.width * 0.95f, Screen.height * ( 1f - currentSanity ), Screen.width * 0.05f, Screen.height * currentSanity  ), meterTexture );
+		
+		GUI.color = Color.white;
+		//int timeLeft = Mathf.RoundToInt( lifeLength - currentTimeLived );
+		//GUI.Label( timerRect, "" + timeLeft, textStyle );
+	}
 	
+	[RPC] void ChangeColor( Vector3 color )
+	{
+		renderer.material.color = new Color( color.x, color.y, color.z, 1f );
+		
+		if( photonView.isMine )
+			photonView.RPC( "ChangeColor", PhotonTargets.OthersBuffered, color );
+	}
+
+	[RPC] void ChangeState( int state )
+	{
+		currentState = (State)state;
+		
+		if( photonView.isMine )
+			photonView.RPC( "ChangeState", PhotonTargets.OthersBuffered, state );
+	}
+
+	[RPC] void ChangeZoom( int zoom )
+	{
+		isZoomedIn = ( zoom == 1 );
+		
+		if( photonView.isMine )
+			photonView.RPC( "ChangeZoom", PhotonTargets.OthersBuffered, zoom );
+	}
+
 	//event handlers
 	private void OnButtonDown( InputController.ButtonType button )
 	{	
@@ -294,6 +408,11 @@ public class PlayerController : Photon.MonoBehaviour {
 		case InputController.ButtonType.Down: 
 		{
 			movementVector -= Quaternion.AngleAxis( cameraTransform.eulerAngles.x * -1f, cameraTransform.right ) * cameraTransform.forward;
+		} break;
+
+		case InputController.ButtonType.Zoom:
+		{
+			ChangeZoom( 1 );
 		} break;
 		}
 	}
@@ -326,7 +445,38 @@ public class PlayerController : Photon.MonoBehaviour {
 	
 	private void OnButtonUp( InputController.ButtonType button )
 	{
-		
+		switch( button )
+		{
+			case InputController.ButtonType.Zoom:
+			{
+				ChangeZoom( 0 );
+			} break;
+		}
+
 	}
 	//end event handlers
+
+	public State GetCurrentState()
+	{
+		return currentState;
+	}
+
+	public bool GetIsZoomedIn()
+	{
+		return isZoomedIn;
+	}
+
+	public void DecreaseSanity()
+	{
+		currentSanity -= sanityDecreaseRate * 2f * Time.deltaTime;
+	}
+
+	public void IncreaseFear()
+	{
+		if( Time.time - fearAttackLastTime > fearAttackTimeBuffer )
+		{
+			currentFear -= fearAttack;
+			fearAttackLastTime = Time.time;
+		}
+	}
 }

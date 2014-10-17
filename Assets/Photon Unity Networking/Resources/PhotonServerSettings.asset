@@ -32,4 +32,7 @@ MonoBehaviour:
   - RequestForPickupTimes
   - SetPosition
   - TaggedPlayer
+  - ChangeColor
+  - ChangeState
+  - ChangeZoom
   DisableAutoOpenWizard: 0

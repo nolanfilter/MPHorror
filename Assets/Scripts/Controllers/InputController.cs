@@ -20,7 +20,8 @@ public class InputController : MonoBehaviour {
 		Down = 1,
 		Left = 2,
 		Right = 3,
-		Invalid = 4,
+		Zoom = 4,
+		Invalid = 5,
 	}
 	
 	private string verticalAxisString;
@@ -74,6 +75,7 @@ public class InputController : MonoBehaviour {
 			codes[ (int)ButtonType.Down ] = KeyCode.S;
 			codes[ (int)ButtonType.Left ] = KeyCode.A;
 			codes[ (int)ButtonType.Right ] = KeyCode.D;
+			codes[ (int)ButtonType.Zoom ] = KeyCode.Space;
 		}
 		//end hardcoded
 		
@@ -144,7 +146,7 @@ public class InputController : MonoBehaviour {
 			OnButtonUp( button );	
 	}
 	
-	public Vector3 GetRawAxes()
+	public Vector3 getRawAxes()
 	{
 		float verticalAxis = Input.GetAxisRaw( verticalAxisString );
 		float horizontalAxis = Input.GetAxisRaw( horizontalAxisString );
@@ -164,7 +166,6 @@ public class InputController : MonoBehaviour {
 			
 			if( currentButtonList[ ButtonType.Right ] )
 				rawAxes += Vector3.right;
-			
 		}
 		
 		return rawAxes;
