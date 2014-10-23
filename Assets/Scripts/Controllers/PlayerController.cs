@@ -11,7 +11,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	}
 	private State currentState = State.Normal;
 
-	private bool isZoomedIn = false;
+	private bool isZoomingIn = false;
 
 	private float currentFear = 1f;
 	private float currentSanity = 1f;
@@ -63,6 +63,8 @@ public class PlayerController : Photon.MonoBehaviour {
 	private float zoomProgress = 0f;
 	private float oldZoomProgress;
 	private float zoomSpeedScale = 0.5f;
+	private float timeZoomedIn = 0f;
+	private float timeZoomedThreshold = 1f;
 
 	private float lifeLength = 120f;
 	private float currentTimeLived = 0f;
@@ -266,7 +268,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( movementVector != Vector3.zero )
 		{
 			float fearFactor = Mathf.Clamp01( currentFear );
-			float zoomFactor = ( isZoomedIn ? zoomSpeedScale : 1f );
+			float zoomFactor = Mathf.Lerp( 1f, zoomSpeedScale, zoomProgress );
 
 			movementVector = movementVector.normalized * speed * fearFactor * zoomFactor * Time.deltaTime;
 
@@ -328,7 +330,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		if( photonView.isMine )
 		{
-			if( isZoomedIn )
+			if( isZoomingIn )
 				zoomProgress = Mathf.Clamp01( zoomProgress + Time.deltaTime / zoomDuration );
 			else
 				zoomProgress = Mathf.Clamp01( zoomProgress - Time.deltaTime / zoomDuration );
@@ -336,6 +338,15 @@ public class PlayerController : Photon.MonoBehaviour {
 			//check for jumps
 			if( Mathf.Abs( oldZoomProgress - zoomProgress ) > 0.5f )
 				zoomProgress = oldZoomProgress + 0.1f * Mathf.Sign( oldZoomProgress - zoomProgress );
+
+			if( zoomProgress == 1f )
+			{
+				timeZoomedIn += Time.deltaTime;
+			}
+			else
+			{
+				timeZoomedIn = 0f;
+			}
 
 			cameraTransform.position = Vector3.Lerp( transform.TransformPoint( cameraPositionOffset ), transform.TransformPoint( cameraPositionZoomOffset ), zoomProgress );
 			cameraTransform.camera.fieldOfView = Mathf.RoundToInt( Mathf.Lerp( cameraFoV, cameraZoomFoV, zoomProgress ) );
@@ -379,7 +390,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	[RPC] void ChangeZoom( int zoom )
 	{
-		isZoomedIn = ( zoom == 1 );
+		isZoomingIn = ( zoom == 1 );
 		
 		if( photonView.isMine )
 			photonView.RPC( "ChangeZoom", PhotonTargets.OthersBuffered, zoom );
@@ -462,9 +473,10 @@ public class PlayerController : Photon.MonoBehaviour {
 		return currentState;
 	}
 
-	public bool GetIsZoomedIn()
+	//has the player been fully zoomed in for at least timeZoomedThreshold seconds
+	public bool IsZoomedIn()
 	{
-		return isZoomedIn;
+		return ( timeZoomedIn > timeZoomedThreshold );
 	}
 
 	public void ChangeSanity( float amount )
