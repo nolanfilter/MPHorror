@@ -21,10 +21,10 @@ public class PlayerController : Photon.MonoBehaviour {
 	private float fearAttackTimeBuffer = 2f;
 	private float fearAttackLastTime = Time.time;
 
-	//random between 90 and 150 seconds
-	private float sanityDecreaseRate = Random.Range( 0.011f, 0.0066f );
+	//random between 60 and 180 seconds
+	private float sanityDecreaseRate = Random.Range( 0.016f, 0.0055f );
 
-	private float fearThreshold = 0.5f;
+	private float fearThreshold = 1f;
 
 	private Rect fearMeterRect;
 	private Rect sanityMeterRect;
@@ -159,7 +159,7 @@ public class PlayerController : Photon.MonoBehaviour {
 			float deltaFear = fearIncreaseRate * Time.deltaTime;
 
 			if( currentFear < fearThreshold - deltaFear )
-				currentFear += deltaFear;
+				ChangeFear( deltaFear * -1f );
 			else if( currentFear < fearThreshold )
 				currentFear = fearThreshold;
 			
@@ -456,6 +456,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	}
 	//end event handlers
 
+	//public functions
 	public State GetCurrentState()
 	{
 		return currentState;
@@ -466,17 +467,40 @@ public class PlayerController : Photon.MonoBehaviour {
 		return isZoomedIn;
 	}
 
+	public void ChangeSanity( float amount )
+	{
+		currentSanity += amount;
+	}
+
+	public void ChangeFear( float amount )
+	{
+		if( amount > 0f )
+		{
+			if( Time.time - fearAttackLastTime > fearAttackTimeBuffer )
+			{
+				currentFear -= amount;
+				fearAttackLastTime = Time.time;
+			}
+		}
+		else
+		{
+			currentFear -= amount;
+		}
+	}
+
 	public void DecreaseSanity()
 	{
-		currentSanity -= sanityDecreaseRate * 2f * Time.deltaTime;
+		ChangeSanity( sanityDecreaseRate * -2f * Time.deltaTime );
+	}
+
+	public void IncreaseSanity()
+	{
+		ChangeSanity( sanityDecreaseRate * 0.5f * Time.deltaTime );
 	}
 
 	public void IncreaseFear()
 	{
-		if( Time.time - fearAttackLastTime > fearAttackTimeBuffer )
-		{
-			currentFear -= fearAttack;
-			fearAttackLastTime = Time.time;
-		}
+		ChangeFear( fearAttack );
 	}
+	//end public functions
 }
