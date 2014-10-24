@@ -1,44 +1,39 @@
 fileFormatVersion: 2
-guid: 989346b9dc030404aa90f496e74f3cc2
+guid: cfc5af3bf92b74ac6bcd22d8dcbc49ae
 ModelImporter:
   serializedVersion: 15
   fileIDToRecycleName:
-    100000: pCube6
-    100002: pCylinder6
-    100004: polySurface4
-    100006: polySurface5
-    100008: polySurface6
-    100010: //RootNode
-    100012: pTorus5
-    100014: pTorus6
-    100016: ShortLeg_Stand
-    100018: Stand 1
-    100020: transform10
-    100022: transform11
-    100024: transform12
-    100026: transform8
-    100028: transform9
-    400000: pCube6
-    400002: pCylinder6
-    400004: polySurface4
-    400006: polySurface5
-    400008: polySurface6
-    400010: //RootNode
-    400012: pTorus5
-    400014: pTorus6
-    400016: ShortLeg_Stand
-    400018: Stand 1
-    400020: transform10
-    400022: transform11
-    400024: transform12
-    400026: transform8
-    400028: transform9
-    2300000: pCube6
-    2300002: polySurface6
-    3300000: pCube6
-    3300002: polySurface6
-    4300000: polySurface6
-    4300002: pCube6
+    100000: //RootNode
+    100002: pCube1
+    100004: pCylinder1
+    100006: pCylinder2
+    100008: pCylinder3
+    100010: pCylinder4
+    100012: polySurface1
+    100014: pSphere1
+    100016: transform1
+    100018: transform2
+    100020: transform3
+    100022: transform4
+    100024: transform5
+    100026: transform6
+    400000: //RootNode
+    400002: pCube1
+    400004: pCylinder1
+    400006: pCylinder2
+    400008: pCylinder3
+    400010: pCylinder4
+    400012: polySurface1
+    400014: pSphere1
+    400016: transform1
+    400018: transform2
+    400020: transform3
+    400022: transform4
+    400024: transform5
+    400026: transform6
+    2300000: polySurface1
+    3300000: polySurface1
+    4300000: polySurface1
     9500000: //RootNode
   materials:
     importMaterials: 1

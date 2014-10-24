@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 9e7e0a5b542a8415dbf32bb2806d106b
+guid: 39a5db43bb3a1468abdb0a91c77c7f33
 ModelImporter:
   serializedVersion: 15
   fileIDToRecycleName:
@@ -44,6 +44,7 @@ ModelImporter:
     4300000: pCylinder5
     4300002: polySurface6
     4300004: pCube6
+    7400000: Take 001
     9500000: //RootNode
   materials:
     importMaterials: 1
