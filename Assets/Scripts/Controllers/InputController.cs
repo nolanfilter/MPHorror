@@ -21,7 +21,8 @@ public class InputController : MonoBehaviour {
 		Left = 2,
 		Right = 3,
 		Zoom = 4,
-		Invalid = 5,
+		Flashlight = 5,
+		Invalid = 6,
 	}
 	
 	private string verticalAxisString;
@@ -38,6 +39,8 @@ public class InputController : MonoBehaviour {
 	{
 		verticalAxisString = "Vertical";
 		horizontalAxisString = "Horizontal";
+
+		Debug.Log( Input.GetJoystickNames()[0] );
 
 		if( Input.GetJoystickNames().Length > 0 )
 		{
@@ -63,19 +66,30 @@ public class InputController : MonoBehaviour {
 				} break;
 					
 				//XBOX 360
-				case "":
+				case "©Microsoft Corporation Controller":
 				{
+					Debug.Log( "Hi" );
 
+					codes[ (int)ButtonType.Up ] = (KeyCode)( (int)KeyCode.Joystick1Button5 );
+					codes[ (int)ButtonType.Down ] = (KeyCode)( (int)KeyCode.Joystick1Button6 );
+					codes[ (int)ButtonType.Left ] = (KeyCode)( (int)KeyCode.Joystick1Button7 );
+					codes[ (int)ButtonType.Right ] = (KeyCode)( (int)KeyCode.Joystick1Button8 );
+					codes[ (int)ButtonType.Zoom ] = (KeyCode)( (int)KeyCode.Joystick1Button3 );
+					codes[ (int)ButtonType.Flashlight ] = (KeyCode)( (int)KeyCode.Joystick1Button12 );
+					
 				} break;
 			}
 		}
 		else
 		{
+			Debug.Log( "Ho" );
+
 			codes[ (int)ButtonType.Up ] = KeyCode.W;
 			codes[ (int)ButtonType.Down ] = KeyCode.S;
 			codes[ (int)ButtonType.Left ] = KeyCode.A;
 			codes[ (int)ButtonType.Right ] = KeyCode.D;
 			codes[ (int)ButtonType.Zoom ] = KeyCode.Space;
+			codes[ (int)ButtonType.Flashlight ] = KeyCode.Return;
 		}
 		//end hardcoded
 		

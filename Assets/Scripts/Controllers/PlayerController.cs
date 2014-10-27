@@ -49,7 +49,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	private CharacterController characterController;
 	
 	private Vector3 movementVector;
-	private float height = 0.68f;
+	public float height = 0.925f;
 	
  	private Transform cameraTransform;
 	private Vector3 cameraPositionOffset = new Vector3( 0f, 1.5f, -1.75f );
@@ -72,6 +72,10 @@ public class PlayerController : Photon.MonoBehaviour {
 	private GUIStyle textStyle;
 
 	private NetworkView networkView;
+
+	private Renderer modelRenderer;
+
+	private Light flashlight;
 	
 	void Awake()
 	{
@@ -94,6 +98,10 @@ public class PlayerController : Photon.MonoBehaviour {
 		cameraTransform = Camera.main.transform;
 		
 		networkView = GetComponent<NetworkView>();
+
+		modelRenderer = GetComponentInChildren<Renderer>();
+
+		flashlight = GetComponentInChildren<Light>();
 	}
 	
 	void Start()
@@ -371,10 +379,19 @@ public class PlayerController : Photon.MonoBehaviour {
 		//int timeLeft = Mathf.RoundToInt( lifeLength - currentTimeLived );
 		//GUI.Label( timerRect, "" + timeLeft, textStyle );
 	}
+
+	private void ToggleFlashlight()
+	{
+		if( flashlight == null )
+			ChangeFlashlight( 0 );
+		else
+			ChangeFlashlight( flashlight.enabled ? 0 : 1 );
+	}
 	
 	[RPC] void ChangeColor( Vector3 color )
 	{
-		renderer.material.color = new Color( color.x, color.y, color.z, 1f );
+		if( modelRenderer != null )
+			modelRenderer.material.color = new Color( color.x, color.y, color.z, 1f );
 		
 		if( photonView.isMine )
 			photonView.RPC( "ChangeColor", PhotonTargets.OthersBuffered, color );
@@ -395,6 +412,16 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( photonView.isMine )
 			photonView.RPC( "ChangeZoom", PhotonTargets.OthersBuffered, zoom );
 	}
+
+	[RPC] void ChangeFlashlight( int state )
+	{
+		if( flashlight )
+			flashlight.enabled = ( state == 1 );
+
+		if( photonView.isMine )
+			photonView.RPC( "ChangeFlashlight", PhotonTargets.OthersBuffered, state );
+	}
+
 
 	//event handlers
 	private void OnButtonDown( InputController.ButtonType button )
@@ -424,6 +451,11 @@ public class PlayerController : Photon.MonoBehaviour {
 		case InputController.ButtonType.Zoom:
 		{
 			ChangeZoom( 1 );
+		} break;
+
+		case InputController.ButtonType.Flashlight: 
+		{
+			ToggleFlashlight();
 		} break;
 		}
 	}
