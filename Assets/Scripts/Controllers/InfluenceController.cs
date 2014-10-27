@@ -5,6 +5,7 @@ public class InfluenceController : MonoBehaviour {
 
 	public float radius = 2f;
 	public float radiusZoom = 0.5f;
+	public float zoomDistance = 2.5f;
 
 	private PlayerController playerController = null;
 
@@ -31,7 +32,7 @@ public class InfluenceController : MonoBehaviour {
 
 		if (playerController.IsZoomedIn ()) 
 		{
-			distance = radiusZoom + transform.root.localScale.z;
+			distance = radiusZoom + transform.root.localScale.z + zoomDistance;
 
 			ray = new Ray( transform.position + transform.forward * distance, transform.forward * -1f );
 
