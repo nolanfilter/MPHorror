@@ -3232,6 +3232,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 171325672}
   - 95: {fileID: 171325673}
+  - 65: {fileID: 171325674}
   m_Layer: 0
   m_Name: Props_Screen03
   m_TagString: Untagged
@@ -3266,6 +3267,18 @@ Animator:
   m_ApplyRootMotion: 1
   m_AnimatePhysics: 0
   m_HasTransformHierarchy: 1
+--- !u!65 &171325674
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 171325671}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: .00600000005, y: .0209999997, z: .00100000005}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &174516454
 GameObject:
   m_ObjectHideFlags: 0
@@ -5991,6 +6004,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 359706325}
   - 95: {fileID: 359706326}
+  - 65: {fileID: 359706327}
   m_Layer: 0
   m_Name: Props_Screen01
   m_TagString: Untagged
@@ -6025,6 +6039,18 @@ Animator:
   m_ApplyRootMotion: 1
   m_AnimatePhysics: 0
   m_HasTransformHierarchy: 1
+--- !u!65 &359706327
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 359706324}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: .00600000005, y: .0209999997, z: .00100000005}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &360105066
 GameObject:
   m_ObjectHideFlags: 0
@@ -8819,6 +8845,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 493912732}
   - 95: {fileID: 493912733}
+  - 65: {fileID: 493912734}
   m_Layer: 0
   m_Name: Props_Screen04
   m_TagString: Untagged
@@ -8853,6 +8880,18 @@ Animator:
   m_ApplyRootMotion: 1
   m_AnimatePhysics: 0
   m_HasTransformHierarchy: 1
+--- !u!65 &493912734
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 493912731}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: .00600000005, y: .0209999997, z: .00100000005}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &494063895
 GameObject:
   m_ObjectHideFlags: 0
@@ -8862,6 +8901,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 494063896}
   - 95: {fileID: 494063897}
+  - 65: {fileID: 494063898}
   m_Layer: 0
   m_Name: Props_Screen02
   m_TagString: Untagged
@@ -8896,6 +8936,18 @@ Animator:
   m_ApplyRootMotion: 1
   m_AnimatePhysics: 0
   m_HasTransformHierarchy: 1
+--- !u!65 &494063898
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 494063895}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: .00600000005, y: .0209999997, z: .00100000005}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &494115587
 Prefab:
   m_ObjectHideFlags: 0
@@ -10384,6 +10436,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 556307193}
   - 95: {fileID: 556307194}
+  - 65: {fileID: 556307195}
   m_Layer: 0
   m_Name: Props_RetroLPPlayer_Player
   m_TagString: Untagged
@@ -10421,6 +10474,18 @@ Animator:
   m_ApplyRootMotion: 1
   m_AnimatePhysics: 0
   m_HasTransformHierarchy: 1
+--- !u!65 &556307195
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 556307192}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: .00700000022, y: .0199999996, z: .00769999996}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &557945751
 GameObject:
   m_ObjectHideFlags: 0
@@ -14484,6 +14549,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 868145939}
   - 95: {fileID: 868145940}
+  - 65: {fileID: 868145941}
   m_Layer: 0
   m_Name: Props_StageSpotlight_NoLeg
   m_TagString: Untagged
@@ -14523,6 +14589,18 @@ Animator:
   m_ApplyRootMotion: 1
   m_AnimatePhysics: 0
   m_HasTransformHierarchy: 1
+--- !u!65 &868145941
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 868145938}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: .550000012, y: .899999976, z: .0500000007}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &868537657
 GameObject:
   m_ObjectHideFlags: 0
@@ -15157,6 +15235,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 945326442}
   - 95: {fileID: 945326443}
+  - 65: {fileID: 945326444}
   m_Layer: 0
   m_Name: Props_StageSpotlight_Light02
   m_TagString: Untagged
@@ -15193,6 +15272,18 @@ Animator:
   m_ApplyRootMotion: 1
   m_AnimatePhysics: 0
   m_HasTransformHierarchy: 1
+--- !u!65 &945326444
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 945326441}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: .75, y: .75, z: .600000024}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &975307836
 GameObject:
   m_ObjectHideFlags: 0
@@ -18654,6 +18745,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 1155784275}
   - 95: {fileID: 1155784276}
+  - 65: {fileID: 1155784277}
   m_Layer: 0
   m_Name: Props_RetroLPPlayer_Bar
   m_TagString: Untagged
@@ -18694,6 +18786,18 @@ Animator:
   m_ApplyRootMotion: 1
   m_AnimatePhysics: 0
   m_HasTransformHierarchy: 1
+--- !u!65 &1155784277
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1155784274}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: .00999999978, y: .0399999991, z: .109999999}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1159038763
 GameObject:
   m_ObjectHideFlags: 0
@@ -22177,6 +22281,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 1416412739}
   - 95: {fileID: 1416412740}
+  - 65: {fileID: 1416412741}
   m_Layer: 0
   m_Name: Props_StageSpotlight_ShortLeg
   m_TagString: Untagged
@@ -22216,6 +22321,18 @@ Animator:
   m_ApplyRootMotion: 1
   m_AnimatePhysics: 0
   m_HasTransformHierarchy: 1
+--- !u!65 &1416412741
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1416412738}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: .0399999991, y: 2.20000005, z: .0399999991}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1421244078
 GameObject:
   m_ObjectHideFlags: 0
@@ -25280,6 +25397,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 1573613154}
   - 95: {fileID: 1573613155}
+  - 65: {fileID: 1573613156}
   m_Layer: 0
   m_Name: Props_StageSpotlight_LongLeg
   m_TagString: Untagged
@@ -25319,6 +25437,18 @@ Animator:
   m_ApplyRootMotion: 1
   m_AnimatePhysics: 0
   m_HasTransformHierarchy: 1
+--- !u!65 &1573613156
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1573613153}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: .0399999991, y: 4, z: .0399999991}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1575418665
 Prefab:
   m_ObjectHideFlags: 0
@@ -27564,6 +27694,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 1680423594}
   - 95: {fileID: 1680423595}
+  - 65: {fileID: 1680423596}
   m_Layer: 0
   m_Name: Props_StageSpotlight_Light03
   m_TagString: Untagged
@@ -27600,6 +27731,18 @@ Animator:
   m_ApplyRootMotion: 1
   m_AnimatePhysics: 0
   m_HasTransformHierarchy: 1
+--- !u!65 &1680423596
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1680423593}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: .75, y: .75, z: .600000024}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1682524466
 GameObject:
   m_ObjectHideFlags: 0
@@ -28754,6 +28897,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 1778854834}
   - 95: {fileID: 1778854835}
+  - 65: {fileID: 1778854836}
   m_Layer: 0
   m_Name: Props_StageSpotlight_Light01
   m_TagString: Untagged
@@ -28790,6 +28934,18 @@ Animator:
   m_ApplyRootMotion: 1
   m_AnimatePhysics: 0
   m_HasTransformHierarchy: 1
+--- !u!65 &1778854836
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1778854833}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: .75, y: .75, z: .600000024}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1789656941
 GameObject:
   m_ObjectHideFlags: 0
@@ -29133,6 +29289,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 1826800770}
   - 95: {fileID: 1826800771}
+  - 65: {fileID: 1826800772}
   m_Layer: 0
   m_Name: Props_RetroLPPlayer_Needle
   m_TagString: Untagged
@@ -29181,6 +29338,18 @@ Animator:
   m_ApplyRootMotion: 1
   m_AnimatePhysics: 0
   m_HasTransformHierarchy: 1
+--- !u!65 &1826800772
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1826800769}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: .0199999996, y: .0149999997, z: .00999999978}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1827160214
 GameObject:
   m_ObjectHideFlags: 0
