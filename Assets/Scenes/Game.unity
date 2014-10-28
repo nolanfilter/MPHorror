@@ -22878,7 +22878,7 @@ MonoBehaviour:
         fsmStringParams: []
         fsmObjectParams: []
         fsmVarParams: []
-        byteData: 00000000014c6170416d6f756e740200000000546f67676c6546494e495348454401
+        byteData: 00000000014c6170416d6f756e740100000000546f67676c6546494e495348454401
         arrayParamSizes: 
         arrayParamTypes: []
         customTypeSizes: 
@@ -23513,7 +23513,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1054545424
 MonoBehaviour:
   m_ObjectHideFlags: 0
