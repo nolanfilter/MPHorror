@@ -40,7 +40,7 @@ public class InputController : MonoBehaviour {
 		verticalAxisString = "Vertical";
 		horizontalAxisString = "Horizontal";
 
-		Debug.Log( Input.GetJoystickNames()[0] );
+		//Debug.Log( Input.GetJoystickNames()[0] );
 
 		if( Input.GetJoystickNames().Length > 0 )
 		{
@@ -68,8 +68,6 @@ public class InputController : MonoBehaviour {
 				//XBOX 360
 				case "©Microsoft Corporation Controller":
 				{
-					Debug.Log( "Hi" );
-
 					codes[ (int)ButtonType.Up ] = (KeyCode)( (int)KeyCode.Joystick1Button5 );
 					codes[ (int)ButtonType.Down ] = (KeyCode)( (int)KeyCode.Joystick1Button6 );
 					codes[ (int)ButtonType.Left ] = (KeyCode)( (int)KeyCode.Joystick1Button7 );
@@ -82,8 +80,6 @@ public class InputController : MonoBehaviour {
 		}
 		else
 		{
-			Debug.Log( "Ho" );
-
 			codes[ (int)ButtonType.Up ] = KeyCode.W;
 			codes[ (int)ButtonType.Down ] = KeyCode.S;
 			codes[ (int)ButtonType.Left ] = KeyCode.A;

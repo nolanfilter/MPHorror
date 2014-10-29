@@ -356,7 +356,21 @@ public class PlayerController : Photon.MonoBehaviour {
 				timeZoomedIn = 0f;
 			}
 
-			cameraTransform.position = Vector3.Lerp( transform.TransformPoint( cameraPositionOffset ), transform.TransformPoint( cameraPositionZoomOffset ), zoomProgress );
+			Vector3 clippingOffset = transform.TransformPoint( cameraPositionOffset );
+
+			RaycastHit[] hits;
+
+			float longestDistance = 0f;
+
+			hits = Physics.RaycastAll( clippingOffset, cameraTransform.forward, Mathf.Abs( cameraPositionOffset.z ) );
+
+			for( int i = 0; i < hits.Length; i++ )
+				if( hits[i].distance > longestDistance )
+					longestDistance = hits[i].distance;
+	
+			clippingOffset += cameraTransform.forward * longestDistance;
+
+			cameraTransform.position = Vector3.Lerp( clippingOffset, transform.TransformPoint( cameraPositionZoomOffset ), zoomProgress );
 			cameraTransform.camera.fieldOfView = Mathf.RoundToInt( Mathf.Lerp( cameraFoV, cameraZoomFoV, zoomProgress ) );
 			cameraTransform.rotation = transform.rotation * cameraRotationOffset;
 
@@ -545,6 +559,14 @@ public class PlayerController : Photon.MonoBehaviour {
 	public void IncreaseFear()
 	{
 		ChangeFear( fearAttack );
+	}
+
+	public void SetFlashlightOn( bool on )
+	{
+		if( flashlight == null )
+			ChangeFlashlight( 0 );
+		else
+			ChangeFlashlight( ( on ? 1 : 0 ) );
 	}
 	//end public functions
 }
