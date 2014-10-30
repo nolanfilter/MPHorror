@@ -8,8 +8,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		Normal = 0,
 		Monster = 1,
 		Dead = 2,
-		Dying = 3,
-		Voyeur = 4,
+		Voyeur = 3,
 	}
 	private State currentState = State.Normal;
 
@@ -555,8 +554,10 @@ public class PlayerController : Photon.MonoBehaviour {
 		currentSanity += amount;
 	}
 
-	public void ChangeFear( float amount )
+	public bool ChangeFear( float amount )
 	{
+		bool wasAlive = ( currentFear > 0f );
+
 		if( amount > 0f )
 		{
 			if( Time.time - fearAttackLastTime > fearAttackTimeBuffer )
@@ -569,6 +570,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		{
 			currentFear -= amount;
 		}
+
+		return wasAlive && ( currentFear <= 0f );
 	}
 
 	public void DecreaseSanity()
@@ -581,9 +584,9 @@ public class PlayerController : Photon.MonoBehaviour {
 		ChangeSanity( sanityDecreaseRate * 0.3f * Time.deltaTime );
 	}
 
-	public void IncreaseFear()
+	public bool IncreaseFear()
 	{
-		ChangeFear( fearAttack );
+		return ChangeFear( fearAttack );
 	}
 
 	public void SetFlashlightTo( bool on )
@@ -614,7 +617,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	public void Escape()
 	{
 		ChangeState( (int)State.Voyeur );
-		DisplayMessage( "You got 5 points!" );
+		DisplayMessage( "Escape! You got 5 points!" );
 
 		foreach( Transform child in transform )
 			child.gameObject.SetActive( false );
