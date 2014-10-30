@@ -72,8 +72,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	private Rect messageRect;
 	private string messageString = "";
 	private GUIStyle textStyle;
-
-	private float messageDisplayDuration = 5f;
+	private float messageDisplayDuration = 7.5f;
 
 	private NetworkView networkView;
 
