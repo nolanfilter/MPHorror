@@ -12,6 +12,7 @@ GameObject:
   - 114: {fileID: 11400002}
   - 114: {fileID: 11400004}
   - 114: {fileID: 11400006}
+  - 114: {fileID: 11400008}
   m_Layer: 0
   m_Name: Agents
   m_TagString: Untagged
@@ -88,7 +89,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20a1718319e9744139e518ca9048dc41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  font: {fileID: 12800000, guid: b2ab5fd2ecca04416a3354005697e3c5, type: 3}
+  font: {fileID: 12800000, guid: 5736631ebdf88429ab9915161a8b247c, type: 3}
+--- !u!114 &11400008
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f2d5e5aa453d454ca0318ff6185ebc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
