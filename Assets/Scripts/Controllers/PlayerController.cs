@@ -23,7 +23,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	private float fearAttackLastTime = Time.time;
 
 	//random between 120 and 240 seconds
-	private float sanityDecreaseRate = Random.Range( 0.0083f, 0.00416f );
+	private float sanityDecreaseRate = Random.Range( 1f/120f, 1f/240f );
 
 	private float fearThreshold = 1f;
 
@@ -50,6 +50,12 @@ public class PlayerController : Photon.MonoBehaviour {
 	private CharacterController characterController;
 	
 	private Vector3 movementVector;
+	private Vector2 viewChangeVector;
+	private Vector2 oldViewChangeVector;
+	private float viewChangeRate = 2.5f;
+	private float timeViewChangeStatic;
+	private float timeViewChangeStaticThreshold = 1f;
+
 	public float height = 0.925f;
 	
  	private Transform cameraTransform;
@@ -58,14 +64,14 @@ public class PlayerController : Photon.MonoBehaviour {
 	private float cameraFoV = 60f;
 	private float cameraZoomFoV = 30f;
 	private Quaternion cameraRotationOffset = Quaternion.Euler( new Vector3( 10f, 0f, 0f ) );
-	private float cameraRotationRate = 0.025f;
+	private float cameraRotationRate = 0.05f;
 
 	private float zoomDuration = 0.1f;
 	private float zoomProgress = 0f;
 	private float oldZoomProgress;
 	private float zoomSpeedScale = 0.5f;
 	private float timeZoomedIn = 0f;
-	private float timeZoomedThreshold = 0.5f;
+	private float timeZoomedInThreshold = 0.5f;
 
 	private float lifeLength = 120f;
 	private float currentTimeLived = 0f;
@@ -76,9 +82,9 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private NetworkView networkView;
 
-	private Renderer modelRenderer;
+	public Renderer modelRenderer;
 
-	private Light flashlight;
+	public Light flashlight;
 	
 	void Awake()
 	{
@@ -102,9 +108,11 @@ public class PlayerController : Photon.MonoBehaviour {
 		
 		networkView = GetComponent<NetworkView>();
 
-		modelRenderer = GetComponentInChildren<Renderer>();
+		if( modelRenderer == null )
+			modelRenderer = GetComponentInChildren<Renderer>();
 
-		flashlight = GetComponentInChildren<Light>();
+		if( flashlight == null )
+			flashlight = GetComponentInChildren<Light>();
 	}
 	
 	void Start()
@@ -115,6 +123,9 @@ public class PlayerController : Photon.MonoBehaviour {
 		textStyle.font = FontAgent.GetFont();
 		textStyle.normal.textColor = Color.white;
 		textStyle.alignment = TextAnchor.MiddleCenter;
+
+		viewChangeVector = Vector2.zero;
+		oldViewChangeVector = viewChangeVector;
 
 		SnapCamera();
 
@@ -268,52 +279,20 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( currentState == State.Dead )
 			return;
 
-		/*
-		Vector3 adjustedPlayerPosition = new Vector3( transform.position.x, cameraTransform.position.y, transform.position.z );
-		
-		Vector3 projectedVector = Vector3.Project( adjustedPlayerPosition - cameraTransform.position, cameraTransform.right );
-		
-		float distanceBetweenPlayerAndCamera = Vector3.Distance( adjustedPlayerPosition, cameraTransform.position + projectedVector  );
+		float fearFactor = Mathf.Clamp01( currentFear );
+		float zoomFactor = Mathf.Lerp( 1f, zoomSpeedScale, zoomProgress );
 
-		float playerScreenPositionX = cameraTransform.camera.WorldToScreenPoint( transform.position ).x / Screen.width;
+		movementVector = movementVector.normalized * speed * fearFactor * zoomFactor * Time.deltaTime;
 
-		if( playerScreenPositionX < 0.3f )
-			cameraTransform.RotateAround( cameraTransform.position, Vector3.up, cameraRotationRate * -1f );
+		characterController.Move( movementVector );
 		
-		if( playerScreenPositionX > 0.7f )
-			cameraTransform.RotateAround( cameraTransform.position, Vector3.up, cameraRotationRate );
-		*/
-
 		if( movementVector != Vector3.zero )
 		{
-			float fearFactor = Mathf.Clamp01( currentFear );
-			float zoomFactor = Mathf.Lerp( 1f, zoomSpeedScale, zoomProgress );
-
-			movementVector = movementVector.normalized * speed * fearFactor * zoomFactor * Time.deltaTime;
-
-			//update player
-			characterController.Move( movementVector );
-		
 			Quaternion movementVectorRotation = Quaternion.LookRotation( movementVector );
-			if( Quaternion.Angle( movementVectorRotation, transform.rotation ) <= 120f )
+
+			if( Quaternion.Angle( movementVectorRotation, transform.rotation ) <= 150f )
 				transform.rotation = Quaternion.Lerp( transform.rotation, movementVectorRotation, cameraRotationRate * fearFactor * zoomFactor );
-
-
-			//update camera		
-			//if( distanceBetweenPlayerAndCamera > 5f || distanceBetweenPlayerAndCamera < 2.5f )
-			//	cameraTransform.position += movementVector;
 		}
-		else
-		{
-			//if( distanceBetweenPlayerAndCamera > 5f )
-			//	cameraTransform.position += ( adjustedPlayerPosition - cameraTransform.position ).normalized * speed * Time.deltaTime * 0.1f;
-
-			//if( distanceBetweenPlayerAndCamera < 2.5f )
-			//	cameraTransform.position -= ( adjustedPlayerPosition - cameraTransform.position ).normalized * speed * Time.deltaTime * 0.1f;
-		}
-
-		//cameraTransform.position = Vector3.Lerp( cameraTransform.position, transform.TransformPoint( cameraPositionOffset ), 0.1f );
-		//cameraTransform.rotation = Quaternion.Lerp( cameraTransform.rotation, transform.rotation * cameraRotationOffset, 0.1f );
 
 		movementVector = Vector3.zero;
 	}
@@ -385,7 +364,37 @@ public class PlayerController : Photon.MonoBehaviour {
 			cameraTransform.camera.fieldOfView = Mathf.RoundToInt( Mathf.Lerp( cameraFoV, cameraZoomFoV, zoomProgress ) );
 			cameraTransform.rotation = transform.rotation * cameraRotationOffset;
 
+			if( viewChangeVector != Vector2.zero )
+			{
+				cameraTransform.eulerAngles = new Vector3( cameraTransform.eulerAngles.x - viewChangeVector.y * 15f, cameraTransform.eulerAngles.y + viewChangeVector.x * 30f, 0f );		
+			}
+
+			if( viewChangeVector == oldViewChangeVector )
+				timeViewChangeStatic += Time.deltaTime;
+			else
+				timeViewChangeStatic = 0f;
+
+
+			if( viewChangeVector != Vector2.zero && timeViewChangeStatic > timeViewChangeStaticThreshold )
+			{
+				if( viewChangeVector.x < 0f )
+					viewChangeVector = new Vector2( Mathf.Clamp( viewChangeVector.x + viewChangeRate * 0.5f * Time.deltaTime, -1f, 0f ), viewChangeVector.y );
+
+				if( viewChangeVector.x > 0f )
+					viewChangeVector = new Vector2( Mathf.Clamp( viewChangeVector.x - viewChangeRate * 0.5f * Time.deltaTime, 0f, 1f ), viewChangeVector.y );
+
+				if( viewChangeVector.y < 0f )
+					viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y + viewChangeRate * 0.5f * Time.deltaTime, -1f, 0f ) );
+
+				if( viewChangeVector.y > 0f )
+					viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y - viewChangeRate * 0.5f * Time.deltaTime, 0f, 1f ) );
+			}
+
+			if( flashlight != null )
+				flashlight.transform.rotation = cameraTransform.rotation;
+
 			oldZoomProgress = zoomProgress;
+			oldViewChangeVector = viewChangeVector;
 		}
 	}
 
@@ -412,6 +421,58 @@ public class PlayerController : Photon.MonoBehaviour {
 			ChangeFlashlight( flashlight.enabled ? 0 : 1 );
 	}
 
+	private void EvaluateMovement( InputController.ButtonType button )
+	{
+		switch( button )
+		{
+		case InputController.ButtonType.Left:
+		{	
+			movementVector -= transform.right;
+		} break;
+			
+		case InputController.ButtonType.Right: 
+		{
+			movementVector += transform.right;
+		} break;
+			
+		case InputController.ButtonType.Up: 
+		{
+			movementVector += transform.forward;
+		} break;
+			
+		case InputController.ButtonType.Down: 
+		{
+			movementVector -= transform.forward;
+		} break;
+		}
+	}
+
+	private void EvaluateViewChange( InputController.ButtonType button )
+	{
+		switch( button )
+		{
+		case InputController.ButtonType.RLeft:
+		{	
+			viewChangeVector = new Vector2( Mathf.Clamp( viewChangeVector.x - viewChangeRate * Time.deltaTime, -1f, 0f ), viewChangeVector.y );
+		} break;
+			
+		case InputController.ButtonType.RRight: 
+		{
+			viewChangeVector = new Vector2( Mathf.Clamp( viewChangeVector.x + viewChangeRate * Time.deltaTime, 0f, 1f ), viewChangeVector.y );
+		} break;
+			
+		case InputController.ButtonType.RUp: 
+		{
+			viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y + viewChangeRate * Time.deltaTime, 0f, 1f ) );
+		} break;
+			
+		case InputController.ButtonType.RDown: 
+		{
+			viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y - viewChangeRate * Time.deltaTime, -1f, 0f ) );
+		} break;
+		}
+	}
+
 	//coroutines
 	private IEnumerator DoDisplayMessage( string messageToDisplay )
 	{
@@ -421,7 +482,6 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		messageString = "";
 	}
-
 	//end coroutines
 
 	//server calls
@@ -463,28 +523,11 @@ public class PlayerController : Photon.MonoBehaviour {
 	//event handlers
 	private void OnButtonDown( InputController.ButtonType button )
 	{	
+		EvaluateMovement( button );
+		EvaluateViewChange( button );
+
 		switch( button )
 		{
-		case InputController.ButtonType.Left:
-		{	
-			movementVector -= cameraTransform.right;
-		} break;
-			
-		case InputController.ButtonType.Right: 
-		{
-			movementVector += cameraTransform.right;
-		} break;
-			
-		case InputController.ButtonType.Up: 
-		{
-			movementVector += Quaternion.AngleAxis( cameraTransform.eulerAngles.x * -1f, cameraTransform.right ) * cameraTransform.forward;
-		} break;
-			
-		case InputController.ButtonType.Down: 
-		{
-			movementVector -= Quaternion.AngleAxis( cameraTransform.eulerAngles.x * -1f, cameraTransform.right ) * cameraTransform.forward;
-		} break;
-
 		case InputController.ButtonType.Zoom:
 		{
 			ChangeZoom( 1 );
@@ -499,27 +542,12 @@ public class PlayerController : Photon.MonoBehaviour {
 	
 	private void OnButtonHeld( InputController.ButtonType button )
 	{	
+		EvaluateMovement( button );
+		EvaluateViewChange( button );
+
 		switch( button )
 		{
-		case InputController.ButtonType.Left:
-		{	
-			movementVector -= cameraTransform.right;
-		} break;
-			
-		case InputController.ButtonType.Right: 
-		{
-			movementVector += cameraTransform.right;
-		} break;
-			
-		case InputController.ButtonType.Up: 
-		{
-			movementVector += Quaternion.AngleAxis( cameraTransform.eulerAngles.x * -1f, cameraTransform.right ) * cameraTransform.forward;
-		} break;
-			
-		case InputController.ButtonType.Down: 
-		{
-			movementVector -= Quaternion.AngleAxis( cameraTransform.eulerAngles.x * -1f, cameraTransform.right ) * cameraTransform.forward;
-		} break;
+		
 		}
 	}
 	
@@ -542,10 +570,10 @@ public class PlayerController : Photon.MonoBehaviour {
 		return currentState;
 	}
 
-	//has the player been fully zoomed in for at least timeZoomedThreshold seconds
+	//has the player been fully zoomed in for at least timeZoomedInThreshold seconds
 	public bool IsZoomedIn()
 	{
-		return ( timeZoomedIn > timeZoomedThreshold );
+		return ( timeZoomedIn > timeZoomedInThreshold );
 	}
 
 	public void ChangeSanity( float amount )
