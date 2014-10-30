@@ -64,7 +64,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	private float cameraFoV = 60f;
 	private float cameraZoomFoV = 30f;
 	private Quaternion cameraRotationOffset = Quaternion.Euler( new Vector3( 10f, 0f, 0f ) );
-	private float cameraRotationRate = 0.05f;
+	private float cameraRotationRate = 0.025f;
 
 	private float zoomDuration = 0.1f;
 	private float zoomProgress = 0f;
