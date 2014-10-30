@@ -372,8 +372,7 @@ public class PlayerController : Photon.MonoBehaviour {
 			if( viewChangeVector == oldViewChangeVector )
 				timeViewChangeStatic += Time.deltaTime;
 			else
-				timeViewChangeStatic = 0f;
-
+				timeViewChangeStatic = 0f;               
 
 			if( viewChangeVector != Vector2.zero && timeViewChangeStatic > timeViewChangeStaticThreshold )
 			{
@@ -453,22 +452,22 @@ public class PlayerController : Photon.MonoBehaviour {
 		{
 		case InputController.ButtonType.RLeft:
 		{	
-			viewChangeVector = new Vector2( Mathf.Clamp( viewChangeVector.x - viewChangeRate * Time.deltaTime, -1f, 0f ), viewChangeVector.y );
+			viewChangeVector = new Vector2( Mathf.Clamp( viewChangeVector.x - viewChangeRate * Time.deltaTime, -1f, 1f ), viewChangeVector.y );
 		} break;
 			
 		case InputController.ButtonType.RRight: 
 		{
-			viewChangeVector = new Vector2( Mathf.Clamp( viewChangeVector.x + viewChangeRate * Time.deltaTime, 0f, 1f ), viewChangeVector.y );
+			viewChangeVector = new Vector2( Mathf.Clamp( viewChangeVector.x + viewChangeRate * Time.deltaTime, -1f, 1f ), viewChangeVector.y );
 		} break;
 			
 		case InputController.ButtonType.RUp: 
 		{
-			viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y + viewChangeRate * Time.deltaTime, 0f, 1f ) );
+			viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y + viewChangeRate * Time.deltaTime, -1f, 1f ) );
 		} break;
 			
 		case InputController.ButtonType.RDown: 
 		{
-			viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y - viewChangeRate * Time.deltaTime, -1f, 0f ) );
+			viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y - viewChangeRate * Time.deltaTime, -1f, 1f ) );
 		} break;
 		}
 	}
