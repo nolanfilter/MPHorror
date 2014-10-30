@@ -20,13 +20,21 @@ public class InputController : MonoBehaviour {
 		Down = 1,
 		Left = 2,
 		Right = 3,
-		Zoom = 4,
-		Flashlight = 5,
-		Invalid = 6,
+		RUp = 4,
+		RDown = 5,
+		RLeft = 6,
+		RRight = 7,
+		Zoom = 8,
+		Flashlight = 9,
+		Invalid = 10,
 	}
 	
-	private string verticalAxisString;
-	private string horizontalAxisString;
+	private string verticalAxisString = "Vertical";
+	private string horizontalAxisString = "Horizontal";
+	private string rVerticalAxisString = "RVertical";
+	private string rHorizontalAxisString = "RHorizontal";
+	private string leftTriggerAxisString = "Left Trigger";
+	private string rightTriggerAxisString = "Right Trigger";
 	
 	private KeyCode[] codes = new KeyCode[ Enum.GetNames( typeof( ButtonType ) ).Length - 1 ];
 	
@@ -42,9 +50,6 @@ public class InputController : MonoBehaviour {
 		currentButtonList = new Dictionary<ButtonType, bool>();
 		oldButtonList = new Dictionary<ButtonType, bool>();
 
-		verticalAxisString = "Vertical";
-		horizontalAxisString = "Horizontal";
-
 		CheckInputType();
 	}
 	
@@ -57,10 +62,21 @@ public class InputController : MonoBehaviour {
 		currentButtonList[ ButtonType.Right ] = horizontalAxis > 0f;
 		currentButtonList[ ButtonType.Down ] = verticalAxis < 0f;
 		currentButtonList[ ButtonType.Left ] = horizontalAxis < 0f;
+
+		float rVerticalAxis = Input.GetAxisRaw( rVerticalAxisString );
+		float rHorizontalAxis = Input.GetAxisRaw( rHorizontalAxisString );
+
+		currentButtonList[ ButtonType.RUp ] = rVerticalAxis > 0f;
+		currentButtonList[ ButtonType.RRight ] = rHorizontalAxis > 0f;
+		currentButtonList[ ButtonType.RDown ] = rVerticalAxis < 0f;
+		currentButtonList[ ButtonType.RLeft ] = rHorizontalAxis < 0f;
+
+		currentButtonList[ ButtonType.Zoom ] = Input.GetAxisRaw( leftTriggerAxisString ) > 0f || Input.GetAxisRaw( rightTriggerAxisString ) > 0f;
 		
 		for( int i = 0; i < codes.Length; i++ )
 		{
-			if( i == (int)ButtonType.Up || i == (int)ButtonType.Right || i == (int)ButtonType.Down || i == (int)ButtonType.Left )
+			if( i == (int)ButtonType.Up || i == (int)ButtonType.Right || i == (int)ButtonType.Down || i == (int)ButtonType.Left ||
+				i == (int)ButtonType.RUp || i == (int)ButtonType.RRight || i == (int)ButtonType.RDown || i == (int)ButtonType.RLeft || i == (int)ButtonType.Zoom )
 				currentButtonList[ (ButtonType)i ] = currentButtonList[ (ButtonType)i ] || Input.GetKey( codes[ i ] );
 			else
 				currentButtonList[ (ButtonType)i ] = Input.GetKey( codes[ i ] );
@@ -116,12 +132,16 @@ public class InputController : MonoBehaviour {
 				} break;
 					
 					//XBOX 360
-				case "©Microsoft Corporation Controller":
+				case "©Microsoft Corporation Controller": case "":
 				{
 					codes[ (int)ButtonType.Up ] = (KeyCode)( (int)KeyCode.Joystick1Button5 );
 					codes[ (int)ButtonType.Down ] = (KeyCode)( (int)KeyCode.Joystick1Button6 );
 					codes[ (int)ButtonType.Left ] = (KeyCode)( (int)KeyCode.Joystick1Button7 );
 					codes[ (int)ButtonType.Right ] = (KeyCode)( (int)KeyCode.Joystick1Button8 );
+					codes[ (int)ButtonType.RUp ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
+					codes[ (int)ButtonType.RDown ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
+					codes[ (int)ButtonType.RLeft ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
+					codes[ (int)ButtonType.RRight ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
 					codes[ (int)ButtonType.Zoom ] = (KeyCode)( (int)KeyCode.Joystick1Button3 );
 					codes[ (int)ButtonType.Flashlight ] = (KeyCode)( (int)KeyCode.Joystick1Button12 );
 					
@@ -136,6 +156,10 @@ public class InputController : MonoBehaviour {
 				codes[ (int)ButtonType.Down ] = KeyCode.S;
 				codes[ (int)ButtonType.Left ] = KeyCode.A;
 				codes[ (int)ButtonType.Right ] = KeyCode.D;
+				codes[ (int)ButtonType.RUp ] = KeyCode.UpArrow;
+				codes[ (int)ButtonType.RDown ] = KeyCode.DownArrow;
+				codes[ (int)ButtonType.RLeft ] = KeyCode.LeftArrow;
+				codes[ (int)ButtonType.RRight ] = KeyCode.RightArrow;
 				codes[ (int)ButtonType.Zoom ] = KeyCode.Space;
 				codes[ (int)ButtonType.Flashlight ] = KeyCode.Return;
 				
@@ -198,5 +222,15 @@ public class InputController : MonoBehaviour {
 		}
 		
 		return rawAxes;
+	}
+
+	public Vector3 getRawRAxes()
+	{
+		float rVerticalAxis = Input.GetAxisRaw( rVerticalAxisString );
+		float rHorizontalAxis = Input.GetAxisRaw( rHorizontalAxisString );
+		
+		Vector3 rawRAxes = new Vector3( rHorizontalAxis, rVerticalAxis, 0f );
+		
+		return rawRAxes;
 	}
 }
