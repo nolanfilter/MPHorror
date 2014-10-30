@@ -64,7 +64,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	private float cameraFoV = 60f;
 	private float cameraZoomFoV = 30f;
 	private Quaternion cameraRotationOffset = Quaternion.Euler( new Vector3( 10f, 0f, 0f ) );
-	private float cameraRotationRate = 0.05f;
+	private float cameraRotationRate = 0.025f;
 
 	private float zoomDuration = 0.1f;
 	private float zoomProgress = 0f;
@@ -586,7 +586,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		if( amount > 0f )
 		{
-			if( Time.time - fearAttackLastTime > fearAttackTimeBuffer )
+			if( CanIncreaseFear() )
 			{
 				currentFear -= amount;
 				fearAttackLastTime = Time.time;
@@ -647,6 +647,11 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		foreach( Transform child in transform )
 			child.gameObject.SetActive( false );
+	}
+
+	public bool CanIncreaseFear()
+	{
+		return ( Time.time - fearAttackLastTime > fearAttackTimeBuffer );
 	}
 	//end public functions
 }
