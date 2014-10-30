@@ -31,7 +31,7 @@ GameObject:
   - 114: {fileID: 11400006}
   m_Layer: 0
   m_Name: Area of Influence
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -48,7 +48,7 @@ GameObject:
   - 23: {fileID: 2300000}
   m_Layer: 0
   m_Name: Model
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -64,7 +64,7 @@ GameObject:
   - 108: {fileID: 10800000}
   m_Layer: 0
   m_Name: Flashlight
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -230,6 +230,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   meterTexture: {fileID: 2800000, guid: ef046fff5043b4ce59c31bd90d47cb71, type: 3}
   height: .959999979
+  modelRenderer: {fileID: 2300000}
+  flashlight: {fileID: 10800000}
 --- !u!114 &11400004
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -255,6 +257,7 @@ MonoBehaviour:
   radius: 2
   radiusZoom: .5
   zoomDistance: 2.5
+  showDebugRay: 0
 --- !u!143 &14300000
 CharacterController:
   m_ObjectHideFlags: 1
