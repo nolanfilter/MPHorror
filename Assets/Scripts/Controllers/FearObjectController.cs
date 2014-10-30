@@ -5,6 +5,7 @@ public class FearObjectController : MonoBehaviour {
 
 	public float fearChange = 0.3f;
 	public bool damageOverTime = false;
+	public string eventName = "";
 
 	void Start()
 	{
@@ -26,14 +27,23 @@ public class FearObjectController : MonoBehaviour {
 		if( collider.tag == "Player" )
 		{
 			PlayerController playerController = collider.GetComponent<PlayerController>();
-			
-			if( playerController == null || playerController.GetCurrentState() != PlayerController.State.Normal )
+
+			bool canIncreaseFear = playerController.CanIncreaseFear();
+
+			if( playerController == null || playerController.GetCurrentState() != PlayerController.State.Normal || !canIncreaseFear )
 				return;
 
 			if( damageOverTime )
 				playerController.ChangeFear( fearChange * Time.deltaTime );
 			else
 				playerController.ChangeFear( fearChange );
+
+			PlayMakerFSM fsm = GetComponent<PlayMakerFSM>();
+			
+			if( fsm == null || eventName == "" )
+				return;
+
+			fsm.SendEvent( eventName );
 		}
 	}
 }

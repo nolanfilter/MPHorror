@@ -586,7 +586,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		if( amount > 0f )
 		{
-			if( Time.time - fearAttackLastTime > fearAttackTimeBuffer )
+			if( CanIncreaseFear() )
 			{
 				currentFear -= amount;
 				fearAttackLastTime = Time.time;
@@ -647,6 +647,11 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		foreach( Transform child in transform )
 			child.gameObject.SetActive( false );
+	}
+
+	public bool CanIncreaseFear()
+	{
+		return ( Time.time - fearAttackLastTime > fearAttackTimeBuffer );
 	}
 	//end public functions
 }
