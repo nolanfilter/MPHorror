@@ -75,9 +75,16 @@ public class InfluenceController : MonoBehaviour {
 				return;
 
 			if( playerController.GetCurrentState() == PlayerController.State.Normal )
+			{
 				otherPlayerController.IncreaseSanity();
+			}
 			else if( playerController.GetCurrentState() == PlayerController.State.Monster )
-				otherPlayerController.IncreaseFear();
+			{
+				bool killedByPlayer = otherPlayerController.IncreaseFear();
+
+				if( killedByPlayer )
+					otherPlayerController.IncrementPoint();
+			}
 		}
 		else if( collider.tag == "Key" )
 		{
@@ -86,6 +93,15 @@ public class InfluenceController : MonoBehaviour {
 			if( fsm == null || playerController.GetCurrentState() != PlayerController.State.Normal || !playerController.IsZoomedIn() )
 				return;
 
+			fsm.SendEvent( "ObjectSeen" );
+		}
+		else if( collider.tag == "Activatable" )
+		{
+			PlayMakerFSM fsm = collider.GetComponent<PlayMakerFSM>();
+			
+			if( fsm == null || !playerController.IsZoomedIn() )
+				return;
+			
 			fsm.SendEvent( "ObjectSeen" );
 		}
 	}
