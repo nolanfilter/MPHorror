@@ -22,8 +22,8 @@ public class PlayerController : Photon.MonoBehaviour {
 	private float fearAttackTimeBuffer = 2f;
 	private float fearAttackLastTime = Time.time;
 
-	//random between 60 and 180 seconds
-	private float sanityDecreaseRate = Random.Range( 0.016f, 0.0055f );
+	//random between 120 and 240 seconds
+	private float sanityDecreaseRate = Random.Range( 0.0083f, 0.00416f );
 
 	private float fearThreshold = 1f;
 
