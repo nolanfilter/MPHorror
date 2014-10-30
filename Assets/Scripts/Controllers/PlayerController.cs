@@ -8,6 +8,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		Normal = 0,
 		Monster = 1,
 		Dead = 2,
+		Dying = 3,
+		Voyeur = 4,
 	}
 	private State currentState = State.Normal;
 
@@ -34,7 +36,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private bool hasReRandomized = false;
 
-	private float speed = 5f;
+	private float speed = Random.Range( 4f, 6f );
 	public Texture2D meterTexture;
 	
 	private float lastSynchronizationTime = 0f;
@@ -64,12 +66,15 @@ public class PlayerController : Photon.MonoBehaviour {
 	private float oldZoomProgress;
 	private float zoomSpeedScale = 0.5f;
 	private float timeZoomedIn = 0f;
-	private float timeZoomedThreshold = 1f;
+	private float timeZoomedThreshold = 0.5f;
 
 	private float lifeLength = 120f;
 	private float currentTimeLived = 0f;
-	private Rect timerRect;
+	private Rect messageRect;
+	private string messageString = "";
 	private GUIStyle textStyle;
+
+	private float messageDisplayDuration = 5f;
 
 	private NetworkView networkView;
 
@@ -106,7 +111,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	
 	void Start()
 	{
-		timerRect = new Rect( 0f, 0f, Screen.width, Screen.height * 0.1f );
+		messageRect = new Rect( 0f, 0f, Screen.width, Screen.height * 0.1f );
 
 		textStyle = new GUIStyle();
 		textStyle.font = FontAgent.GetFont();
@@ -114,6 +119,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		textStyle.alignment = TextAnchor.MiddleCenter;
 
 		SnapCamera();
+
+		PlayerAgent.RegisterPlayer( this );
 	}
 	
 	void OnEnable()
@@ -128,6 +135,11 @@ public class PlayerController : Photon.MonoBehaviour {
 		inputController.OnButtonDown -= OnButtonDown;
 		inputController.OnButtonHeld -= OnButtonHeld;
 		inputController.OnButtonUp -= OnButtonUp;
+	}
+
+	void OnDestroy()
+	{
+		PlayerAgent.UnregisterPlayer( this );
 	}
 	
 	void Update()
@@ -243,8 +255,7 @@ public class PlayerController : Photon.MonoBehaviour {
 			
 			if( fromDoorTransform )
 			{
-				transform.position = fromDoorTransform.position + fromDoorTransform.forward * 1.25f;
-				transform.position = new Vector3( transform.position.x, height, transform.position.z );
+				TeleportTo( fromDoorTransform.position + fromDoorTransform.forward * 1.25f );
 				transform.LookAt( transform.position + fromDoorTransform.forward, Vector3.up );
 
 				SnapCamera();
@@ -380,18 +391,17 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private void DisplayGUI()
 	{
-		if( currentState == State.Monster )
-			return;
+		if( currentState == State.Normal )
+		{
+			GUI.color = fearColor;
+			GUI.DrawTexture( new Rect( 0f, Screen.height * currentFear, Screen.width * 0.05f, Screen.height * ( 1f- currentFear ) ), meterTexture );
 
-		GUI.color = fearColor;
-		GUI.DrawTexture( new Rect( 0f, Screen.height * currentFear, Screen.width * 0.05f, Screen.height * ( 1f- currentFear ) ), meterTexture );
+			GUI.color = sanityColor;
+			GUI.DrawTexture( new Rect( Screen.width * 0.95f, Screen.height * ( 1f - currentSanity ), Screen.width * 0.05f, Screen.height * currentSanity  ), meterTexture );
+		}
 
-		GUI.color = sanityColor;
-		GUI.DrawTexture( new Rect( Screen.width * 0.95f, Screen.height * ( 1f - currentSanity ), Screen.width * 0.05f, Screen.height * currentSanity  ), meterTexture );
-		
 		GUI.color = Color.white;
-		//int timeLeft = Mathf.RoundToInt( lifeLength - currentTimeLived );
-		//GUI.Label( timerRect, "" + timeLeft, textStyle );
+		GUI.Label( messageRect, messageString, textStyle );
 	}
 
 	private void ToggleFlashlight()
@@ -401,7 +411,20 @@ public class PlayerController : Photon.MonoBehaviour {
 		else
 			ChangeFlashlight( flashlight.enabled ? 0 : 1 );
 	}
-	
+
+	//coroutines
+	private IEnumerator DoDisplayMessage( string messageToDisplay )
+	{
+		messageString = messageToDisplay;
+
+		yield return new WaitForSeconds( messageDisplayDuration );
+
+		messageString = "";
+	}
+
+	//end coroutines
+
+	//server calls
 	[RPC] void ChangeColor( Vector3 color )
 	{
 		if( modelRenderer != null )
@@ -435,7 +458,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( photonView.isMine )
 			photonView.RPC( "ChangeFlashlight", PhotonTargets.OthersBuffered, state );
 	}
-
+	// end server calls
 
 	//event handlers
 	private void OnButtonDown( InputController.ButtonType button )
@@ -553,7 +576,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public void IncreaseSanity()
 	{
-		ChangeSanity( sanityDecreaseRate * 0.5f * Time.deltaTime );
+		ChangeSanity( sanityDecreaseRate * 0.3f * Time.deltaTime );
 	}
 
 	public void IncreaseFear()
@@ -567,6 +590,23 @@ public class PlayerController : Photon.MonoBehaviour {
 			ChangeFlashlight( 0 );
 		else
 			ChangeFlashlight( ( on ? 1 : 0 ) );
+	}
+
+	public void TeleportTo( Vector3 coordinate )
+	{
+		transform.position = coordinate;
+		transform.position = new Vector3( transform.position.x, height, transform.position.z );
+	}
+
+	public void IncrementPoint()
+	{
+		DisplayMessage( "You got 1 point!" );
+	}
+
+	public void DisplayMessage( string messageToDisplay )
+	{
+		StopCoroutine( "DoDisplayMessage" );
+		StartCoroutine( "DoDisplayMessage", messageToDisplay );
 	}
 	//end public functions
 }
