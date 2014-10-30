@@ -34,69 +34,18 @@ public class InputController : MonoBehaviour {
 	
 	private Dictionary<ButtonType, bool> currentButtonList;
 	private Dictionary<ButtonType, bool> oldButtonList;
+
+	private String currentInputType = "Invalid";
 	
 	void Start()
 	{
+		currentButtonList = new Dictionary<ButtonType, bool>();
+		oldButtonList = new Dictionary<ButtonType, bool>();
+
 		verticalAxisString = "Vertical";
 		horizontalAxisString = "Horizontal";
 
-		//Debug.Log( Input.GetJoystickNames()[0] );
-
-		if( Input.GetJoystickNames().Length > 0 )
-		{
-			//hardcoded for PS3 controller, PS4 controller, and PC
-			switch( Input.GetJoystickNames()[0] )
-			{
-				//PS3
-				case "Sony PLAYSTATION(R)3 Controller":
-				{
-
-				} break;
-					
-				//PS4
-				case "Sony Computer Entertainment Wireless Controller":
-				{
-
-				} break;
-					
-				//SNES
-				case " 2Axes 11Keys Game  Pad":
-				{
-
-				} break;
-					
-				//XBOX 360
-				case "©Microsoft Corporation Controller":
-				{
-					codes[ (int)ButtonType.Up ] = (KeyCode)( (int)KeyCode.Joystick1Button5 );
-					codes[ (int)ButtonType.Down ] = (KeyCode)( (int)KeyCode.Joystick1Button6 );
-					codes[ (int)ButtonType.Left ] = (KeyCode)( (int)KeyCode.Joystick1Button7 );
-					codes[ (int)ButtonType.Right ] = (KeyCode)( (int)KeyCode.Joystick1Button8 );
-					codes[ (int)ButtonType.Zoom ] = (KeyCode)( (int)KeyCode.Joystick1Button3 );
-					codes[ (int)ButtonType.Flashlight ] = (KeyCode)( (int)KeyCode.Joystick1Button12 );
-					
-				} break;
-			}
-		}
-		else
-		{
-			codes[ (int)ButtonType.Up ] = KeyCode.W;
-			codes[ (int)ButtonType.Down ] = KeyCode.S;
-			codes[ (int)ButtonType.Left ] = KeyCode.A;
-			codes[ (int)ButtonType.Right ] = KeyCode.D;
-			codes[ (int)ButtonType.Zoom ] = KeyCode.Space;
-			codes[ (int)ButtonType.Flashlight ] = KeyCode.Return;
-		}
-		//end hardcoded
-		
-		currentButtonList = new Dictionary<ButtonType, bool>();
-		oldButtonList = new Dictionary<ButtonType, bool>();
-		
-		foreach( ButtonType button in buttonTypes )
-		{
-			currentButtonList.Add( button, false );
-			oldButtonList.Add( button, false );
-		}
+		CheckInputType();
 	}
 	
 	void Update()
@@ -134,6 +83,76 @@ public class InputController : MonoBehaviour {
 			
 			oldButtonList[ button ] = currentButtonList[ button ];
 		}
+
+		CheckInputType();
+	}
+
+	private void CheckInputType()
+	{
+		if( ( Input.GetJoystickNames().Length > 0 && currentInputType != Input.GetJoystickNames()[0] ) ||
+		   ( Input.GetJoystickNames().Length == 0 && currentInputType != "Keyboard" ) )
+		{
+			if( Input.GetJoystickNames().Length > 0 )
+			{
+				//hardcoded for PS3 controller, PS4 controller, and PC
+				switch( Input.GetJoystickNames()[0] )
+				{
+					//PS3
+				case "Sony PLAYSTATION(R)3 Controller":
+				{
+					
+				} break;
+					
+					//PS4
+				case "Sony Computer Entertainment Wireless Controller":
+				{
+					
+				} break;
+					
+					//SNES
+				case " 2Axes 11Keys Game  Pad":
+				{
+					
+				} break;
+					
+					//XBOX 360
+				case "©Microsoft Corporation Controller":
+				{
+					codes[ (int)ButtonType.Up ] = (KeyCode)( (int)KeyCode.Joystick1Button5 );
+					codes[ (int)ButtonType.Down ] = (KeyCode)( (int)KeyCode.Joystick1Button6 );
+					codes[ (int)ButtonType.Left ] = (KeyCode)( (int)KeyCode.Joystick1Button7 );
+					codes[ (int)ButtonType.Right ] = (KeyCode)( (int)KeyCode.Joystick1Button8 );
+					codes[ (int)ButtonType.Zoom ] = (KeyCode)( (int)KeyCode.Joystick1Button3 );
+					codes[ (int)ButtonType.Flashlight ] = (KeyCode)( (int)KeyCode.Joystick1Button12 );
+					
+				} break;
+				}
+				
+				currentInputType = Input.GetJoystickNames()[0];
+			}
+			else
+			{
+				codes[ (int)ButtonType.Up ] = KeyCode.W;
+				codes[ (int)ButtonType.Down ] = KeyCode.S;
+				codes[ (int)ButtonType.Left ] = KeyCode.A;
+				codes[ (int)ButtonType.Right ] = KeyCode.D;
+				codes[ (int)ButtonType.Zoom ] = KeyCode.Space;
+				codes[ (int)ButtonType.Flashlight ] = KeyCode.Return;
+				
+				currentInputType = "Keyboard";
+			}
+			//end hardcoded
+			
+			currentButtonList.Clear();
+			oldButtonList.Clear();
+			
+			foreach( ButtonType button in buttonTypes )
+			{
+				currentButtonList.Add( button, false );
+				oldButtonList.Add( button, false );
+			}
+		}
+		
 	}
 	
 	private void SendDownEvent( ButtonType button )

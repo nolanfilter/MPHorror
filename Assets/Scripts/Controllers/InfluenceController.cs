@@ -6,6 +6,7 @@ public class InfluenceController : MonoBehaviour {
 	public float radius = 2f;
 	public float radiusZoom = 0.5f;
 	public float zoomDistance = 2.5f;
+	public bool showDebugRay = false;
 
 	private PlayerController playerController = null;
 
@@ -47,7 +48,8 @@ public class InfluenceController : MonoBehaviour {
 			hits = Physics.SphereCastAll( ray, radius, distance );
 		}
 
-		//Debug.DrawRay( ray.origin, ray.direction * distance );
+		if( showDebugRay )
+			Debug.DrawRay( ray.origin, ray.direction * distance );
 
 		foreach( RaycastHit hit in hits )
 			EvaluateCollider( hit.collider );
@@ -81,7 +83,7 @@ public class InfluenceController : MonoBehaviour {
 		{
 			PlayMakerFSM fsm = collider.GetComponent<PlayMakerFSM>();
 
-			if( fsm == null || !playerController.IsZoomedIn() )
+			if( fsm == null || playerController.GetCurrentState() != PlayerController.State.Normal || !playerController.IsZoomedIn() )
 				return;
 
 			fsm.SendEvent( "ObjectSeen" );
