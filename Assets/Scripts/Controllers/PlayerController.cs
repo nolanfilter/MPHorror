@@ -174,6 +174,7 @@ public class PlayerController : Photon.MonoBehaviour {
 			if( currentSanity == 0f )
 			{
 				ChangeState( (int)State.Monster );
+				DisplayMessage( "Kill players to get points!" );
 				ChangeColor( new Vector3( 1f, 0f, 0f ) );
 				currentFear = 1.25f;
 			}
@@ -188,6 +189,7 @@ public class PlayerController : Photon.MonoBehaviour {
 			if( currentFear < 0f )
 			{
 				ChangeState( (int)State.Dead );
+				DisplayMessage( "You're paralyzed with fear!" );
 				ChangeColor( new Vector3( 0.5f, 0.5f, 0.5f ) );
 				currentFear = 0f;
 			}
@@ -584,7 +586,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		ChangeFear( fearAttack );
 	}
 
-	public void SetFlashlightOn( bool on )
+	public void SetFlashlightTo( bool on )
 	{
 		if( flashlight == null )
 			ChangeFlashlight( 0 );
@@ -607,6 +609,15 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		StopCoroutine( "DoDisplayMessage" );
 		StartCoroutine( "DoDisplayMessage", messageToDisplay );
+	}
+
+	public void Escape()
+	{
+		ChangeState( (int)State.Voyeur );
+		DisplayMessage( "You got 5 points!" );
+
+		foreach( Transform child in transform )
+			child.gameObject.SetActive( false );
 	}
 	//end public functions
 }

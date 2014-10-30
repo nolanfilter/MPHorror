@@ -2,7 +2,8 @@
 using System.Collections;
 
 public class NetworkAgent : MonoBehaviour {
-	
+
+	public int numPlayers;
 	public GameObject playerPrefab;
 	public GameObject networkBackgroundPrefab;
 	public Vector3[] playerStartPositions;
@@ -35,6 +36,8 @@ public class NetworkAgent : MonoBehaviour {
 
 	void Start()
 	{
+		numPlayers = Mathf.RoundToInt( Mathf.Clamp( numPlayers, 0f, Mathf.Infinity ) );
+
 		PhotonNetwork.ConnectUsingSettings( "0.1" );
 
 		if( networkBackgroundPrefab )
@@ -70,7 +73,7 @@ public class NetworkAgent : MonoBehaviour {
 			// Create Room
 			if( GUI.Button( new Rect( 100, 100, 300, 100 ), "Start Server" ) )
 			{
-				PhotonNetwork.CreateRoom( roomName + System.Guid.NewGuid().ToString( "N" ), true, true, 4 );
+				PhotonNetwork.CreateRoom( roomName + System.Guid.NewGuid().ToString( "N" ), true, true, numPlayers );
 			}
 				
 			// Join Room
@@ -119,4 +122,13 @@ public class NetworkAgent : MonoBehaviour {
 	{
 		PhotonNetwork.LeaveRoom();
 	}	
+
+	public static int GetNumPlayers()
+	{
+		if( instance )
+			return instance.numPlayers;
+
+		return 0;
+	}
+
 }

@@ -1,9 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class MessageObjectController : MonoBehaviour {
 
 	public string message = "";
+
+	private List<PlayerController> encounteredPlayers;
+
+	void Start()
+	{
+		encounteredPlayers = new List<PlayerController>();
+	}
 
 	void OnTriggerEnter( Collider collider )
 	{
@@ -21,12 +29,15 @@ public class MessageObjectController : MonoBehaviour {
 		{
 			PlayerController playerController = collider.GetComponent<PlayerController>();
 			
-			if( playerController == null )
+			if( playerController == null || encounteredPlayers.Contains( playerController ) )
 				return;
 
 			playerController.DisplayMessage( message );
 
-			enabled = false;
+			encounteredPlayers.Add( playerController );
+
+			if( encounteredPlayers.Count >= NetworkAgent.GetNumPlayers() )
+				Destroy( gameObject );
 		}
 	}
 }
