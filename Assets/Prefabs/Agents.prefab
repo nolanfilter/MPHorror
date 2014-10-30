@@ -84,7 +84,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20a1718319e9744139e518ca9048dc41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  font: {fileID: 12800000, guid: 5736631ebdf88429ab9915161a8b247c, type: 3}
+  font: {fileID: 12800000, guid: 1811da8f98ed6472f82d52cac474a90f, type: 3}
 --- !u!114 &11400008
 MonoBehaviour:
   m_ObjectHideFlags: 1
