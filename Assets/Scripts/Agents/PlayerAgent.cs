@@ -55,7 +55,7 @@ public class PlayerAgent : MonoBehaviour {
 	public void SetAllFlashlightsTo( bool on )
 	{
 		for( int i = 0; i < playerControllers.Count; i++ )
-			playerControllers[i].SetFlashlightOn( on );
+			playerControllers[i].SetFlashlightTo( on );
 	}
 
 	public void TeleportAllTo( string coordinates )
