@@ -70,9 +70,15 @@ MonoBehaviour:
   networkBackgroundPrefab: {fileID: 100000, guid: 31af3ae2df7ba4ae8b37d917edabeec6,
     type: 2}
   playerStartPositions:
-  - {x: -3, y: .5, z: 12.25}
+  - {x: -42, y: .5, z: 7.5}
+  - {x: -42, y: .5, z: 9.5}
+  - {x: -39, y: .5, z: 7.5}
+  - {x: -39, y: .5, z: 9.5}
   playerStartRotations:
-  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: -90, z: 0}
+  - {x: 0, y: -90, z: 0}
+  - {x: 0, y: -90, z: 0}
+  - {x: 0, y: -90, z: 0}
 --- !u!114 &11400006
 MonoBehaviour:
   m_ObjectHideFlags: 1
