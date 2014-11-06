@@ -6,8 +6,8 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: InteriorWall 2
-  m_Shader: {fileID: 7, guid: 0000000000000000f000000000000000, type: 0}
+  m_Name: interior_2color_2
+  m_Shader: {fileID: 2, guid: 0000000000000000f000000000000000, type: 0}
   m_ShaderKeywords: []
   m_CustomRenderQueue: -1
   m_SavedProperties:
@@ -17,8 +17,15 @@ Material:
         first:
           name: _MainTex
         second:
-          m_Texture: {fileID: 2800000, guid: c90081827bbc84f77b8e57597326e088, type: 3}
-          m_Scale: {x: 3, y: 1}
+          m_Texture: {fileID: 2800000, guid: 792484e4e497c4f14a089460758f72ef, type: 3}
+          m_Scale: {x: 1, y: -1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _BumpMap
+        second:
+          m_Texture: {fileID: 2800000, guid: 1b5ba50c368b944389ceaab0003fe2b4, type: 3}
+          m_Scale: {x: 1, y: -1}
           m_Offset: {x: 0, y: 0}
     m_Floats: {}
     m_Colors:
