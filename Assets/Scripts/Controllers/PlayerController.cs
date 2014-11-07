@@ -35,7 +35,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private bool hasReRandomized = false;
 
-	private float speed = Random.Range( 4f, 6f );
+	private float speed = Random.Range( 4.5f, 6.5f );
 	public Texture2D meterTexture;
 	
 	private float lastSynchronizationTime = 0f;
@@ -63,8 +63,11 @@ public class PlayerController : Photon.MonoBehaviour {
 	private Vector3 cameraPositionZoomOffset = new Vector3( 0f, 1.5f, -1.5f );
 	private float cameraFoV = 60f;
 	private float cameraZoomFoV = 30f;
-	private Quaternion cameraRotationOffset = Quaternion.Euler( new Vector3( 10f, 0f, 0f ) );
+	private Quaternion cameraRotationOffset = Quaternion.Euler( new Vector3( 0f, 0f, 0f ) );
 	private float cameraRotationRate = 0.025f;
+
+	private Vector3 clippingOffset = Vector3.zero;
+	private Vector3 zoomOffset = Vector3.zero;
 
 	private float zoomDuration = 0.1f;
 	private float zoomProgress = 0f;
@@ -86,6 +89,31 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public Light flashlight;
 	
+	//new movement variables
+	private Vector3 moveDirection = Vector3.zero;
+	private bool movingBack = false;
+	private bool isMoving = false;
+	private float lockCameraTimer = 0.0f;
+	private float walkSpeed = 0f;
+	private float trotSpeed = 0f;
+	private float runSpeed = 0f;
+	private float speedSmoothing = 10f;
+	private float rotateSpeed = 500f;
+	private float trotAfterSeconds = 3f;
+	private float moveSpeed = 0f;
+	private float walkTimeStart = 0f;
+	private float lockCameraTimeout = 2f;
+	private float angularSmoothLag = 0.3f;
+	private float angularMaxSpeed = 15.0f;
+	private float snapSmoothLag = 0.2f;
+	private float snapMaxSpeed = 720.0f;
+	private float clampHeadPositionScreenSpace = 0.75f;
+	private Vector3 headOffset = Vector3.zero;
+	private Vector3 centerOffset = Vector3.zero;
+	private float angleVelocity = 0.0f;
+	private bool snap = false;
+	private float distance = 1.25f;
+
 	void Awake()
 	{
 		inputController = GetComponent<InputController>();
@@ -113,6 +141,8 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		if( flashlight == null )
 			flashlight = GetComponentInChildren<Light>();
+
+		moveDirection = transform.TransformDirection(Vector3.forward);
 	}
 	
 	void Start()
@@ -127,6 +157,10 @@ public class PlayerController : Photon.MonoBehaviour {
 		viewChangeVector = Vector2.zero;
 		oldViewChangeVector = viewChangeVector;
 
+		walkSpeed = speed * 0.5f;
+		trotSpeed = speed;
+		runSpeed = speed * 1.5f;
+
 		SnapCamera();
 
 		PlayerAgent.RegisterPlayer( this );
@@ -137,6 +171,13 @@ public class PlayerController : Photon.MonoBehaviour {
 		inputController.OnButtonDown += OnButtonDown;
 		inputController.OnButtonHeld += OnButtonHeld;
 		inputController.OnButtonUp += OnButtonUp;
+
+		centerOffset = Vector3.up * 1.5f;
+		headOffset = centerOffset;
+		//headOffset.y = characterController.bounds.max.y - transform.position.y;
+		
+		
+		Cut(transform, centerOffset);
 	}
 	
 	void OnDisable()
@@ -161,8 +202,6 @@ public class PlayerController : Photon.MonoBehaviour {
 		{
 			SyncedMovement();
 		}
-	
-		SnapCamera();
 
 		if (transform.position.y != height)
 			transform.position = new Vector3( transform.position.x, height, transform.position.z );
@@ -208,6 +247,11 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		//if( currentTimeLived > lifeLength )
 		//	Destroy( gameObject );
+	}
+
+	void LateUpdate()
+	{
+		Apply(transform, Vector3.zero);
 	}
 
 	void OnGUI()
@@ -282,7 +326,93 @@ public class PlayerController : Photon.MonoBehaviour {
 		float fearFactor = Mathf.Clamp01( currentFear );
 		float zoomFactor = Mathf.Lerp( 1f, zoomSpeedScale, zoomProgress );
 
-		movementVector = movementVector.normalized * speed * fearFactor * zoomFactor * Time.deltaTime;
+
+		// Forward vector relative to the camera along the x-z plane	
+		Vector3 forward = cameraTransform.TransformDirection(Vector3.forward);
+		forward.y = 0;
+		forward = forward.normalized;
+		
+		// Right vector relative to the camera
+		// Always orthogonal to the forward vector
+		Vector3 right = new Vector3(forward.z, 0, -forward.x);
+
+		movementVector = inputController.getRawAxes();
+
+		// Are we moving backwards or looking backwards
+		if (movementVector.y < -0.2f)
+			movingBack = true;
+		else
+			movingBack = false;
+		
+		bool wasMoving = isMoving;
+		isMoving = Mathf.Abs(movementVector.x) > 0.1f || Mathf.Abs(movementVector.y) > 0.1f;
+		
+		// Target direction relative to the camera
+		Vector3 targetDirection = movementVector.x * right + movementVector.y * forward;
+
+		// Lock camera for short period when transitioning moving & standing still
+		lockCameraTimer += Time.deltaTime;
+		if (isMoving != wasMoving)
+			lockCameraTimer = 0.0f;
+		
+		// We store speed and direction seperately,
+		// so that when the character stands still we still have a valid forward direction
+		// moveDirection is always normalized, and we only update it if there is user input.
+		if (targetDirection != Vector3.zero)
+		{
+			// If we are really slow, just snap to the target direction
+			if (moveSpeed < walkSpeed * 0.9f)
+			{
+				moveDirection = targetDirection.normalized;
+			}
+			// Otherwise smoothly turn towards it
+			else
+			{
+				moveDirection = Vector3.RotateTowards(moveDirection, targetDirection, rotateSpeed * Mathf.Deg2Rad * Time.deltaTime, 1000);
+				
+				moveDirection = moveDirection.normalized;
+			}
+		}
+
+		// Smooth the speed based on the current target direction
+		float curSmooth = speedSmoothing * Time.deltaTime;
+		
+		// Choose target speed
+		//* We want to support analog input but make sure you cant walk faster diagonally than just forward or sideways
+		float targetSpeed = Mathf.Min(targetDirection.magnitude, 1.0f);
+
+		// Pick speed modifier
+		if (Input.GetKey(KeyCode.LeftShift) | Input.GetKey(KeyCode.RightShift))
+		{
+			targetSpeed *= runSpeed;
+		}
+		else if (Time.time - trotAfterSeconds > walkTimeStart)
+		{
+			targetSpeed *= trotSpeed;
+		}
+		else
+		{
+			targetSpeed *= walkSpeed;
+		}
+		
+		moveSpeed = Mathf.Lerp(moveSpeed, targetSpeed, curSmooth);
+		
+		// Reset walk time start when we slow down
+		if (moveSpeed < walkSpeed * 0.3f)
+			walkTimeStart = Time.time;
+
+		Vector3 movement = moveDirection * moveSpeed;
+		movement *= Time.deltaTime;
+		
+		characterController.Move(movement);
+
+		if( zoomProgress == 1f )
+			moveDirection = zoomOffset.normalized;
+
+		transform.rotation = Quaternion.LookRotation(moveDirection);
+
+		//nolan code
+		/*movementVector = movementVector.normalized * speed * fearFactor * zoomFactor * Time.deltaTime;
 
 		characterController.Move( movementVector );
 		
@@ -293,6 +423,7 @@ public class PlayerController : Photon.MonoBehaviour {
 			if( Quaternion.Angle( movementVectorRotation, transform.rotation ) <= 150f )
 				transform.rotation = Quaternion.Lerp( transform.rotation, movementVectorRotation, cameraRotationRate * fearFactor * zoomFactor );
 		}
+		*/
 
 		movementVector = Vector3.zero;
 	}
@@ -346,29 +477,75 @@ public class PlayerController : Photon.MonoBehaviour {
 				timeZoomedIn = 0f;
 			}
 
-			Vector3 clippingOffset = transform.TransformPoint( cameraPositionOffset );
+			if( zoomProgress != 0f )
+				lockCameraTimer = 0f;
 
-			RaycastHit[] hits;
+			zoomOffset = Vector3.Lerp( Vector3.zero, Quaternion.AngleAxis( cameraTransform.eulerAngles.y, Vector3.up ) * Vector3.forward * 1.25f, zoomProgress );
 
-			float longestDistance = 0f;
-
-			hits = Physics.RaycastAll( clippingOffset, cameraTransform.forward, Mathf.Abs( cameraPositionOffset.z ) );
-
-			for( int i = 0; i < hits.Length; i++ )
-				if( hits[i].distance > longestDistance )
-					longestDistance = hits[i].distance;
-	
-			clippingOffset += cameraTransform.forward * longestDistance;
-
-			cameraTransform.position = Vector3.Lerp( clippingOffset, transform.TransformPoint( cameraPositionZoomOffset ), zoomProgress );
+			cameraTransform.position += zoomOffset;
 			cameraTransform.camera.fieldOfView = Mathf.RoundToInt( Mathf.Lerp( cameraFoV, cameraZoomFoV, zoomProgress ) );
-			cameraTransform.rotation = transform.rotation * cameraRotationOffset;
+
+			if( flashlight != null )
+			{
+				RaycastHit hit;
+
+				Quaternion newFlashlightRotation = cameraTransform.rotation;
+
+				if( Physics.Raycast( cameraTransform.position + cameraTransform.forward * 1.5f, cameraTransform.forward, out hit ) )
+				{
+					Vector3 hitPosition = cameraTransform.position + cameraTransform.forward * ( hit.distance + 1.5f );
+
+					newFlashlightRotation = Quaternion.LookRotation( hitPosition - flashlight.transform.position );
+				}
+
+				float percent = Mathf.Clamp01( Quaternion.Angle( flashlight.transform.rotation, newFlashlightRotation ) / 90f );
+
+				flashlight.transform.rotation = Quaternion.Lerp( flashlight.transform.rotation, newFlashlightRotation, percent );
+			}
+			
+			oldZoomProgress = zoomProgress;
+			oldViewChangeVector = viewChangeVector;
+
+			return;
+
+			//if( )
+			//{
+				if( !movingBack )
+					clippingOffset = transform.TransformPoint( cameraPositionOffset );
+				else
+					clippingOffset = transform.TransformPoint( new Vector3( cameraPositionOffset.x, cameraPositionOffset.y, cameraPositionOffset.z * -1f ) );
+
+				RaycastHit[] hits;
+
+				float longestDistance = 0f;
+
+				hits = Physics.RaycastAll( clippingOffset, cameraTransform.forward, Mathf.Abs( cameraPositionOffset.z ) );
+
+				for( int i = 0; i < hits.Length; i++ )
+					if( hits[i].distance > longestDistance )
+						longestDistance = hits[i].distance;
+		
+				clippingOffset += cameraTransform.forward * longestDistance;
+
+				if( !movingBack )
+					zoomOffset = transform.TransformPoint( cameraPositionZoomOffset );
+				else
+					zoomOffset = transform.TransformPoint( new Vector3( cameraPositionZoomOffset.x, cameraPositionZoomOffset.y, cameraPositionZoomOffset.z * -1f ) );
+			//}
+					                                   
+			cameraTransform.position = Vector3.Lerp( clippingOffset, zoomOffset, zoomProgress );
+			cameraTransform.camera.fieldOfView = Mathf.RoundToInt( Mathf.Lerp( cameraFoV, cameraZoomFoV, zoomProgress ) );
+
+			if( !movingBack )
+				cameraTransform.rotation = transform.rotation * cameraRotationOffset;
 
 			if( viewChangeVector != Vector2.zero )
 			{
-				cameraTransform.eulerAngles = new Vector3( cameraTransform.eulerAngles.x - viewChangeVector.y * 15f, cameraTransform.eulerAngles.y + viewChangeVector.x * 30f, 0f );		
+				//cameraTransform.eulerAngles = new Vector3( cameraTransform.eulerAngles.x - viewChangeVector.y * 15f, cameraTransform.eulerAngles.y + viewChangeVector.x * 30f, 0f );	
+				//cameraTransform.eulerAngles = new Vector3( cameraTransform.eulerAngles.x - viewChangeVector.y * 30f, cameraTransform.eulerAngles.y + viewChangeVector.x * 180f, 0f );	
 			}
 
+			/*
 			if( viewChangeVector == oldViewChangeVector )
 				timeViewChangeStatic += Time.deltaTime;
 			else
@@ -388,13 +565,16 @@ public class PlayerController : Photon.MonoBehaviour {
 				if( viewChangeVector.y > 0f )
 					viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y - viewChangeRate * 0.5f * Time.deltaTime, 0f, 1f ) );
 			}
-
-			if( flashlight != null )
-				flashlight.transform.rotation = cameraTransform.rotation;
-
-			oldZoomProgress = zoomProgress;
-			oldViewChangeVector = viewChangeVector;
+			*/
 		}
+	}
+
+	private float AngleDistance(float a, float b)
+	{
+		a = Mathf.Repeat(a, 360);
+		b = Mathf.Repeat(b, 360);
+		
+		return Mathf.Abs(b - a);
 	}
 
 	private void DisplayGUI()
@@ -422,6 +602,8 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private void EvaluateMovement( InputController.ButtonType button )
 	{
+		return;
+
 		switch( button )
 		{
 		case InputController.ButtonType.Left:
@@ -654,4 +836,178 @@ public class PlayerController : Photon.MonoBehaviour {
 		return ( Time.time - fearAttackLastTime > fearAttackTimeBuffer );
 	}
 	//end public functions
+
+	//camera junk
+	void Apply(Transform dummyTarget, Vector3 dummyCenter)
+	{
+		Vector3 targetCenter = transform.position + centerOffset;
+		Vector3 targetHead = transform.position + headOffset;
+		
+		//	DebugDrawStuff();
+		
+		// Calculate the current & target rotation angles
+		float originalTargetAngle = transform.eulerAngles.y;
+		float currentAngle = cameraTransform.eulerAngles.y;
+		
+		// Adjust real target angle when camera is locked
+		float targetAngle = originalTargetAngle;
+		
+		if (snap)
+		{
+			// We are close to the target, so we can stop snapping now!
+			if (AngleDistance(currentAngle, originalTargetAngle) < 3.0f)
+				snap = false;
+			
+			currentAngle = Mathf.SmoothDampAngle(currentAngle, targetAngle, ref angleVelocity, snapSmoothLag, snapMaxSpeed);
+		}
+		// Normal camera motion
+		else
+		{
+			if (lockCameraTimer < lockCameraTimeout)
+			{
+				targetAngle = currentAngle;
+			}
+			
+			// Lock the camera when moving backwards!
+			// * It is really confusing to do 180 degree spins when turning around.
+			if (AngleDistance(currentAngle, targetAngle) > 160 && movingBack)
+				targetAngle += 180;
+			
+			currentAngle = Mathf.SmoothDampAngle(currentAngle, targetAngle, ref angleVelocity, angularSmoothLag, angularMaxSpeed);
+		}
+		
+
+		// Damp the height
+		float currentHeight = transform.position.y + height;
+		
+		// Convert the angle into a rotation, by which we then reposition the camera
+		Quaternion currentRotation = Quaternion.Euler(0, currentAngle, 0);
+		
+		// Set the position of the camera on the x-z plane to:
+		// distance meters behind the target
+		cameraTransform.position = targetCenter;
+		cameraTransform.position += currentRotation * Vector3.back * distance;
+		
+		// Set the height of the camera
+		cameraTransform.position = new Vector3(cameraTransform.position.x, currentHeight, cameraTransform.position.z);
+
+		SnapCamera();
+		
+		// Always look at the target	
+		SetUpRotation(targetCenter, targetHead);
+	}
+
+	void Cut(Transform dummyTarget, Vector3 dummyCenter)
+	{
+		float oldSnapMaxSpeed = snapMaxSpeed;
+		float oldSnapSmooth = snapSmoothLag;
+		
+		snapMaxSpeed = 10000;
+		snapSmoothLag = 0.001f;
+
+		snap = true;
+		Apply(transform, Vector3.zero);
+		
+		snapMaxSpeed = oldSnapMaxSpeed;
+		snapSmoothLag = oldSnapSmooth;
+	}
+	
+	void SetUpRotation(Vector3 centerPos, Vector3 headPos)
+	{
+		// Now it's getting hairy. The devil is in the details here, the big issue is jumping of course.
+		// * When jumping up and down we don't want to center the guy in screen space.
+		//  This is important to give a feel for how high you jump and avoiding large camera movements.
+		//   
+		// * At the same time we dont want him to ever go out of screen and we want all rotations to be totally smooth.
+		//
+		// So here is what we will do:
+		//
+		// 1. We first find the rotation around the y axis. Thus he is always centered on the y-axis
+		// 2. When grounded we make him be centered
+		// 3. When jumping we keep the camera rotation but rotate the camera to get him back into view if his head is above some threshold
+		// 4. When landing we smoothly interpolate towards centering him on screen
+		Vector3 cameraPos = cameraTransform.position - zoomOffset;
+		Vector3 offsetToCenter = centerPos - cameraPos;
+		
+		// Generate base rotation only around y-axis
+		Quaternion yRotation = Quaternion.LookRotation(new Vector3(offsetToCenter.x, 0, offsetToCenter.z));
+		
+		Vector3 relativeOffset = Vector3.forward * distance + Vector3.down * height;
+		cameraTransform.rotation = yRotation * Quaternion.LookRotation(relativeOffset);
+		
+		// Calculate the projected center position and top position in world space
+		Ray centerRay = cameraTransform.camera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 1));
+		Ray topRay = cameraTransform.camera.ViewportPointToRay(new Vector3(0.5f, clampHeadPositionScreenSpace, 1));
+		
+		Vector3 centerRayPos = centerRay.GetPoint(distance);
+		Vector3 topRayPos = topRay.GetPoint(distance);
+		
+		float centerToTopAngle = Vector3.Angle(centerRay.direction, topRay.direction);
+		
+		float heightToAngle = centerToTopAngle / (centerRayPos.y - topRayPos.y);
+		
+		float extraLookAngle = heightToAngle * (centerRayPos.y - centerPos.y);
+		if (extraLookAngle < centerToTopAngle)
+		{
+			extraLookAngle = 0;
+		}
+		else
+		{
+			extraLookAngle = extraLookAngle - centerToTopAngle;
+			cameraTransform.rotation *= Quaternion.Euler(-extraLookAngle, 0, 0);
+		}
+
+		float xAngleOffset = cameraRotationOffset.eulerAngles.x;
+
+		//nolan junk
+		if( viewChangeVector != Vector2.zero )
+		{
+			if( zoomProgress == 0f )
+			{
+				cameraRotationOffset *= Quaternion.AngleAxis( viewChangeVector.y * -30f, Vector3.right );
+				cameraTransform.rotation *= Quaternion.AngleAxis( viewChangeVector.x * 90f, Vector3.up );
+			}
+			else
+			{
+				cameraRotationOffset *= Quaternion.AngleAxis( viewChangeVector.y * -15f, Vector3.right );
+				cameraTransform.rotation *= Quaternion.AngleAxis( viewChangeVector.x * 45f, Vector3.up );
+			}
+
+			xAngleOffset = cameraRotationOffset.eulerAngles.x;
+
+			//cameraTransform.eulerAngles = new Vector3( cameraTransform.eulerAngles.x - viewChangeVector.y * 30f, cameraTransform.eulerAngles.y + viewChangeVector.x * 30f, 0f );	
+			viewChangeVector = Vector2.zero;
+
+			lockCameraTimer = 0f;
+		}
+
+		if( zoomProgress == 0f )
+		{
+			if( xAngleOffset > 30f && xAngleOffset < 180f )
+				xAngleOffset = 30f;
+			
+			if( xAngleOffset > 180f && xAngleOffset < 330f )
+				xAngleOffset = 330f;
+		}
+		else
+		{
+			if( xAngleOffset > 40f && xAngleOffset < 180f )
+				xAngleOffset = 40f;
+
+			if( xAngleOffset > 180f && xAngleOffset < 355f )
+				xAngleOffset = 355f;
+		}
+
+		cameraRotationOffset.eulerAngles = new Vector3( xAngleOffset, cameraRotationOffset.eulerAngles.y, cameraRotationOffset.eulerAngles.z );
+		cameraTransform.rotation *= cameraRotationOffset;
+
+		cameraTransform.eulerAngles = new Vector3 (cameraTransform.eulerAngles.x, cameraTransform.eulerAngles.y, 0f);
+
+	}
+	
+	Vector3 GetCenterOffset()
+	{
+		return centerOffset;
+	}
+	//end camera junk
 }
