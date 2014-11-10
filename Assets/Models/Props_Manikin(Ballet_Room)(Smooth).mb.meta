@@ -1,0 +1,166 @@
+fileFormatVersion: 2
+guid: 0e7ededdecd0e4d1d97d58e33dd94182
+ModelImporter:
+  serializedVersion: 15
+  fileIDToRecycleName:
+    100000: Head
+    100002: Index_Finger
+    100004: Index_Finger 1
+    100006: Left_Arm
+    100008: Left_Arm_Hand
+    100010: Left_Hand
+    100012: Left_Lower
+    100014: Left_Lower_Arm
+    100016: Left_Upper_Arm
+    100018: Little_Finger
+    100020: Little_Finger 1
+    100022: Middle_Finger
+    100024: Middle_Finger 1
+    100026: Palm
+    100028: Palm 1
+    100030: //RootNode
+    100032: Right_Arm
+    100034: Right_Arm_Hand
+    100036: Right_Hand
+    100038: Right_Lower
+    100040: Right_Lower_Arm
+    100042: Right_Upper_Arm
+    100044: Ring_Finger
+    100046: Ring_Finger 1
+    100048: Thumb
+    100050: Thumb 1
+    100052: Upper_Body
+    400000: Head
+    400002: Index_Finger
+    400004: Index_Finger 1
+    400006: Left_Arm
+    400008: Left_Arm_Hand
+    400010: Left_Hand
+    400012: Left_Lower
+    400014: Left_Lower_Arm
+    400016: Left_Upper_Arm
+    400018: Little_Finger
+    400020: Little_Finger 1
+    400022: Middle_Finger
+    400024: Middle_Finger 1
+    400026: Palm
+    400028: Palm 1
+    400030: //RootNode
+    400032: Right_Arm
+    400034: Right_Arm_Hand
+    400036: Right_Hand
+    400038: Right_Lower
+    400040: Right_Lower_Arm
+    400042: Right_Upper_Arm
+    400044: Ring_Finger
+    400046: Ring_Finger 1
+    400048: Thumb
+    400050: Thumb 1
+    400052: Upper_Body
+    2300000: Head
+    2300002: Index_Finger
+    2300004: Index_Finger 1
+    2300006: Left_Lower_Arm
+    2300008: Left_Upper_Arm
+    2300010: Little_Finger
+    2300012: Little_Finger 1
+    2300014: Middle_Finger
+    2300016: Middle_Finger 1
+    2300018: Palm
+    2300020: Palm 1
+    2300022: Right_Lower_Arm
+    2300024: Right_Upper_Arm
+    2300026: Ring_Finger
+    2300028: Ring_Finger 1
+    2300030: Thumb
+    2300032: Thumb 1
+    2300034: Upper_Body
+    3300000: Head
+    3300002: Index_Finger
+    3300004: Index_Finger 1
+    3300006: Left_Lower_Arm
+    3300008: Left_Upper_Arm
+    3300010: Little_Finger
+    3300012: Little_Finger 1
+    3300014: Middle_Finger
+    3300016: Middle_Finger 1
+    3300018: Palm
+    3300020: Palm 1
+    3300022: Right_Lower_Arm
+    3300024: Right_Upper_Arm
+    3300026: Ring_Finger
+    3300028: Ring_Finger 1
+    3300030: Thumb
+    3300032: Thumb 1
+    3300034: Upper_Body
+    4300000: Upper_Body
+    4300002: Head
+    4300004: Left_Upper_Arm
+    4300006: Left_Lower_Arm
+    4300008: Thumb
+    4300010: Little_Finger
+    4300012: Ring_Finger
+    4300014: Middle_Finger
+    4300016: Index_Finger
+    4300018: Palm
+    4300020: Right_Upper_Arm
+    4300022: Right_Lower_Arm
+    4300024: Thumb
+    4300026: Little_Finger
+    4300028: Ring_Finger
+    4300030: Middle_Finger
+    4300032: Index_Finger
+    4300034: Palm
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  userData: 
