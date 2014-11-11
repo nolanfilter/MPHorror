@@ -20,6 +20,20 @@ Material:
           m_Texture: {fileID: 2800000, guid: 7773d0b449f6d4cb99d49159aa44711f, type: 3}
           m_Scale: {x: 8, y: 2}
           m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _BumpMap
+        second:
+          m_Texture: {fileID: 2800000, guid: fefd2a115c27e498cbecf3956191f188, type: 3}
+          m_Scale: {x: 8, y: 2}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _DecalTex
+        second:
+          m_Texture: {fileID: 2800000, guid: 60be01677219b40b1ab9beaa151596b8, type: 3}
+          m_Scale: {x: 8, y: 2}
+          m_Offset: {x: 0, y: 0}
     m_Floats: {}
     m_Colors:
       data:
