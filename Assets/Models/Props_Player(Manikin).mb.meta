@@ -1,7 +1,7 @@
 fileFormatVersion: 2
-guid: 227bb77e169df4c2fa07210220952b00
+guid: a6e4dc7e52f4149d9b511fc30e3cf665
 ModelImporter:
-  serializedVersion: 15
+  serializedVersion: 16
   fileIDToRecycleName:
     100000: Hair
     100002: Head
@@ -141,6 +141,7 @@ ModelImporter:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
     optimizeGameObjects: 0
+    motionNodeName: 
     animationCompression: 1
     animationRotationError: .5
     animationPositionError: .5
@@ -184,4 +185,5 @@ ModelImporter:
     rootMotionBoneName: 
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   animationType: 2
+  additionalBone: 0
   userData: 
