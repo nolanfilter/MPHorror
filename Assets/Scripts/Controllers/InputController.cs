@@ -26,7 +26,8 @@ public class InputController : MonoBehaviour {
 		RRight = 7,
 		Zoom = 8,
 		Flashlight = 9,
-		Invalid = 10,
+		Photograph = 10,
+		Invalid = 11,
 	}
 	
 	private string verticalAxisString = "Vertical";
@@ -71,12 +72,14 @@ public class InputController : MonoBehaviour {
 		currentButtonList[ ButtonType.RDown ] = rVerticalAxis < 0f;
 		currentButtonList[ ButtonType.RLeft ] = rHorizontalAxis < 0f;
 
-		currentButtonList[ ButtonType.Zoom ] = Input.GetAxisRaw( leftTriggerAxisString ) > 0f || Input.GetAxisRaw( rightTriggerAxisString ) > 0f;
+		currentButtonList[ ButtonType.Zoom ] = ( Input.GetAxisRaw( leftTriggerAxisString ) > 0f );
+		currentButtonList[ ButtonType.Photograph ] = ( Input.GetAxisRaw( rightTriggerAxisString ) > 0f );
 		
 		for( int i = 0; i < codes.Length; i++ )
 		{
 			if( i == (int)ButtonType.Up || i == (int)ButtonType.Right || i == (int)ButtonType.Down || i == (int)ButtonType.Left ||
-				i == (int)ButtonType.RUp || i == (int)ButtonType.RRight || i == (int)ButtonType.RDown || i == (int)ButtonType.RLeft || i == (int)ButtonType.Zoom )
+				i == (int)ButtonType.RUp || i == (int)ButtonType.RRight || i == (int)ButtonType.RDown || i == (int)ButtonType.RLeft || 
+			   	i == (int)ButtonType.Zoom || i == (int)ButtonType.Photograph )
 				currentButtonList[ (ButtonType)i ] = currentButtonList[ (ButtonType)i ] || Input.GetKey( codes[ i ] );
 			else
 				currentButtonList[ (ButtonType)i ] = Input.GetKey( codes[ i ] );
@@ -142,8 +145,9 @@ public class InputController : MonoBehaviour {
 					codes[ (int)ButtonType.RDown ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
 					codes[ (int)ButtonType.RLeft ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
 					codes[ (int)ButtonType.RRight ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
-					codes[ (int)ButtonType.Zoom ] = (KeyCode)( (int)KeyCode.Joystick1Button3 );
+					codes[ (int)ButtonType.Zoom ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
 					codes[ (int)ButtonType.Flashlight ] = (KeyCode)( (int)KeyCode.Joystick1Button12 );
+					codes[ (int)ButtonType.Photograph ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
 					
 				} break;
 				}
@@ -161,7 +165,8 @@ public class InputController : MonoBehaviour {
 				codes[ (int)ButtonType.RLeft ] = KeyCode.LeftArrow;
 				codes[ (int)ButtonType.RRight ] = KeyCode.RightArrow;
 				codes[ (int)ButtonType.Zoom ] = KeyCode.Space;
-				codes[ (int)ButtonType.Flashlight ] = KeyCode.Return;
+				codes[ (int)ButtonType.Flashlight ] = KeyCode.Delete;
+				codes[ (int)ButtonType.Photograph ] = KeyCode.Return;
 				
 				currentInputType = "Keyboard";
 			}

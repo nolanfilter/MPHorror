@@ -43,9 +43,9 @@ public class NetworkAgent : MonoBehaviour {
 		if( networkBackgroundPrefab )
 		{
 			networkBackground = Instantiate( networkBackgroundPrefab ) as GameObject;
-			networkBackground.transform.parent = Camera.main.transform;
-			networkBackground.transform.localPosition = new Vector3( 0f, 0f, Camera.main.nearClipPlane + 0.001f );
-			networkBackground.transform.localRotation = Quaternion.identity;
+			//networkBackground.transform.parent = Camera.main.transform;
+			//networkBackground.transform.localPosition = new Vector3( 0f, 0f, Camera.main.nearClipPlane + 0.001f );
+			//networkBackground.transform.localRotation = Quaternion.identity;
 		}
 	}
 

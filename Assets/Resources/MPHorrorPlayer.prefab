@@ -229,7 +229,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meterTexture: {fileID: 2800000, guid: ef046fff5043b4ce59c31bd90d47cb71, type: 3}
-  height: .959999979
+  flashQuadPrefab: {fileID: 100000, guid: 6e7de32a852f645ee91e6d64325dadd8, type: 2}
+  screenshotQuadPrefab: {fileID: 100000, guid: 03dea27ec7fb4488c97fa493552293dd, type: 2}
   modelRenderer: {fileID: 2300000}
   flashlight: {fileID: 10800000}
 --- !u!114 &11400004
