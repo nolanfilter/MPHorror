@@ -13,6 +13,7 @@ GameObject:
   - 114: {fileID: 11400004}
   - 114: {fileID: 11400006}
   - 114: {fileID: 11400008}
+  - 114: {fileID: 11400010}
   m_Layer: 0
   m_Name: Agents
   m_TagString: Untagged
@@ -54,6 +55,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06cfb31ec2e014854808defcf581d467, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  menuControllerPrefab: {fileID: 0}
+  darkQuadPrefab: {fileID: 0}
 --- !u!114 &11400004
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -70,15 +73,15 @@ MonoBehaviour:
   networkBackgroundPrefab: {fileID: 100000, guid: 31af3ae2df7ba4ae8b37d917edabeec6,
     type: 2}
   playerStartPositions:
-  - {x: -42, y: .5, z: 7.5}
-  - {x: -42, y: .5, z: 9.5}
-  - {x: -39, y: .5, z: 7.5}
-  - {x: -39, y: .5, z: 9.5}
+  - {x: 3, y: .5, z: -.300000012}
+  - {x: -31, y: .5, z: 33}
+  - {x: 29.5, y: .5, z: 26.5}
+  - {x: 47.5, y: .5, z: 8}
   playerStartRotations:
-  - {x: 0, y: -90, z: 0}
-  - {x: 0, y: -90, z: 0}
-  - {x: 0, y: -90, z: 0}
-  - {x: 0, y: -90, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
 --- !u!114 &11400006
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -100,6 +103,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4f2d5e5aa453d454ca0318ff6185ebc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &11400010
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56c329b7de9824cc280c49f470e6ea99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &100100000
