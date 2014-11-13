@@ -74,8 +74,35 @@ public class PlayerAgent : MonoBehaviour {
 
 	private IEnumerator WaitAndMonsterize()
 	{
-		yield return new WaitForSeconds( 30f );
+		yield return new WaitForSeconds( 5f );
 
-		playerControllers[ Random.Range( 0, playerControllers.Count ) ].Monsterize();
+		Debug.Log( PhotonNetwork.room.name );
+
+		int seed = HexToInt( PhotonNetwork.room.name[ PhotonNetwork.room.name.Length - 1 ] );
+
+		Debug.Log( seed );
+
+		Random.seed = seed;
+
+		int seededRandomValue = Mathf.FloorToInt (Random.value * playerControllers.Count);
+
+		Debug.Log( seededRandomValue );
+
+		playerControllers[ seededRandomValue ].Monsterize();
+	}
+
+	private int HexToInt( char hex )
+	{
+		switch( hex )
+		{
+			case 'a': return 10;
+			case 'b': return 11;
+			case 'c': return 12;
+			case 'd': return 13;
+			case 'e': return 14;
+			case 'f': return 15;
+
+			default: return (int)(hex - '0');
+		}
 	}
 }
