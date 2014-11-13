@@ -90,7 +90,7 @@ public class InfluenceController : MonoBehaviour {
 		{
 			PlayMakerFSM fsm = collider.GetComponent<PlayMakerFSM>();
 
-			if( fsm == null || playerController.GetCurrentState() != PlayerController.State.Normal || !playerController.IsZoomedIn() )
+			if( fsm == null || playerController.GetCurrentState() == PlayerController.State.Monster || !playerController.IsZoomedIn() )
 				return;
 
 			fsm.SendEvent( "ObjectSeen" );
