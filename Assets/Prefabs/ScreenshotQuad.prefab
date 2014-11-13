@@ -11,8 +11,8 @@ GameObject:
   - 33: {fileID: 3300000}
   - 23: {fileID: 2300000}
   - 114: {fileID: 11400000}
-  m_Layer: 0
-  m_Name: NetworkBackground
+  m_Layer: 5
+  m_Name: ScreenshotQuad
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25,7 +25,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100000}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: .310000002}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -42,7 +42,7 @@ Renderer:
   m_LightmapIndex: 255
   m_LightmapTilingOffset: {x: 1, y: 1, z: 0, w: 0}
   m_Materials:
-  - {fileID: 2100000, guid: 86a4bc1af90dc46658496907dd366913, type: 2}
+  - {fileID: 2100000, guid: 7994f761a471e496a966cae2e0e0a289, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -68,8 +68,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a6f7b6f1fb16483eb9b72a3f541f5b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  widthPercentage: 1
-  heightPercentage: 1
+  widthPercentage: .375
+  heightPercentage: .375
+  xPercentage: .1875
+  yPercentage: .1875
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
