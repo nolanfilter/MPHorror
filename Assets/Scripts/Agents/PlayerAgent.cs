@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public class PlayerAgent : MonoBehaviour {
 
@@ -38,6 +39,11 @@ public class PlayerAgent : MonoBehaviour {
 	{
 		if( !playerControllers.Contains( playerController ) )
 			playerControllers.Add( playerController );
+
+		playerControllers = playerControllers.OrderBy( pc => pc.photonView.viewID ).ToList();
+
+		if( playerControllers.Count == 1 )
+			StartCoroutine( "WaitAndMonsterize" );
 	}
 
 	public static void UnregisterPlayer( PlayerController playerController )
@@ -64,5 +70,12 @@ public class PlayerAgent : MonoBehaviour {
 
 		for( int i = 0; i < playerControllers.Count; i++ )
 			playerControllers[i].TeleportTo( new Vector3( float.Parse( splitCoordinates[ i * 2 ] ), 0f, float.Parse( splitCoordinates[ i * 2 + 1 ] ) ) );
+	}
+
+	private IEnumerator WaitAndMonsterize()
+	{
+		yield return new WaitForSeconds( 30f );
+
+		playerControllers[ Random.Range( 0, playerControllers.Count ) ].Monsterize();
 	}
 }

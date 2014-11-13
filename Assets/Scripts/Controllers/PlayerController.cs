@@ -90,7 +90,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	public GameObject flashQuadPrefab;
 	public GameObject screenshotQuadPrefab;
 
-	public Renderer modelRenderer;
+	private Renderer[] modelRenderers = null;
 
 	public Light flashlight;
 
@@ -146,8 +146,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		
 		networkView = GetComponent<NetworkView>();
 
-		if( modelRenderer == null )
-			modelRenderer = GetComponentInChildren<Renderer>();
+		if( modelRenderers == null )
+			modelRenderers = GetComponentsInChildren<Renderer>();
 
 		if( flashlight == null )
 			flashlight = GetComponentInChildren<Light>();
@@ -180,7 +180,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		oldViewChangeVector = viewChangeVector;
 
 		walkSpeed = speed * 0.5f;
-		trotSpeed = speed;
+		trotSpeed = walkSpeed;
+		//trotSpeed = speed;
 
 		SnapCamera();
 
@@ -462,7 +463,7 @@ public class PlayerController : Photon.MonoBehaviour {
 			cameraTransform.position += zoomOffset;
 			cameraTransform.camera.fieldOfView = Mathf.RoundToInt( Mathf.Lerp( cameraFoV, cameraZoomFoV, zoomProgress ) );
 
-			if( flashlight != null )
+			if( flashlight != null && currentState != State.Dead )
 			{
 				RaycastHit hit;
 
@@ -596,11 +597,22 @@ public class PlayerController : Photon.MonoBehaviour {
 			lockCameraTimer = 0f;
 		}
 
-		if( xAngleOffset > 40f && xAngleOffset < 180f )
-			xAngleOffset = 40f;
+		if( zoomProgress == 0f )
+		{
+			if( xAngleOffset > 40f && xAngleOffset < 180f )
+				xAngleOffset = 40f;
+				
+			if( xAngleOffset > 180f && xAngleOffset < 340f )
+				xAngleOffset = 340f;
+		}
+		else
+		{
+			if( xAngleOffset > 60f && xAngleOffset < 180f )
+				xAngleOffset = 60f;
 			
-		if( xAngleOffset > 180f && xAngleOffset < 330f )
-			xAngleOffset = 330f;
+			if( xAngleOffset > 180f && xAngleOffset < 320f )
+				xAngleOffset = 320f;
+		}
 		
 		cameraRotationOffset.eulerAngles = new Vector3( xAngleOffset, cameraRotationOffset.eulerAngles.y, cameraRotationOffset.eulerAngles.z );
 		cameraTransform.rotation *= cameraRotationOffset;
@@ -677,7 +689,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private IEnumerator TakePhoto()
 	{
-		if( ( zoomProgress < 0.75f ) || isWaitingForPhotoFinish || hasPhoto )
+		if( ( zoomProgress != 1f ) || isWaitingForPhotoFinish || hasPhoto )
 			yield break;
 
 		ScreenshotAgent.instance.OnPostRenderFinish += OnScreenshotFinish;
@@ -738,13 +750,18 @@ public class PlayerController : Photon.MonoBehaviour {
 	//end coroutines
 
 	//server calls
-	[RPC] void ChangeColor( Vector3 color )
+	[RPC] void ChangeColor( Vector3 colorVector )
 	{
-		if( modelRenderer != null )
-			modelRenderer.material.color = new Color( color.x, color.y, color.z, 1f );
+		if( modelRenderers != null )
+		{
+			Color color = new Color( colorVector.x, colorVector.y, colorVector.z, 1f );
+
+			for( int i = 0; i < modelRenderers.Length; i++ )
+				modelRenderers[i].material.color = color;
+		}
 		
 		if( photonView.isMine )
-			photonView.RPC( "ChangeColor", PhotonTargets.OthersBuffered, color );
+			photonView.RPC( "ChangeColor", PhotonTargets.OthersBuffered, colorVector );
 	}
 
 	[RPC] void ChangeState( int state )
@@ -874,7 +891,14 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public bool IncreaseFear()
 	{
-		return ChangeFear( fearAttack );
+		//TODO tie into mechanic
+
+		ChangeState( (int)State.Dead );
+		DisplayMessage( "Your soul was stolen" );
+		ChangeColor( new Vector3( 0.175f, 0.175f, 0.175f ) );
+
+		return true;
+		//return ChangeFear( fearAttack );
 	}
 
 	public void SetFlashlightTo( bool on )
@@ -893,7 +917,8 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public void IncrementPoint()
 	{
-		DisplayMessage( "You got 1 point!" );
+		//TODO tie into mechanic
+		//DisplayMessage( "You got 1 point!" );
 	}
 
 	public void DisplayMessage( string messageToDisplay )
@@ -913,7 +938,16 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public bool CanIncreaseFear()
 	{
-		return ( Time.time - fearAttackLastTime > fearAttackTimeBuffer );
+		//TODO tie into mechanic
+
+		return true;
+		//return ( Time.time - fearAttackLastTime > fearAttackTimeBuffer );
+	}
+
+	public void Monsterize()
+	{
+		ChangeState( (int)State.Monster );
+		DisplayMessage( "(You're the Monster)" );
 	}
 	//end public functions
 }
