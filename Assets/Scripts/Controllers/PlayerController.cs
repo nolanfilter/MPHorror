@@ -90,7 +90,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	public GameObject flashQuadPrefab;
 	public GameObject screenshotQuadPrefab;
 
-	public Renderer modelRenderer;
+	private Renderer[] modelRenderers = null;
 
 	public Light flashlight;
 
@@ -146,8 +146,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		
 		networkView = GetComponent<NetworkView>();
 
-		if( modelRenderer == null )
-			modelRenderer = GetComponentInChildren<Renderer>();
+		if( modelRenderers == null )
+			modelRenderers = GetComponentsInChildren<Renderer>();
 
 		if( flashlight == null )
 			flashlight = GetComponentInChildren<Light>();
@@ -738,13 +738,18 @@ public class PlayerController : Photon.MonoBehaviour {
 	//end coroutines
 
 	//server calls
-	[RPC] void ChangeColor( Vector3 color )
+	[RPC] void ChangeColor( Vector3 colorVector )
 	{
-		if( modelRenderer != null )
-			modelRenderer.material.color = new Color( color.x, color.y, color.z, 1f );
+		if( modelRenderers != null )
+		{
+			Color color = new Color( colorVector.x, colorVector.y, colorVector.z, 1f );
+
+			for( int i = 0; i < modelRenderers.Length; i++ )
+				modelRenderers[i].material.color = color;
+		}
 		
 		if( photonView.isMine )
-			photonView.RPC( "ChangeColor", PhotonTargets.OthersBuffered, color );
+			photonView.RPC( "ChangeColor", PhotonTargets.OthersBuffered, colorVector );
 	}
 
 	[RPC] void ChangeState( int state )
