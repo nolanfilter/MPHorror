@@ -30,9 +30,9 @@ public class MannequinAgent : MonoBehaviour {
 
 	void Start()
 	{
-		mannequins[ Random.Range( 0, mannequins.Count ) ].tag = "Key";
+		StartCoroutine( "WaitAndSetKeyTag" );
 	}
-	
+
 	public static void RegisterMannequin( GameObject mannequin )
 	{
 		if( instance )
@@ -55,5 +55,13 @@ public class MannequinAgent : MonoBehaviour {
 	{
 		if( mannequins.Contains( mannequin ) )
 			mannequins.Remove( mannequin );
+	}
+
+	private IEnumerator WaitAndSetKeyTag()
+	{
+		yield return null;
+
+		if( mannequins.Count > 0 )
+			mannequins[ Random.Range( 0, mannequins.Count ) ].tag = "Key";
 	}
 }

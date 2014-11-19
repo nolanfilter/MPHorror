@@ -56,6 +56,12 @@ public class GameAgent : MonoBehaviour {
 			darkQuad = Instantiate( darkQuadPrefab ) as GameObject; 
 	}
 
+	void Update()
+	{
+		if( Input.GetKeyDown( KeyCode.Escape ) )
+			Application.Quit();
+	}
+
 	public static void ChangeGameState( GameState newGameState )
 	{
 		if( instance )
