@@ -71,19 +71,14 @@ public class InfluenceController : MonoBehaviour {
 		{
 			PlayerController otherPlayerController = collider.GetComponent<PlayerController>();
 
-			if( otherPlayerController == null || otherPlayerController == playerController || otherPlayerController.GetCurrentState() != PlayerController.State.Normal )
+			if( otherPlayerController == null || otherPlayerController == playerController )
 				return;
 
-			if( playerController.GetCurrentState() == PlayerController.State.Normal )
+			if( playerController.IsZoomedIn() && playerController.GetCurrentState() == PlayerController.State.Monster )
 			{
-				otherPlayerController.IncreaseSanity();
-			}
-			else if( playerController.GetCurrentState() == PlayerController.State.Monster )
-			{
-				bool killedByPlayer = otherPlayerController.IncreaseFear();
+				Debug.Log( "Attack player " + otherPlayerController.photonView.viewID );
 
-				if( killedByPlayer )
-					otherPlayerController.IncrementPoint();
+				otherPlayerController.IncreaseFear();
 			}
 		}
 		else if( collider.tag == "Key" )
