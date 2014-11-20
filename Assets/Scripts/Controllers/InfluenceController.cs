@@ -75,11 +75,7 @@ public class InfluenceController : MonoBehaviour {
 				return;
 
 			if( playerController.IsZoomedIn() && playerController.GetCurrentState() == PlayerController.State.Monster )
-			{
-				Debug.Log( "Attack player " + otherPlayerController.photonView.viewID );
-
 				otherPlayerController.IncreaseFear();
-			}
 		}
 		else if( collider.tag == "Key" )
 		{
