@@ -112,7 +112,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	private float trotAfterSeconds = 3f;
 	private float moveSpeed = 0f;
 	private float walkTimeStart = 0f;
-	private float lockCameraTimeout = 2f;
+	private float lockCameraTimeout = 15f;
 	private float angularSmoothLag = 0.3f;
 	private float angularMaxSpeed = 15.0f;
 	private float snapSmoothLag = 0.2f;
@@ -470,9 +470,18 @@ public class PlayerController : Photon.MonoBehaviour {
 			if( zoomProgress != 0f )
 				lockCameraTimer = 0f;
 
-			zoomOffset = Vector3.Lerp( Vector3.zero, Quaternion.AngleAxis( cameraTransform.eulerAngles.y, Vector3.up ) * Vector3.forward * 1.25f, zoomProgress );
+			float longestDistance = 0f;
+			RaycastHit[] hits = Physics.RaycastAll( cameraTransform.position, cameraTransform.forward, Vector3.Distance( cameraTransform.position, transform.position + headOffset ) );
+			
+			for( int i = 0; i < hits.Length; i++ )
+				if( hits[i].transform != transform && hits[i].normal != Vector3.up && hits[i].distance > longestDistance )
+					longestDistance = hits[i].distance;
+			
+			clippingOffset = cameraTransform.forward * longestDistance;
 
+			zoomOffset = Vector3.Lerp( clippingOffset, Quaternion.AngleAxis( cameraTransform.eulerAngles.y, Vector3.up ) * Vector3.forward * 1.25f, zoomProgress );
 			cameraTransform.position += zoomOffset;
+
 			cameraTransform.camera.fieldOfView = Mathf.RoundToInt( Mathf.Lerp( cameraFoV, cameraZoomFoV, zoomProgress ) );
 
 			if( flashlight != null && currentState != State.Dead )
