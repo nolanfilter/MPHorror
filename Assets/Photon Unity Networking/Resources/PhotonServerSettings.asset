@@ -41,4 +41,5 @@ MonoBehaviour:
   - RPCChangeFlashlight
   - RPCChangeZoom
   - RPCDisplayMessage
+  - RPCChangeColider
   DisableAutoOpenWizard: 0

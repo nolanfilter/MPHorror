@@ -8,6 +8,8 @@ public class PlayerAgent : MonoBehaviour {
 
 	public bool monsterize = true;
 
+	private int monsterID = -1;
+
 	private static PlayerAgent mInstance = null;
 	public static PlayerAgent instance
 	{
@@ -80,27 +82,33 @@ public class PlayerAgent : MonoBehaviour {
 			playerControllers[i].TeleportTo( new Vector3( float.Parse( splitCoordinates[ i * 2 ] ), 0f, float.Parse( splitCoordinates[ i * 2 + 1 ] ) ) );
 	}
 
+	public void GlobalMessageDisplay( string messageToDisplay )
+	{
+		for( int i = 0; i < playerControllers.Count; i++ )
+			playerControllers[i].DisplayMessage( messageToDisplay );
+	}
+
+	public void AllButMonsterMessageDisplay( string messageToDisplay )
+	{
+		for( int i = 0; i < playerControllers.Count; i++ )
+			if( i != monsterID )
+				playerControllers[i].DisplayMessage( messageToDisplay );
+	}
+
 	private IEnumerator WaitAndMonsterize()
 	{
 		if( !monsterize || playerControllers.Count == 0 )
 			yield break;
 
-		yield return new WaitForSeconds( 5f );
-
-		//Debug.Log( PhotonNetwork.room.name );
+		yield return new WaitForSeconds( 25f );
 
 		int seed = HexToInt( PhotonNetwork.room.name[ PhotonNetwork.room.name.Length - 1 ] );
 
-		//Debug.Log( seed );
-
 		Random.seed = seed;
 
-		int seededRandomValue = Mathf.FloorToInt (Random.value * playerControllers.Count);
-
-		//Debug.Log( seededRandomValue );
-		//Debug.Log( playerControllers[ seededRandomValue ].photonView.viewID );
+		monsterID = Mathf.FloorToInt( Random.value * playerControllers.Count );
 	
-		playerControllers[ seededRandomValue ].Monsterize();
+		playerControllers[ monsterID ].Monsterize();
 	}
 
 	private int HexToInt( char hex )
