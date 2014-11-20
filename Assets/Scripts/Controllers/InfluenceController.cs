@@ -82,12 +82,11 @@ public class InfluenceController : MonoBehaviour {
 					playerController.MonsterReveal();
 				}
 
-				if( otherPlayerController.GetCurrentState() == PlayerController.State.Monster && ( playerController.GetCurrentState() == PlayerController.State.Normal || playerController.GetCurrentState() == PlayerController.State.None ) ) )
+				if( otherPlayerController.GetCurrentState() == PlayerController.State.Monster && ( playerController.GetCurrentState() == PlayerController.State.Normal || playerController.GetCurrentState() == PlayerController.State.None ) )
 				{
 					otherPlayerController.MonsterReveal();
 				}
 			}
-
 		}
 		else if( collider.tag == "Key" )
 		{

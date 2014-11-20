@@ -676,9 +676,9 @@ public class PlayerController : Photon.MonoBehaviour {
 	private void ToggleFlashlight()
 	{
 		if( flashlight == null )
-			ChangeFlashlight( 0 );
+			SetFlashlightTo( false );
 		else
-			ChangeFlashlight( flashlight.enabled ? 0 : 1 );
+			SetFlashlightTo( !flashlight.enabled );
 	}
 
 	private void EvaluateViewChange( InputController.ButtonType button )
@@ -730,6 +730,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		while( isWaitingForPhotoFinish )
 			yield return null;
 
+		bool oldFlashlightState = ( flashlight && flashlight.enabled );
+
 		SetFlashlightTo( false );
 
 		hasPhoto = true;
@@ -746,9 +748,9 @@ public class PlayerController : Photon.MonoBehaviour {
 			yield return new WaitForSeconds( 1.25f );
 		}
 
-		SetFlashlightTo( true );
-
 		hasPhoto = false;
+
+		SetFlashlightTo( oldFlashlightState );
 
 		if( screenshotQuad )
 		{
@@ -780,6 +782,13 @@ public class PlayerController : Photon.MonoBehaviour {
 	//end coroutines
 
 	//server calls
+	[RPC] 
+	public void RPCChangeColider( int state )
+	{
+		if( characterController )
+			characterController.enabled = ( state == 1 );
+	}
+
 	[RPC] 
 	public void RPCChangeColor( Quaternion colorVector4 )
 	{
@@ -880,6 +889,14 @@ public class PlayerController : Photon.MonoBehaviour {
 		//return ( Time.time - fearAttackLastTime > fearAttackTimeBuffer );
 	}
 
+	public void ChangeColider( int state )
+	{
+		if( characterController )
+			characterController.enabled = ( state == 1 );
+
+		photonView.RPC( "RPCChangeColider", PhotonTargets.OthersBuffered, state );
+	}
+
 	public void ChangeColor( Quaternion colorVector4 )
 	{
 		if( modelRenderers != null )
@@ -973,7 +990,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		
 		ChangeState( (int)State.Dead );
 		DisplayMessage( "Your soul was stolen" );
-		ChangeColor( new Quaternion( 0.175f, 0.175f, 0.175f, 0.75f ) );
+		ChangeColor( new Quaternion( 0.175f, 0.175f, 0.175f, 0.5f ) );
+		ChangeColider( 0 );
 		
 		return true;
 		//return ChangeFear( fearAttack );
@@ -998,7 +1016,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	public void Monsterize()
 	{
 		ChangeState( (int)State.Monster );
-		DisplayMessage( "\n(You're the Monster)\nSteal souls with Photos" );
+		DisplayMessage( "\n(You're the Murderer)\nSteal souls with Photos" );
 	}
 
 	public void MonsterReveal()
@@ -1008,7 +1026,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public void SetFlashlightTo( bool on )
 	{
-		if( flashlight == null )
+		if( flashlight == null || hasPhoto )
 			ChangeFlashlight( 0 );
 		else
 			ChangeFlashlight( ( on ? 1 : 0 ) );
