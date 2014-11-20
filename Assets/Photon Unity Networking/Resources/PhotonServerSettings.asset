@@ -36,4 +36,9 @@ MonoBehaviour:
   - ChangeState
   - ChangeZoom
   - ChangeFlashlight
+  - RPCChangeState
+  - RPCChangeColor
+  - RPCChangeFlashlight
+  - RPCChangeZoom
+  - RPCDisplayMessage
   DisableAutoOpenWizard: 0

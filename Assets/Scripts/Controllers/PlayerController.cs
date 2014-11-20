@@ -771,43 +771,42 @@ public class PlayerController : Photon.MonoBehaviour {
 	//end coroutines
 
 	//server calls
-	[RPC] void ChangeColor( Vector3 colorVector )
+	[RPC] 
+	public void RPCChangeColor( Quaternion colorVector4 )
 	{
 		if( modelRenderers != null )
 		{
-			Color color = new Color( colorVector.x, colorVector.y, colorVector.z, 1f );
+			Color color = new Color( colorVector4.x, colorVector4.y, colorVector4.z, colorVector4.w );
 
 			for( int i = 0; i < modelRenderers.Length; i++ )
 				modelRenderers[i].material.color = color;
 		}
-		
-		if( photonView.isMine )
-			photonView.RPC( "ChangeColor", PhotonTargets.OthersBuffered, colorVector );
 	}
 
-	[RPC] void ChangeState( int state )
-	{
-		currentState = (State)state;
-		
-		if( photonView.isMine )
-			photonView.RPC( "ChangeState", PhotonTargets.OthersBuffered, state );
-	}
-
-	[RPC] void ChangeZoom( int zoom )
-	{
-		isZoomingIn = ( zoom == 1 );
-		
-		if( photonView.isMine )
-			photonView.RPC( "ChangeZoom", PhotonTargets.OthersBuffered, zoom );
-	}
-
-	[RPC] void ChangeFlashlight( int state )
+	[RPC] 
+	public void RPCChangeFlashlight( int state )
 	{
 		if( flashlight )
 			flashlight.enabled = ( state == 1 );
+	}
 
-		if( photonView.isMine )
-			photonView.RPC( "ChangeFlashlight", PhotonTargets.OthersBuffered, state );
+	[RPC]
+	public void RPCChangeState( int state )
+	{
+		currentState = (State)state;
+	}
+
+	[RPC] 
+	public void RPCChangeZoom( int zoom )
+	{
+		isZoomingIn = ( zoom == 1 );
+	}
+
+	[RPC]
+	public void RPCDisplayMessage( string messageToDisplay )
+	{
+		StopCoroutine( "DoDisplayMessage" );
+		StartCoroutine( "DoDisplayMessage", messageToDisplay );
 	}
 	// end server calls
 
@@ -864,26 +863,31 @@ public class PlayerController : Photon.MonoBehaviour {
 	//end event handlers
 
 	//public functions
-	public State GetCurrentState()
+	public bool CanIncreaseFear()
 	{
-		return currentState;
+		//TODO tie into mechanic
+		
+		return true;
+		//return ( Time.time - fearAttackLastTime > fearAttackTimeBuffer );
 	}
 
-	//has the player been fully zoomed in for at least timeZoomedInThreshold seconds
-	public bool IsZoomedIn()
+	public void ChangeColor( Quaternion colorVector4 )
 	{
-		return hasPhoto;
-	}
-
-	public void ChangeSanity( float amount )
-	{
-		currentSanity += amount;
+		if( modelRenderers != null )
+		{
+			Color color = new Color( colorVector4.x, colorVector4.y, colorVector4.z, colorVector4.w );
+			
+			for( int i = 0; i < modelRenderers.Length; i++ )
+				modelRenderers[i].material.color = color;
+		}
+		
+		photonView.RPC( "RPCChangeColor", PhotonTargets.OthersBuffered, colorVector4 );
 	}
 
 	public bool ChangeFear( float amount )
 	{
 		bool wasAlive = ( currentFear > 0f );
-
+		
 		if( amount > 0f )
 		{
 			if( CanIncreaseFear() )
@@ -896,8 +900,34 @@ public class PlayerController : Photon.MonoBehaviour {
 		{
 			currentFear -= amount;
 		}
-
+		
 		return wasAlive && ( currentFear <= 0f );
+	}
+
+	public void ChangeFlashlight( int state )
+	{
+		if( flashlight )
+			flashlight.enabled = ( state == 1 );
+		
+		photonView.RPC( "RPCChangeFlashlight", PhotonTargets.OthersBuffered, state );
+	}
+
+	public void ChangeSanity( float amount )
+	{
+		currentSanity += amount;
+	}
+
+	public void ChangeState( int state )
+	{
+		currentState = (State)state;
+		photonView.RPC( "RPCChangeState", PhotonTargets.OthersBuffered, state );
+	}
+
+	public void ChangeZoom( int zoom )
+	{
+		isZoomingIn = ( zoom == 1 );
+		
+		photonView.RPC( "RPCChangeZoom", PhotonTargets.OthersBuffered, zoom );
 	}
 
 	public void DecreaseSanity()
@@ -905,21 +935,60 @@ public class PlayerController : Photon.MonoBehaviour {
 		ChangeSanity( sanityDecreaseRate * -2f * Time.deltaTime );
 	}
 
-	public void IncreaseSanity()
+	public void DisplayMessage( string messageToDisplay )
 	{
-		ChangeSanity( sanityDecreaseRate * 0.3f * Time.deltaTime );
+		StopCoroutine( "DoDisplayMessage" );
+		StartCoroutine( "DoDisplayMessage", messageToDisplay );
+		
+		photonView.RPC( "RPCDisplayMessage", PhotonTargets.OthersBuffered, messageToDisplay );
+	}
+
+	public void Escape()
+	{
+		ChangeState( (int)State.Voyeur );
+		DisplayMessage( "Escape! You got 5 points!" );
+		
+		foreach( Transform child in transform )
+			child.gameObject.SetActive( false );
+	}
+
+	public State GetCurrentState()
+	{
+		return currentState;
 	}
 
 	public bool IncreaseFear()
 	{
 		//TODO tie into mechanic
-
+		
 		ChangeState( (int)State.Dead );
 		DisplayMessage( "Your soul was stolen" );
-		ChangeColor( new Vector3( 0.175f, 0.175f, 0.175f ) );
-
+		ChangeColor( new Quaternion( 0.175f, 0.175f, 0.175f, 0.75f ) );
+		
 		return true;
 		//return ChangeFear( fearAttack );
+	}
+	
+	public void IncreaseSanity()
+	{
+		ChangeSanity( sanityDecreaseRate * 0.3f * Time.deltaTime );
+	}
+
+	public void IncrementPoint()
+	{
+		//TODO tie into mechanic
+		//DisplayMessage( "You got 1 point!" );
+	}
+
+	public bool IsZoomedIn()
+	{
+		return hasPhoto;
+	}
+
+	public void Monsterize()
+	{
+		ChangeState( (int)State.Monster );
+		DisplayMessage( "\n(You're the Monster)\nSteal souls with Photos" );
 	}
 
 	public void SetFlashlightTo( bool on )
@@ -934,41 +1003,6 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		transform.position = coordinate;
 		transform.position = new Vector3( transform.position.x, height, transform.position.z );
-	}
-
-	public void IncrementPoint()
-	{
-		//TODO tie into mechanic
-		//DisplayMessage( "You got 1 point!" );
-	}
-
-	public void DisplayMessage( string messageToDisplay )
-	{
-		StopCoroutine( "DoDisplayMessage" );
-		StartCoroutine( "DoDisplayMessage", messageToDisplay );
-	}
-
-	public void Escape()
-	{
-		ChangeState( (int)State.Voyeur );
-		DisplayMessage( "Escape! You got 5 points!" );
-
-		foreach( Transform child in transform )
-			child.gameObject.SetActive( false );
-	}
-
-	public bool CanIncreaseFear()
-	{
-		//TODO tie into mechanic
-
-		return true;
-		//return ( Time.time - fearAttackLastTime > fearAttackTimeBuffer );
-	}
-
-	public void Monsterize()
-	{
-		ChangeState( (int)State.Monster );
-		DisplayMessage( "(You're the Monster)" );
 	}
 	//end public functions
 }

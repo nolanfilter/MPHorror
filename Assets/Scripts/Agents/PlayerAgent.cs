@@ -6,6 +6,8 @@ public class PlayerAgent : MonoBehaviour {
 
 	private List<PlayerController> playerControllers;
 
+	public bool monsterize = true;
+
 	private static PlayerAgent mInstance = null;
 	public static PlayerAgent instance
 	{
@@ -48,9 +50,6 @@ public class PlayerAgent : MonoBehaviour {
 			playerControllers.Insert( index, playerController );
 		}
 
-		for( int i = 0; i < playerControllers.Count; i++ )
-			Debug.Log( "" + i + " = " + playerControllers[i].photonView.viewID );
-
 		if( playerControllers.Count == 1 )
 			StartCoroutine( "WaitAndMonsterize" );
 	}
@@ -83,21 +82,24 @@ public class PlayerAgent : MonoBehaviour {
 
 	private IEnumerator WaitAndMonsterize()
 	{
+		if( !monsterize || playerControllers.Count == 0 )
+			yield break;
+
 		yield return new WaitForSeconds( 5f );
 
-		Debug.Log( PhotonNetwork.room.name );
+		//Debug.Log( PhotonNetwork.room.name );
 
 		int seed = HexToInt( PhotonNetwork.room.name[ PhotonNetwork.room.name.Length - 1 ] );
 
-		Debug.Log( seed );
+		//Debug.Log( seed );
 
 		Random.seed = seed;
 
 		int seededRandomValue = Mathf.FloorToInt (Random.value * playerControllers.Count);
 
-		Debug.Log( seededRandomValue );
-		Debug.Log( playerControllers[ seededRandomValue ].photonView.viewID );
-
+		//Debug.Log( seededRandomValue );
+		//Debug.Log( playerControllers[ seededRandomValue ].photonView.viewID );
+	
 		playerControllers[ seededRandomValue ].Monsterize();
 	}
 
