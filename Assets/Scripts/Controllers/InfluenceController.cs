@@ -74,8 +74,19 @@ public class InfluenceController : MonoBehaviour {
 			if( otherPlayerController == null || otherPlayerController == playerController )
 				return;
 
-			if( playerController.IsZoomedIn() && playerController.GetCurrentState() == PlayerController.State.Monster )
-				otherPlayerController.IncreaseFear();
+			if( playerController.IsZoomedIn() )
+			{
+				if( playerController.GetCurrentState() == PlayerController.State.Monster )
+				{
+					otherPlayerController.IncreaseFear();
+					playerController.MonsterReveal();
+				}
+				else if( otherPlayerController.GetCurrentState() == PlayerController.State.Monster )
+				{
+					otherPlayerController.MonsterReveal();
+				}
+			}
+
 		}
 		else if( collider.tag == "Key" )
 		{
