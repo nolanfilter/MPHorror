@@ -954,11 +954,12 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public void Escape()
 	{
+		if( currentState == State.Monster || currentState == State.Voyeur || currentState == State.Dead )
+			return;
+
 		ChangeState( (int)State.Voyeur );
-		DisplayMessage( "Escape! You got 5 points!" );
-		
-		foreach( Transform child in transform )
-			child.gameObject.SetActive( false );
+		ChangeColor( new Quaternion( 0f, 0f, 0f, 0f ) );
+		DisplayMessage( "You escaped!" );
 	}
 
 	public State GetCurrentState()

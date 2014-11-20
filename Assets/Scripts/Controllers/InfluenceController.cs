@@ -31,7 +31,7 @@ public class InfluenceController : MonoBehaviour {
 
 		float distance;
 
-		if (playerController.IsZoomedIn ()) 
+		if( playerController.IsZoomedIn() ) 
 		{
 			distance = radiusZoom + transform.root.localScale.z + zoomDistance;
 
@@ -76,12 +76,13 @@ public class InfluenceController : MonoBehaviour {
 
 			if( playerController.IsZoomedIn() )
 			{
-				if( playerController.GetCurrentState() == PlayerController.State.Monster )
+				if( playerController.GetCurrentState() == PlayerController.State.Monster && ( otherPlayerController.GetCurrentState() == PlayerController.State.Normal || otherPlayerController.GetCurrentState() == PlayerController.State.None ) )
 				{
 					otherPlayerController.IncreaseFear();
 					playerController.MonsterReveal();
 				}
-				else if( otherPlayerController.GetCurrentState() == PlayerController.State.Monster )
+
+				if( otherPlayerController.GetCurrentState() == PlayerController.State.Monster && ( playerController.GetCurrentState() == PlayerController.State.Normal || playerController.GetCurrentState() == PlayerController.State.None ) ) )
 				{
 					otherPlayerController.MonsterReveal();
 				}

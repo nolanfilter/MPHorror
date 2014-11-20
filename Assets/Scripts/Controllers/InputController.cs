@@ -165,7 +165,7 @@ public class InputController : MonoBehaviour {
 				codes[ (int)ButtonType.RLeft ] = KeyCode.LeftArrow;
 				codes[ (int)ButtonType.RRight ] = KeyCode.RightArrow;
 				codes[ (int)ButtonType.Zoom ] = KeyCode.Space;
-				codes[ (int)ButtonType.Flashlight ] = KeyCode.Delete;
+				codes[ (int)ButtonType.Flashlight ] = KeyCode.RightShift;
 				codes[ (int)ButtonType.Photograph ] = KeyCode.Return;
 				
 				currentInputType = "Keyboard";
