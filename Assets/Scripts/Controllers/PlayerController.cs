@@ -1000,6 +1000,11 @@ public class PlayerController : Photon.MonoBehaviour {
 		DisplayMessage( "\n(You're the Monster)\nSteal souls with Photos" );
 	}
 
+	public void MonsterReveal()
+	{
+		ChangeColor( new Quaternion( 0.75f, 0f, 0f, 1f ) );
+	}
+
 	public void SetFlashlightTo( bool on )
 	{
 		if( flashlight == null )
