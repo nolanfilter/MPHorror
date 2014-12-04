@@ -182,6 +182,9 @@ public class InputController : MonoBehaviour {
 				codes[ (int)ButtonType.Photograph ] = KeyCode.Return;
 				codes[ (int)ButtonType.LeftShoulder ] = KeyCode.LeftCommand;
 				codes[ (int)ButtonType.RightShoulder ] = KeyCode.RightCommand;
+
+				codes[ (int)ButtonType.Start ] = KeyCode.Return;
+				codes[ (int)ButtonType.A ] = KeyCode.Return;
 				
 				currentInputType = "Keyboard";
 			}
