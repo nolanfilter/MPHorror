@@ -27,7 +27,9 @@ public class InputController : MonoBehaviour {
 		Zoom = 8,
 		Flashlight = 9,
 		Photograph = 10,
-		Invalid = 11,
+		LeftShoulder = 11,
+		RightShoulder = 12,
+		Invalid = 13,
 	}
 	
 	private string verticalAxisString = "Vertical";
@@ -148,6 +150,8 @@ public class InputController : MonoBehaviour {
 					codes[ (int)ButtonType.Zoom ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
 					codes[ (int)ButtonType.Flashlight ] = (KeyCode)( (int)KeyCode.Joystick1Button12 );
 					codes[ (int)ButtonType.Photograph ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
+					codes[ (int)ButtonType.LeftShoulder ] = (KeyCode)( (int)KeyCode.Joystick1Button13 );
+					codes[ (int)ButtonType.RightShoulder ] = (KeyCode)( (int)KeyCode.Joystick1Button14 );
 					
 				} break;
 				}
@@ -167,6 +171,8 @@ public class InputController : MonoBehaviour {
 				codes[ (int)ButtonType.Zoom ] = KeyCode.Space;
 				codes[ (int)ButtonType.Flashlight ] = KeyCode.RightShift;
 				codes[ (int)ButtonType.Photograph ] = KeyCode.Return;
+				codes[ (int)ButtonType.LeftShoulder ] = KeyCode.LeftCommand;
+				codes[ (int)ButtonType.RightShoulder ] = KeyCode.RightCommand;
 				
 				currentInputType = "Keyboard";
 			}
