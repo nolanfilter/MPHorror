@@ -88,7 +88,7 @@ public class InfluenceController : MonoBehaviour {
 				}
 			}
 		}
-		else if( collider.tag == "Key" )
+		else if( collider.tag == "Key" || collider.tag == "Key2" )
 		{
 			PlayMakerFSM fsm = collider.GetComponent<PlayMakerFSM>();
 
