@@ -22,10 +22,9 @@ public class PlayerController : Photon.MonoBehaviour {
 	private float fearIncreaseRate = 0.005f;
 	private float fearAttack = 0.3f;
 	private float fearAttackTimeBuffer = 2f;
-	private float fearAttackLastTime = Time.time;
+	private float fearAttackLastTime = 0f;
 
-	//random between 120 and 240 seconds
-	private float sanityDecreaseRate = Random.Range( 1f/120f, 1f/240f );
+	private float sanityDecreaseRate;
 
 	private float fearThreshold = 1f;
 
@@ -37,7 +36,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private bool hasReRandomized = false;
 
-	private float speed = Random.Range( 4.5f, 6.5f );
+	private float speed;
 	public Texture2D meterTexture;
 	
 	private float lastSynchronizationTime = 0f;
@@ -120,6 +119,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	private float clampHeadPositionScreenSpace = 0.75f;
 	private Vector3 headOffset = Vector3.zero;
 	private Vector3 centerOffset = Vector3.zero;
+	private float shoulderOffset = 0.4f;
 	private float angleVelocity = 0.0f;
 	private bool snap = false;
 	private float distance = 1.25f;
@@ -187,9 +187,16 @@ public class PlayerController : Photon.MonoBehaviour {
 		viewChangeVector = Vector2.zero;
 		oldViewChangeVector = viewChangeVector;
 
+		speed = Random.Range( 4.5f, 6.5f );
+
 		walkSpeed = speed * 0.5f;
 		trotSpeed = walkSpeed;
 		//trotSpeed = speed;
+
+		fearAttackLastTime = Time.time;
+
+		//random between 120 and 240 seconds
+		sanityDecreaseRate = Random.Range( 1f/120f, 1f/240f );
 
 		SnapCamera();
 
@@ -546,10 +553,14 @@ public class PlayerController : Photon.MonoBehaviour {
 			cameraTransform.position += currentRotation * Vector3.back * distance;
 			
 			cameraTransform.position = new Vector3(cameraTransform.position.x, currentHeight, cameraTransform.position.z);
+
+			Vector3 shoulderOffsetVector = cameraTransform.right * shoulderOffset;
+
+			cameraTransform.position += shoulderOffsetVector;
 			
 			SnapCamera();
 			
-			SetUpRotation(targetCenter, targetHead);
+			SetUpRotation(targetCenter + shoulderOffsetVector, targetHead + shoulderOffsetVector);
 		}
 	}
 	
@@ -707,6 +718,11 @@ public class PlayerController : Photon.MonoBehaviour {
 		}
 	}
 
+	private void SetShoulderOffset( float sign )
+	{
+		shoulderOffset = Mathf.Abs( shoulderOffset ) * sign;
+	}
+
 	//coroutines
 	private IEnumerator DoDisplayMessage( string messageToDisplay )
 	{
@@ -848,6 +864,16 @@ public class PlayerController : Photon.MonoBehaviour {
 		case InputController.ButtonType.Photograph: 
 		{
 			StartCoroutine( "TakePhoto" );
+		} break;
+
+		case InputController.ButtonType.LeftShoulder: 
+		{
+			SetShoulderOffset( -1f );
+		} break;
+
+		case InputController.ButtonType.RightShoulder: 
+		{
+			SetShoulderOffset( 1f );
 		} break;
 		}
 	}
