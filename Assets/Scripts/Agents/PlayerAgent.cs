@@ -102,27 +102,12 @@ public class PlayerAgent : MonoBehaviour {
 
 		yield return new WaitForSeconds( 25f );
 
-		int seed = HexToInt( PhotonNetwork.room.name[ PhotonNetwork.room.name.Length - 1 ] );
+		int seed = Utilities.HexToInt( PhotonNetwork.room.name[ PhotonNetwork.room.name.Length - 1 ] );
 
 		Random.seed = seed;
 
 		monsterID = Mathf.FloorToInt( Random.value * playerControllers.Count );
 	
 		playerControllers[ monsterID ].Monsterize();
-	}
-
-	private int HexToInt( char hex )
-	{
-		switch( hex )
-		{
-			case 'a': return 10;
-			case 'b': return 11;
-			case 'c': return 12;
-			case 'd': return 13;
-			case 'e': return 14;
-			case 'f': return 15;
-
-			default: return (int)(hex - '0');
-		}
 	}
 }

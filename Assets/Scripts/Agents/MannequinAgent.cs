@@ -28,11 +28,6 @@ public class MannequinAgent : MonoBehaviour {
 		mannequins = new List<GameObject>();
 	}
 
-	void Start()
-	{
-		StartCoroutine( "WaitAndSetKeyTag" );
-	}
-
 	public static void RegisterMannequin( GameObject mannequin )
 	{
 		if( instance )
@@ -57,11 +52,28 @@ public class MannequinAgent : MonoBehaviour {
 			mannequins.Remove( mannequin );
 	}
 
-	private IEnumerator WaitAndSetKeyTag()
+	public static void SetKeys()
 	{
-		yield return null;
+		if( instance )
+			instance.internalSetKeys();
+	}
 
+	private void internalSetKeys()
+	{
+		int seed = Utilities.HexToInt( PhotonNetwork.room.name[ PhotonNetwork.room.name.Length - 2 ] );
+		
+		Random.seed = seed;
+
+		int keyIndex = Random.Range( 0, mannequins.Count );
+		int key2Index = Random.Range( 0, mannequins.Count );
+		
+		if( key2Index == keyIndex )
+			key2Index = ( key2Index + 1 )%mannequins.Count;
+		
 		if( mannequins.Count > 0 )
-			mannequins[ Random.Range( 0, mannequins.Count ) ].tag = "Key";
+			mannequins[ keyIndex ].tag = "Key";
+		
+		if( mannequins.Count > 1 )
+			mannequins[ key2Index ].tag = "Key2";
 	}
 }
