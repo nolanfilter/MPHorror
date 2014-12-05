@@ -14,6 +14,8 @@ public class NetworkAgent : MonoBehaviour {
 
 	private GameObject networkBackground;
 
+	private int selectionIndex;
+
 	private static NetworkAgent mInstance = null;
 	public static NetworkAgent instance
 	{
@@ -40,13 +42,8 @@ public class NetworkAgent : MonoBehaviour {
 
 		PhotonNetwork.ConnectUsingSettings( "0.1" );
 
-		if( networkBackgroundPrefab )
-		{
-			networkBackground = Instantiate( networkBackgroundPrefab ) as GameObject;
-			//networkBackground.transform.parent = Camera.main.transform;
-			//networkBackground.transform.localPosition = new Vector3( 0f, 0f, Camera.main.nearClipPlane + 0.001f );
-			//networkBackground.transform.localRotation = Quaternion.identity;
-		}
+		//if( networkBackgroundPrefab )
+		//	networkBackground = Instantiate( networkBackgroundPrefab ) as GameObject;
 	}
 
 	void Update()
@@ -61,9 +58,12 @@ public class NetworkAgent : MonoBehaviour {
 			networkBackground.renderer.enabled = ( PhotonNetwork.room == null );
 		}
 	}
-
+	
 	void OnGUI()
 	{
+		if( GameAgent.GetCurrentGameState() != GameAgent.GameState.Lobby )
+			return;
+
 		if( !PhotonNetwork.connected )
 		{
 			GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
@@ -71,7 +71,14 @@ public class NetworkAgent : MonoBehaviour {
 		else if( PhotonNetwork.room == null )
 		{
 			// Create Room
-			if( GUI.Button( new Rect( 100, 100, 300, 100 ), "Start Server" ) )
+			Rect createRoomRect;
+
+			if( selectionIndex == 0 )
+				createRoomRect = new Rect( 50, 100, 400, 100 );
+			else
+				createRoomRect = new Rect( 100, 100, 300, 100 );
+
+			if( GUI.Button( createRoomRect, "Start Server" ) )
 			{
 				PhotonNetwork.CreateRoom( roomName + System.Guid.NewGuid().ToString( "N" ), true, true, numPlayers );
 			}
@@ -79,13 +86,22 @@ public class NetworkAgent : MonoBehaviour {
 			// Join Room
 			if( roomsList != null )
 			{
+				Rect roomRect;
+
 				for (int i = 0; i < roomsList.Length; i++ )
 				{
-					if( GUI.Button( new Rect( Screen.width * 0.5f, 100 + ( 110 * i ), 300, 100 ), "Join\n" + roomsList[i].name ) )
+					if( selectionIndex == i + 1 )
+						roomRect = new Rect( Screen.width * 0.5f - 50, 100 + ( 110 * i ), 400, 100 );
+					else
+						roomRect = new Rect( Screen.width * 0.5f, 100 + ( 110 * i ), 300, 100 );
+
+					if( GUI.Button( roomRect, "Join\n" + roomsList[i].name ) )
 						PhotonNetwork.JoinRoom( roomsList[i].name );
 				}
 			}
 		}
+
+		SetSelectionIndex( GetSelectionIndex() );
 	}
 
 	void OnReceivedRoomListUpdate()
@@ -132,4 +148,62 @@ public class NetworkAgent : MonoBehaviour {
 		return 0;
 	}
 
+	public static void SetSelectionIndex( int newSelectionIndex )
+	{
+		if( instance )
+			instance.internalSetSelectionIndex( newSelectionIndex );
+	}
+
+	private void internalSetSelectionIndex( int newSelectionIndex )
+	{
+		if( newSelectionIndex > 0 )
+		{
+			if( roomsList != null )
+			{
+				if( newSelectionIndex > roomsList.Length )
+				{
+					newSelectionIndex = roomsList.Length;
+				}
+			}
+			else
+			{
+				newSelectionIndex = 0;
+			}
+		}
+
+		selectionIndex = newSelectionIndex;
+	}
+
+	public static int GetSelectionIndex()
+	{
+		if( instance )
+			return instance.internalGetSelectionIndex();
+
+		return -1;
+	}
+
+	private int internalGetSelectionIndex()
+	{
+		return selectionIndex;
+	}
+
+	public static void ActivateSelected()
+	{
+		if( instance )
+			instance.internalActivateSelected();
+	}
+
+	private void internalActivateSelected()
+	{
+		if( selectionIndex == 0 )
+		{
+			PhotonNetwork.CreateRoom( roomName + System.Guid.NewGuid().ToString( "N" ), true, true, numPlayers );
+		}
+		else
+		{
+			PhotonNetwork.JoinRoom( roomsList[ selectionIndex - 1 ].name );
+		}
+
+		GameAgent.ChangeGameState( GameAgent.GameState.Game );
+	}
 }

@@ -55,7 +55,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06cfb31ec2e014854808defcf581d467, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  menuControllerPrefab: {fileID: 0}
+  gameStatePrefabs:
+  - {fileID: 100000, guid: c954d073180844c8ca97e1ded8a3a7b1, type: 2}
+  - {fileID: 100000, guid: 5eac146a239f94e6eb501b44506159d7, type: 2}
+  - {fileID: 100000, guid: 603bf4564b4354f71a28c3127ceb2be8, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  menuControllerPrefab: {fileID: 100000, guid: e61fad5d754d44d9292f8ffb7199bf53, type: 2}
   darkQuadPrefab: {fileID: 0}
 --- !u!114 &11400004
 MonoBehaviour:
@@ -73,10 +82,10 @@ MonoBehaviour:
   networkBackgroundPrefab: {fileID: 100000, guid: 31af3ae2df7ba4ae8b37d917edabeec6,
     type: 2}
   playerStartPositions:
-  - {x: 3, y: .5, z: -.300000012}
-  - {x: -31, y: .5, z: 33}
-  - {x: 29.5, y: .5, z: 26.5}
-  - {x: 47.5, y: .5, z: 8}
+  - {x: 0, y: 0, z: 0}
+  - {x: -5, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
   playerStartRotations:
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: 0}
@@ -105,6 +114,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f2d5e5aa453d454ca0318ff6185ebc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  monsterize: 1
 --- !u!114 &11400010
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -29,7 +29,13 @@ public class InputController : MonoBehaviour {
 		Photograph = 10,
 		LeftShoulder = 11,
 		RightShoulder = 12,
-		Invalid = 13,
+		Start = 13,
+		Back = 14,
+		A = 15,
+		B = 16,
+		X = 17,
+		Y = 18,
+		Invalid = 19,
 	}
 	
 	private string verticalAxisString = "Vertical";
@@ -143,15 +149,18 @@ public class InputController : MonoBehaviour {
 					codes[ (int)ButtonType.Down ] = (KeyCode)( (int)KeyCode.Joystick1Button6 );
 					codes[ (int)ButtonType.Left ] = (KeyCode)( (int)KeyCode.Joystick1Button7 );
 					codes[ (int)ButtonType.Right ] = (KeyCode)( (int)KeyCode.Joystick1Button8 );
-					codes[ (int)ButtonType.RUp ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
-					codes[ (int)ButtonType.RDown ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
-					codes[ (int)ButtonType.RLeft ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
-					codes[ (int)ButtonType.RRight ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
-					codes[ (int)ButtonType.Zoom ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
+					codes[ (int)ButtonType.RUp ] = (KeyCode)( (int)KeyCode.Joystick1Button0 );
+					codes[ (int)ButtonType.RDown ] = (KeyCode)( (int)KeyCode.Joystick1Button0 );
+					codes[ (int)ButtonType.RLeft ] = (KeyCode)( (int)KeyCode.Joystick1Button0 );
+					codes[ (int)ButtonType.RRight ] = (KeyCode)( (int)KeyCode.Joystick1Button0 );
+					codes[ (int)ButtonType.Zoom ] = (KeyCode)( (int)KeyCode.Joystick1Button0 );
 					codes[ (int)ButtonType.Flashlight ] = (KeyCode)( (int)KeyCode.Joystick1Button12 );
-					codes[ (int)ButtonType.Photograph ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
+					codes[ (int)ButtonType.Photograph ] = (KeyCode)( (int)KeyCode.Joystick1Button0 );
 					codes[ (int)ButtonType.LeftShoulder ] = (KeyCode)( (int)KeyCode.Joystick1Button13 );
 					codes[ (int)ButtonType.RightShoulder ] = (KeyCode)( (int)KeyCode.Joystick1Button14 );
+
+					codes[ (int)ButtonType.Start ] = (KeyCode)( (int)KeyCode.Joystick1Button9 );
+					codes[ (int)ButtonType.A ] = (KeyCode)( (int)KeyCode.Joystick1Button16 );
 					
 				} break;
 				}
@@ -173,6 +182,9 @@ public class InputController : MonoBehaviour {
 				codes[ (int)ButtonType.Photograph ] = KeyCode.Return;
 				codes[ (int)ButtonType.LeftShoulder ] = KeyCode.LeftCommand;
 				codes[ (int)ButtonType.RightShoulder ] = KeyCode.RightCommand;
+
+				codes[ (int)ButtonType.Start ] = KeyCode.Return;
+				codes[ (int)ButtonType.A ] = KeyCode.Return;
 				
 				currentInputType = "Keyboard";
 			}
@@ -187,13 +199,10 @@ public class InputController : MonoBehaviour {
 				oldButtonList.Add( button, false );
 			}
 		}
-		
 	}
 	
 	private void SendDownEvent( ButtonType button )
 	{						
-		//Debug.Log( button );
-		
 		if( OnButtonDown != null )
 			OnButtonDown( button );		
 	}
