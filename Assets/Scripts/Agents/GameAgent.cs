@@ -52,6 +52,9 @@ public class GameAgent : MonoBehaviour {
 
 	void Start()
 	{
+		Screen.showCursor = false;
+		Screen.lockCursor = true;
+
 		Camera.main.gameObject.AddComponent<ScreenshotAgent>();
 
 		if( menuControllerPrefab )
