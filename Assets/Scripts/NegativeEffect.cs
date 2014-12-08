@@ -1,16 +1,23 @@
 using UnityEngine;
+using System.Collections;
 
 public class NegativeEffect : MonoBehaviour {
 
-	public float negativeAmount = 1f;
-
 	private Shader shader;
 	private Material material;
+
+	private float negativeAmount;
+	private float fromNegativeAmount = 0f;
+	private float toNegativeAmount = 0.9f;
+
+	private float duration = 1.5f;
 
 	void Start()
 	{
 		shader = Shader.Find( "Custom/Negative" );
 		material = new Material( shader );
+
+		StartCoroutine( "DoNegativeFade" );
 	}
 
 	void Update()
@@ -22,5 +29,27 @@ public class NegativeEffect : MonoBehaviour {
 	{
 		material.SetFloat("_NegativeAmount", negativeAmount);
 		Graphics.Blit (source, destination, material);
+	}
+
+	private IEnumerator DoNegativeFade()
+	{
+		negativeAmount = fromNegativeAmount;
+
+		float lerp;
+		float currentDuration = 0f;
+		float beginTime = Time.time;
+
+		do
+		{
+			currentDuration += Time.deltaTime;
+			lerp = currentDuration / duration;
+
+			negativeAmount = Mathf.Lerp( fromNegativeAmount, toNegativeAmount, lerp );
+
+			yield return null;
+
+		} while( currentDuration < duration );
+
+		negativeAmount = toNegativeAmount;
 	}
 }
