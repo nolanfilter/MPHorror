@@ -1,0 +1,182 @@
+fileFormatVersion: 2
+guid: a7891dbde414e4abc9da49f8576882b4
+ModelImporter:
+  serializedVersion: 16
+  fileIDToRecycleName:
+    100000: Hair
+    100002: Head
+    100004: Index_Finger
+    100006: Index_Finger 1
+    100008: Left_Arm
+    100010: Left_Arm_Hand
+    100012: Left_Hand
+    100014: Left_Lower
+    100016: Left_Lower_Arm
+    100018: Left_Upper_Arm
+    100020: Leg_Left
+    100022: Little_Finger
+    100024: Little_Finger 1
+    100026: Manikin_Body
+    100028: Middle_Finger
+    100030: Middle_Finger 1
+    100032: //RootNode
+    100034: Palm
+    100036: Palm 1
+    100038: Player 1
+    100040: polySurface1
+    100042: polySurface1_MeshPart0
+    100044: polySurface1_MeshPart1
+    100046: Props_Ballet_Dancer__Lower_:Ballet_Dancer
+    100048: Props_Ballet_Dancer__Lower_:Ballet_Dancer 1
+    100050: Props_Ballet_Dancer__Lower_:Leg_Left
+    100052: Right_Arm
+    100054: Right_Arm_Hand
+    100056: Right_Hand
+    100058: Right_Lower
+    100060: Right_Lower_Arm
+    100062: Right_Upper_Arm
+    100064: Ring_Finger
+    100066: Ring_Finger 1
+    100068: Thumb
+    100070: Thumb 1
+    100072: transform1
+    100074: transform10
+    100076: transform11
+    100078: transform12
+    100080: transform13
+    100082: transform14
+    100084: transform15
+    100086: transform16
+    100088: transform17
+    100090: transform18
+    100092: transform19
+    100094: transform2
+    100096: transform20
+    100098: transform21
+    100100: transform3
+    100102: transform4
+    100104: transform5
+    100106: transform6
+    100108: transform7
+    100110: transform8
+    100112: transform9
+    100114: Upper_Body
+    400000: Hair
+    400002: Head
+    400004: Index_Finger
+    400006: Index_Finger 1
+    400008: Left_Arm
+    400010: Left_Arm_Hand
+    400012: Left_Hand
+    400014: Left_Lower
+    400016: Left_Lower_Arm
+    400018: Left_Upper_Arm
+    400020: Leg_Left
+    400022: Little_Finger
+    400024: Little_Finger 1
+    400026: Manikin_Body
+    400028: Middle_Finger
+    400030: Middle_Finger 1
+    400032: //RootNode
+    400034: Palm
+    400036: Palm 1
+    400038: Player 1
+    400040: polySurface1
+    400042: polySurface1_MeshPart0
+    400044: polySurface1_MeshPart1
+    400046: Props_Ballet_Dancer__Lower_:Ballet_Dancer
+    400048: Props_Ballet_Dancer__Lower_:Ballet_Dancer 1
+    400050: Props_Ballet_Dancer__Lower_:Leg_Left
+    400052: Right_Arm
+    400054: Right_Arm_Hand
+    400056: Right_Hand
+    400058: Right_Lower
+    400060: Right_Lower_Arm
+    400062: Right_Upper_Arm
+    400064: Ring_Finger
+    400066: Ring_Finger 1
+    400068: Thumb
+    400070: Thumb 1
+    400072: transform1
+    400074: transform10
+    400076: transform11
+    400078: transform12
+    400080: transform13
+    400082: transform14
+    400084: transform15
+    400086: transform16
+    400088: transform17
+    400090: transform18
+    400092: transform19
+    400094: transform2
+    400096: transform20
+    400098: transform21
+    400100: transform3
+    400102: transform4
+    400104: transform5
+    400106: transform6
+    400108: transform7
+    400110: transform8
+    400112: transform9
+    400114: Upper_Body
+    2300000: polySurface1_MeshPart0
+    2300002: polySurface1_MeshPart1
+    3300000: polySurface1_MeshPart0
+    3300002: polySurface1_MeshPart1
+    4300000: polySurface1_MeshPart0
+    4300002: polySurface1_MeshPart1
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 
