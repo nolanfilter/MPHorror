@@ -4,7 +4,7 @@ using System.Collections;
 public class MenuController : MonoBehaviour {
 
 	private InputController inputController;
-	private float buttonBuffer = 1f;
+	private float buttonBuffer = 0.3f;
 	private float lastButtonTime;
 
 	void Awake()
