@@ -92,6 +92,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	private Renderer[] modelRenderers = null;
 
 	public Light flashlight;
+	public Light flashBulb;
 
 	private GameObject flashQuad;
 	private GameObject screenshotQuad;
@@ -153,7 +154,24 @@ public class PlayerController : Photon.MonoBehaviour {
 			modelRenderers = GetComponentsInChildren<Renderer>();
 
 		if( flashlight == null )
-			flashlight = GetComponentInChildren<Light>();
+		{
+			Light[] lights = GetComponentsInChildren<Light>();
+
+			for( int i = 0; i < lights.Length; i++ )
+				if( lights[i].gameObject.name == "Flashlight" )
+					flashlight = lights[i];
+		}
+
+		if( flashBulb == null )
+		{
+			Light[] lights = GetComponentsInChildren<Light>();
+			
+			for( int i = 0; i < lights.Length; i++ )
+				if( lights[i].gameObject.name == "Flash Bulb" )
+					flashBulb = lights[i];
+		}
+
+		SetFlashBulbTo( false );
 
 		moveDirection = transform.TransformDirection(Vector3.forward);
 
@@ -752,10 +770,14 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		hasPhoto = true;
 
+		SetFlashBulbTo( true );
+
 		if( flashQuad )
 		{
 			yield return StartCoroutine( DoColorFade( flashQuad.renderer.material, Color.white, whiteClear, 0.5f ) );
 		}
+
+		SetFlashBulbTo( false );
 	
 		if( screenshotQuad )
 		{
@@ -815,6 +837,13 @@ public class PlayerController : Photon.MonoBehaviour {
 			for( int i = 0; i < modelRenderers.Length; i++ )
 				modelRenderers[i].material.color = color;
 		}
+	}
+
+	[RPC] 
+	public void RPCChangeFlashBulb( int state )
+	{
+		if( flashBulb )
+			flashBulb.enabled = ( state == 1 );
 	}
 
 	[RPC] 
@@ -956,6 +985,14 @@ public class PlayerController : Photon.MonoBehaviour {
 		return wasAlive && ( currentFear <= 0f );
 	}
 
+	public void ChangeFlashBulb( int state )
+	{
+		if( flashBulb )
+			flashBulb.enabled = ( state == 1 );
+		
+		photonView.RPC( "RPCChangeFlashBulb", PhotonTargets.OthersBuffered, state );
+	}
+
 	public void ChangeFlashlight( int state )
 	{
 		if( flashlight )
@@ -1041,6 +1078,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public void Monsterize()
 	{
+		cameraTransform.gameObject.AddComponent<NegativeEffect>();
 		ChangeState( (int)State.Monster );
 		DisplayMessage( "\n(You're the Murderer)\nSteal souls with Photos" );
 	}
@@ -1048,6 +1086,14 @@ public class PlayerController : Photon.MonoBehaviour {
 	public void MonsterReveal()
 	{
 		ChangeColor( new Quaternion( 0.75f, 0f, 0f, 1f ) );
+	}
+
+	public void SetFlashBulbTo( bool on )
+	{
+		if( flashBulb == null )
+			ChangeFlashBulb( 0 );
+		else
+			ChangeFlashBulb( ( on ? 1 : 0 ) );
 	}
 
 	public void SetFlashlightTo( bool on )
