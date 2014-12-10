@@ -52,8 +52,11 @@ public class GameAgent : MonoBehaviour {
 
 	void Start()
 	{
-		Screen.showCursor = false;
-		Screen.lockCursor = true;
+		if( !Application.isEditor )
+		{
+			Screen.showCursor = false;
+			Screen.lockCursor = true;
+		}
 
 		Camera.main.gameObject.AddComponent<ScreenshotAgent>();
 

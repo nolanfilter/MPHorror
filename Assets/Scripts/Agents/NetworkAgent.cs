@@ -16,6 +16,8 @@ public class NetworkAgent : MonoBehaviour {
 
 	private int selectionIndex;
 
+	private bool wasInRoom = false;
+
 	private static NetworkAgent mInstance = null;
 	public static NetworkAgent instance
 	{
@@ -57,6 +59,14 @@ public class NetworkAgent : MonoBehaviour {
 		{
 			networkBackground.renderer.enabled = ( PhotonNetwork.room == null );
 		}
+
+		if( GameAgent.GetCurrentGameState() == GameAgent.GameState.Waiting )
+		{
+			if( PhotonNetwork.room != null  && !wasInRoom )
+				GameAgent.ChangeGameState( GameAgent.GameState.Game );
+		}
+
+		wasInRoom = ( PhotonNetwork.room == null );
 	}
 	
 	void OnGUI()
@@ -204,6 +214,6 @@ public class NetworkAgent : MonoBehaviour {
 			PhotonNetwork.JoinRoom( roomsList[ selectionIndex - 1 ].name );
 		}
 
-		GameAgent.ChangeGameState( GameAgent.GameState.Game );
+		GameAgent.ChangeGameState( GameAgent.GameState.Waiting );
 	}
 }
