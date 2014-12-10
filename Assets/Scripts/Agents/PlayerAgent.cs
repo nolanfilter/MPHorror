@@ -7,8 +7,11 @@ public class PlayerAgent : MonoBehaviour {
 	private List<PlayerController> playerControllers;
 
 	public bool monsterize = true;
+	public bool monsterizeMaster = false;
 
 	private int monsterID = -1;
+
+	private float waitTime = 25f;
 
 	private static PlayerAgent mInstance = null;
 	public static PlayerAgent instance
@@ -52,8 +55,18 @@ public class PlayerAgent : MonoBehaviour {
 			playerControllers.Insert( index, playerController );
 		}
 
-		if( playerControllers.Count == 1 )
-			StartCoroutine( "WaitAndMonsterize" );
+		if( monsterize )
+		{
+			if( monsterizeMaster )
+			{
+				StartCoroutine( "WaitAndMonsterizeMaster" );
+			}
+			else
+			{
+				if( playerControllers.Count == 1 )
+					StartCoroutine( "WaitAndMonsterizeRandom" );
+			}
+		}
 	}
 
 	public static void UnregisterPlayer( PlayerController playerController )
@@ -95,12 +108,22 @@ public class PlayerAgent : MonoBehaviour {
 				playerControllers[i].DisplayMessage( messageToDisplay );
 	}
 
-	private IEnumerator WaitAndMonsterize()
+	private IEnumerator WaitAndMonsterizeMaster()
+	{
+		if( !monsterize || playerControllers.Count == 0 )
+			yield break;
+		
+		yield return new WaitForSeconds( waitTime );
+		
+		playerControllers[ 0 ].Monsterize();
+	}
+
+	private IEnumerator WaitAndMonsterizeRandom()
 	{
 		if( !monsterize || playerControllers.Count == 0 )
 			yield break;
 
-		yield return new WaitForSeconds( 25f );
+		yield return new WaitForSeconds( waitTime );
 
 		int seed = Utilities.HexToInt( PhotonNetwork.room.name[ PhotonNetwork.room.name.Length - 1 ] );
 

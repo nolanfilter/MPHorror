@@ -227,7 +227,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		inputController.OnButtonHeld += OnButtonHeld;
 		inputController.OnButtonUp += OnButtonUp;
 
-		centerOffset = Vector3.up * 1.5f;
+		centerOffset = Vector3.up * 1.25f;
 		headOffset = centerOffset;
 		//headOffset.y = characterController.bounds.max.y - transform.position.y;
 		
@@ -249,6 +249,9 @@ public class PlayerController : Photon.MonoBehaviour {
 	
 	void Update()
 	{
+		if( GameAgent.GetCurrentGameState() != GameAgent.GameState.Game )
+			return;
+
 		if( photonView.isMine )
 		{
 			InputMovement();
@@ -517,9 +520,12 @@ public class PlayerController : Photon.MonoBehaviour {
 
 				if( Physics.Raycast( cameraTransform.position + cameraTransform.forward * 1.5f, cameraTransform.forward, out hit ) )
 				{
-					Vector3 hitPosition = cameraTransform.position + cameraTransform.forward * ( hit.distance + 1.5f );
+					if( hit.collider.transform != transform )
+					{
+						Vector3 hitPosition = cameraTransform.position + cameraTransform.forward * ( hit.distance + 1.5f );
 
-					newFlashlightRotation = Quaternion.LookRotation( hitPosition - flashlight.transform.position );
+						newFlashlightRotation = Quaternion.LookRotation( hitPosition - flashlight.transform.position );
+					}
 				}
 
 				float percent = Mathf.Clamp01( Quaternion.Angle( flashlight.transform.rotation, newFlashlightRotation ) / 90f );
@@ -1080,7 +1086,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		cameraTransform.gameObject.AddComponent<NegativeEffect>();
 		ChangeState( (int)State.Monster );
-		DisplayMessage( "\n(You're the Murderer)\nSteal souls with Photos" );
+		DisplayMessage( "Steal souls with Photos" );
 	}
 
 	public void MonsterReveal()
