@@ -1084,8 +1084,8 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public void Monsterize()
 	{
-		//if( photonView.isMine )
-		//	cameraTransform.gameObject.AddComponent<NegativeEffect>();
+		if( photonView.isMine )
+			cameraTransform.gameObject.AddComponent<NegativeEffect>();
 
 		ChangeState( (int)State.Monster );
 		DisplayMessage( "Steal souls with Photos" );

@@ -114,7 +114,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f2d5e5aa453d454ca0318ff6185ebc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  monsterShader: {fileID: 4800000, guid: a75f0ab14b53949168c63946615d7cad, type: 3}
   monsterize: 1
+  monsterizeMaster: 0
+  waitTime: 25
 --- !u!114 &11400010
 MonoBehaviour:
   m_ObjectHideFlags: 1

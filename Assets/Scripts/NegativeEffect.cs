@@ -14,7 +14,14 @@ public class NegativeEffect : MonoBehaviour {
 
 	void Start()
 	{
-		shader = Shader.Find( "Custom/Negative" );
+		shader = PlayerAgent.GetMonsterShader();
+
+		if( shader == null )
+		{
+			enabled = false;
+			return;
+		}
+
 		material = new Material( shader );
 
 		StartCoroutine( "DoNegativeFade" );
@@ -22,13 +29,16 @@ public class NegativeEffect : MonoBehaviour {
 
 	void Update()
 	{
-		negativeAmount = Mathf.Clamp01 (negativeAmount);
+		negativeAmount = Mathf.Clamp01( negativeAmount );
 	}
 
-	void OnRenderImage (RenderTexture source, RenderTexture destination)
+	void OnRenderImage( RenderTexture source, RenderTexture destination )
 	{
-		material.SetFloat("_NegativeAmount", negativeAmount);
-		Graphics.Blit (source, destination, material);
+		if( material == null )
+			return;
+
+		material.SetFloat( "_NegativeAmount", negativeAmount );
+		Graphics.Blit( source, destination, material );
 	}
 
 	private IEnumerator DoNegativeFade()

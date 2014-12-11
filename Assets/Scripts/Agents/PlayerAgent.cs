@@ -6,12 +6,14 @@ public class PlayerAgent : MonoBehaviour {
 
 	private List<PlayerController> playerControllers;
 
+	public Shader monsterShader;
+
 	public bool monsterize = true;
 	public bool monsterizeMaster = false;
 
 	private int monsterID = -1;
 
-	private float waitTime = 25f;
+	public float waitTime = 25f;
 
 	private static PlayerAgent mInstance = null;
 	public static PlayerAgent instance
@@ -74,11 +76,19 @@ public class PlayerAgent : MonoBehaviour {
 		if( instance )
 			instance.internalUnregisterPlayer( playerController );
 	}
-	
+
 	private void internalUnregisterPlayer( PlayerController playerController )
 	{
 		if( playerControllers.Contains( playerController ) )
 			playerControllers.Remove( playerController );
+	}
+
+	public static Shader GetMonsterShader()
+	{
+		if( instance )
+			return instance.monsterShader;
+
+		return null;
 	}
 
 	public void SetAllFlashlightsTo( bool on )
@@ -114,8 +124,10 @@ public class PlayerAgent : MonoBehaviour {
 			yield break;
 		
 		yield return new WaitForSeconds( waitTime );
+
+		monsterID = 0;
 		
-		playerControllers[ 0 ].Monsterize();
+		playerControllers[ monsterID ].Monsterize();
 	}
 
 	private IEnumerator WaitAndMonsterizeRandom()
