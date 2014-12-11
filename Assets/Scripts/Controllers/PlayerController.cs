@@ -179,6 +179,8 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		if( photonView.isMine )
 			gameObject.name += "(Client)";
+
+		ChangeColor( new Quaternion( 1f, 0.9f, 0.9f, 1f ) );
 	}
 	
 	void Start()
@@ -666,16 +668,16 @@ public class PlayerController : Photon.MonoBehaviour {
 				if( xAngleOffset > 40f && xAngleOffset < 180f )
 					xAngleOffset = 40f;
 					
-				if( xAngleOffset > 180f && xAngleOffset < 340f )
-					xAngleOffset = 340f;
+				if( xAngleOffset > 180f && xAngleOffset < 300f )
+					xAngleOffset = 300f;
 			}
 			else
 			{
 				if( xAngleOffset > 60f && xAngleOffset < 180f )
 					xAngleOffset = 60f;
 				
-				if( xAngleOffset > 180f && xAngleOffset < 320f )
-					xAngleOffset = 320f;
+				if( xAngleOffset > 180f && xAngleOffset < 290f )
+					xAngleOffset = 290f;
 			}
 			
 			cameraRotationOffset.eulerAngles = new Vector3( xAngleOffset, cameraRotationOffset.eulerAngles.y, cameraRotationOffset.eulerAngles.z );
@@ -1084,7 +1086,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public void Monsterize()
 	{
-		if( !photonView.isMine )
+		if( !photonView.isMine || currentState == State.Monster || currentState == State.Dead )
 			return;
 
 		cameraTransform.gameObject.AddComponent<NegativeEffect>();
