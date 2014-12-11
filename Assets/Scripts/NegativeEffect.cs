@@ -14,6 +14,9 @@ public class NegativeEffect : MonoBehaviour {
 
 	void Start()
 	{
+		if( GetComponents<NegativeEffect>().Length > 1 )
+			Destroy( this );
+
 		shader = PlayerAgent.GetMonsterShader();
 
 		if( shader == null )
