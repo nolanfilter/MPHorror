@@ -56,19 +56,6 @@ public class PlayerAgent : MonoBehaviour {
 
 			playerControllers.Insert( index, playerController );
 		}
-
-		if( monsterize )
-		{
-			if( monsterizeMaster )
-			{
-				StartCoroutine( "WaitAndMonsterizeMaster" );
-			}
-			else
-			{
-				if( playerControllers.Count == 1 )
-					StartCoroutine( "WaitAndMonsterizeRandom" );
-			}
-		}
 	}
 
 	public static void UnregisterPlayer( PlayerController playerController )
@@ -89,6 +76,35 @@ public class PlayerAgent : MonoBehaviour {
 			return instance.monsterShader;
 
 		return null;
+	}
+
+	public static void StartGame()
+	{
+		if( instance )
+			instance.internalStartGame();
+	}
+
+	private void internalStartGame()
+	{
+		if( playerControllers.Count > 0 )
+			playerControllers[ 0 ].StartGame();
+	}
+
+	public static void SetMonster()
+	{
+		if( instance )
+			instance.internalSetMonster();
+	}
+
+	private void internalSetMonster()
+	{
+		if( monsterize )
+		{
+			if( monsterizeMaster )
+				StartCoroutine( "WaitAndMonsterizeMaster" );
+			else
+				StartCoroutine( "WaitAndMonsterizeRandom" );
+		}
 	}
 
 	public void SetAllFlashlightsTo( bool on )
@@ -120,29 +136,25 @@ public class PlayerAgent : MonoBehaviour {
 
 	private IEnumerator WaitAndMonsterizeMaster()
 	{
-		if( !monsterize || playerControllers.Count == 0 )
-			yield break;
+		monsterID = 0;
 		
 		yield return new WaitForSeconds( waitTime );
 
-		monsterID = 0;
-		
-		playerControllers[ monsterID ].Monsterize();
+		if( monsterID < playerControllers.Count )
+			playerControllers[ monsterID ].Monsterize();
 	}
 
 	private IEnumerator WaitAndMonsterizeRandom()
 	{
-		if( !monsterize || playerControllers.Count == 0 )
-			yield break;
+		int seed = Utilities.HexToInt( PhotonNetwork.room.name[ PhotonNetwork.room.name.Length - 1 ] );
+		
+		Random.seed = seed;
+		
+		monsterID = Mathf.FloorToInt( Random.value * playerControllers.Count );
 
 		yield return new WaitForSeconds( waitTime );
-
-		int seed = Utilities.HexToInt( PhotonNetwork.room.name[ PhotonNetwork.room.name.Length - 1 ] );
-
-		Random.seed = seed;
-
-		monsterID = Mathf.FloorToInt( Random.value * playerControllers.Count );
 	
-		playerControllers[ monsterID ].Monsterize();
+		if( monsterID < playerControllers.Count )
+			playerControllers[ monsterID ].Monsterize();
 	}
 }

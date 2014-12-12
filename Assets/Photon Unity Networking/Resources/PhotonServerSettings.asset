@@ -43,4 +43,5 @@ MonoBehaviour:
   - RPCDisplayMessage
   - RPCChangeColider
   - RPCChangeFlashBulb
+  - RPCStartGame
   DisableAutoOpenWizard: 0

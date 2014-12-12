@@ -15,7 +15,8 @@ public class GameAgent : MonoBehaviour {
 		Settings = 5,
 		Credits = 6,
 		Options = 7,
-		Invalid = 8,
+		Room = 8,
+		Invalid = 9,
 	}
 	private List<GameState> gameStateStack = new List<GameState>();
 

@@ -61,7 +61,7 @@ public class MenuController : MonoBehaviour {
 					NetworkAgent.ActivateSelected();
 					lastButtonTime = Time.time;
 				}
-				else if( button == InputController.ButtonType.Left )
+				else if( button == InputController.ButtonType.Left || button == InputController.ButtonType.RLeft )
 				{
 					if( NetworkAgent.GetSelectionIndex() != 0 )
 					{
@@ -69,7 +69,7 @@ public class MenuController : MonoBehaviour {
 						lastButtonTime = Time.time;
 					}
 				}
-				else if( button == InputController.ButtonType.Right )
+				else if( button == InputController.ButtonType.Right || button == InputController.ButtonType.RRight )
 				{
 					if( NetworkAgent.GetSelectionIndex() == 0 )
 					{
@@ -77,7 +77,7 @@ public class MenuController : MonoBehaviour {
 						lastButtonTime = Time.time;
 					}
 				}
-				else if( button == InputController.ButtonType.Up )
+				else if( button == InputController.ButtonType.Up || button == InputController.ButtonType.RUp )
 				{
 					if( NetworkAgent.GetSelectionIndex() > 1 )
 					{
@@ -85,13 +85,29 @@ public class MenuController : MonoBehaviour {
 						lastButtonTime = Time.time;
 					}
 				}
-				else if( button == InputController.ButtonType.Down )
+				else if( button == InputController.ButtonType.Down || button == InputController.ButtonType.RDown )
 				{
 					if( NetworkAgent.GetSelectionIndex() > 0 )
 					{
 						NetworkAgent.SetSelectionIndex( NetworkAgent.GetSelectionIndex() + 1 );
 						lastButtonTime = Time.time;
 					}
+				}
+			} break;
+
+			case GameAgent.GameState.Room:
+			{
+				if( button == InputController.ButtonType.Start || button == InputController.ButtonType.A )
+				{
+					if( NetworkAgent.GetIsHost() )
+					{
+						PlayerAgent.StartGame();
+						lastButtonTime = Time.time;
+					}
+				} else if( button == InputController.ButtonType.B )
+				{
+					NetworkAgent.LeaveRoom();
+					lastButtonTime = Time.time;
 				}
 			} break;
 		}

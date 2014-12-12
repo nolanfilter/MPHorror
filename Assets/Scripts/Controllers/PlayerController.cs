@@ -879,6 +879,13 @@ public class PlayerController : Photon.MonoBehaviour {
 		StopCoroutine( "DoDisplayMessage" );
 		StartCoroutine( "DoDisplayMessage", messageToDisplay );
 	}
+
+	[RPC]
+	public void RPCStartGame()
+	{
+		GameAgent.ChangeGameState( GameAgent.GameState.Game );
+		PlayerAgent.SetMonster();
+	}
 	// end server calls
 
 	//event handlers
@@ -1113,6 +1120,14 @@ public class PlayerController : Photon.MonoBehaviour {
 			ChangeFlashlight( 0 );
 		else
 			ChangeFlashlight( ( on ? 1 : 0 ) );
+	}
+
+	public void StartGame()
+	{
+		GameAgent.ChangeGameState( GameAgent.GameState.Game );
+		PlayerAgent.SetMonster();
+
+		photonView.RPC( "RPCStartGame", PhotonTargets.OthersBuffered );
 	}
 
 	public void TeleportTo( Vector3 coordinate )

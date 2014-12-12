@@ -161,6 +161,7 @@ public class InputController : MonoBehaviour {
 
 					codes[ (int)ButtonType.Start ] = (KeyCode)( (int)KeyCode.Joystick1Button9 );
 					codes[ (int)ButtonType.A ] = (KeyCode)( (int)KeyCode.Joystick1Button16 );
+					codes[ (int)ButtonType.B ] = (KeyCode)( (int)KeyCode.Joystick1Button17 );
 					
 				} break;
 				}
@@ -185,6 +186,7 @@ public class InputController : MonoBehaviour {
 
 				codes[ (int)ButtonType.Start ] = KeyCode.Return;
 				codes[ (int)ButtonType.A ] = KeyCode.Return;
+				codes[ (int)ButtonType.B ] = KeyCode.Backspace;
 				
 				currentInputType = "Keyboard";
 			}
