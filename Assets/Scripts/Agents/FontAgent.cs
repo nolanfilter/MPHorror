@@ -3,7 +3,8 @@ using System.Collections;
 
 public class FontAgent : MonoBehaviour {
 
-	public Font font;
+	public Font notificationFont;
+	public Font uIFont;
 
 	private static FontAgent mInstance = null;
 	public static FontAgent instance
@@ -25,16 +26,29 @@ public class FontAgent : MonoBehaviour {
 		mInstance = this;
 	}
 
-	public static Font GetFont()
+	public static Font GetNotificationFont()
 	{
 		if( instance )
-			return instance.internalGetFont();
+			return instance.internalGetNotificationFont();
 
 		return null;
 	}
 
-	private Font internalGetFont()
+	private Font internalGetNotificationFont()
 	{
-		return font;
+		return notificationFont;
+	}
+
+	public static Font GetUIFont()
+	{
+		if( instance )
+			return instance.internalGetUIFont();
+
+		return null;
+	}
+
+	private Font internalGetUIFont()
+	{
+		return uIFont;
 	}
 }

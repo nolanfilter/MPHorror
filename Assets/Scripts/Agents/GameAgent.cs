@@ -16,7 +16,8 @@ public class GameAgent : MonoBehaviour {
 		Credits = 6,
 		Options = 7,
 		Room = 8,
-		Invalid = 9,
+		Intro = 9,
+		Invalid = 10,
 	}
 	private List<GameState> gameStateStack = new List<GameState>();
 
@@ -70,7 +71,7 @@ public class GameAgent : MonoBehaviour {
 		if( darkQuadPrefab )
 			darkQuad = Instantiate( darkQuadPrefab ) as GameObject; 
 
-		PushGameState( GameState.Start );
+		PushGameState( GameState.Intro );
 	}
 
 	void Update()
