@@ -64,7 +64,8 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  - {fileID: 100000, guid: 6729b56c082ca4604b1b732f4cf736cc, type: 2}
+  - {fileID: 100006, guid: 6729b56c082ca4604b1b732f4cf736cc, type: 2}
+  - {fileID: 100000, guid: d4836a03e6f864770818ec0fcd21f554, type: 2}
   menuControllerPrefab: {fileID: 100000, guid: e61fad5d754d44d9292f8ffb7199bf53, type: 2}
   darkQuadPrefab: {fileID: 0}
 --- !u!114 &11400004
@@ -78,6 +79,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2162a4370b1a64be1b680839b0dbfb1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selectionCursor: {fileID: 2800000, guid: 8d06bfa830515497d8c31288e04ecb65, type: 3}
   numPlayers: 4
   playerPrefab: {fileID: 100000, guid: afb5c7e6a90424178a67485185db9d18, type: 2}
   networkBackgroundPrefab: {fileID: 100000, guid: 31af3ae2df7ba4ae8b37d917edabeec6,
@@ -103,7 +105,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20a1718319e9744139e518ca9048dc41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  font: {fileID: 12800000, guid: 1811da8f98ed6472f82d52cac474a90f, type: 3}
+  notificationFont: {fileID: 12800000, guid: 1811da8f98ed6472f82d52cac474a90f, type: 3}
+  uIFont: {fileID: 12800000, guid: 4309e43381048469ca5e630099fd92f4, type: 3}
 --- !u!114 &11400008
 MonoBehaviour:
   m_ObjectHideFlags: 1

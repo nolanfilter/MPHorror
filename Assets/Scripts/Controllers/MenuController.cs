@@ -44,6 +44,15 @@ public class MenuController : MonoBehaviour {
 
 		switch( GameAgent.GetCurrentGameState() )
 		{
+			case GameAgent.GameState.Intro:
+			{
+				if( button == InputController.ButtonType.Start || button == InputController.ButtonType.A )
+				{
+					GameAgent.ChangeGameState( GameAgent.GameState.Start );
+					lastButtonTime = Time.time;
+				}
+			} break;
+
 			case GameAgent.GameState.Start:
 			{
 				if( button == InputController.ButtonType.Start || button == InputController.ButtonType.A )

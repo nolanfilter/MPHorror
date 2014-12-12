@@ -188,7 +188,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		messageRect = new Rect( 0f, 0f, Screen.width, Screen.height * 0.1f );
 
 		textStyle = new GUIStyle();
-		textStyle.font = FontAgent.GetFont();
+		textStyle.font = FontAgent.GetNotificationFont();
 		textStyle.normal.textColor = Color.white;
 		textStyle.alignment = TextAnchor.MiddleCenter;
 

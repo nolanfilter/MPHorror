@@ -3,6 +3,7 @@ using System.Collections;
 
 public class NetworkAgent : MonoBehaviour {
 
+	public Texture2D selectionCursor;
 	public int numPlayers;
 	public GameObject playerPrefab;
 	public GameObject networkBackgroundPrefab;
@@ -15,10 +16,11 @@ public class NetworkAgent : MonoBehaviour {
 	private GameObject networkBackground;
 
 	private int selectionIndex;
-
-	private bool wasInRoom = false;
-
+	
 	private bool isHost = false;
+
+	private GUIStyle textStyle;
+	private GUIStyle shadowStyle;
 
 	private static NetworkAgent mInstance = null;
 	public static NetworkAgent instance
@@ -46,6 +48,16 @@ public class NetworkAgent : MonoBehaviour {
 
 		PhotonNetwork.ConnectUsingSettings( "0.1" );
 
+		textStyle = new GUIStyle();
+		textStyle.font = FontAgent.GetUIFont();
+		textStyle.normal.textColor = Color.white;
+		textStyle.alignment = TextAnchor.MiddleCenter;
+
+		shadowStyle = new GUIStyle();
+		shadowStyle.font = FontAgent.GetUIFont();
+		shadowStyle.normal.textColor = Color.black;
+		shadowStyle.alignment = TextAnchor.MiddleCenter;
+
 		//if( networkBackgroundPrefab )
 		//	networkBackground = Instantiate( networkBackgroundPrefab ) as GameObject;
 	}
@@ -59,11 +71,9 @@ public class NetworkAgent : MonoBehaviour {
 
 		if( GameAgent.GetCurrentGameState() == GameAgent.GameState.Waiting )
 		{
-			if( PhotonNetwork.room != null  && !wasInRoom )
+			if( PhotonNetwork.room != null )
 				GameAgent.ChangeGameState( GameAgent.GameState.Room );
 		}
-
-		wasInRoom = ( PhotonNetwork.room == null );
 
 		SetSelectionIndex( GetSelectionIndex() );
 	}
@@ -79,14 +89,13 @@ public class NetworkAgent : MonoBehaviour {
 			else if( PhotonNetwork.room == null )
 			{
 				// Create Room
-				Rect createRoomRect;
+				Rect createRoomRect = new Rect( 100, 100, 300, 100 );
 
 				if( selectionIndex == 0 )
-					createRoomRect = new Rect( 75, 75, 350, 150 );
-				else
-					createRoomRect = new Rect( 100, 100, 300, 100 );
-
-				GUI.Button( createRoomRect, "Start Server" );
+					GUI.DrawTexture( new Rect( createRoomRect.center.x - 225, createRoomRect.center.y - 390, 512, 512 ), selectionCursor );
+				
+				GUI.Label( new Rect( createRoomRect.x + 3, createRoomRect.y, createRoomRect.width, createRoomRect.height ), "Start Server", shadowStyle );
+				GUI.Label( createRoomRect, "Start Server", textStyle );
 					
 				// Join Room
 				if( roomsList != null )
@@ -95,12 +104,13 @@ public class NetworkAgent : MonoBehaviour {
 
 					for (int i = 0; i < roomsList.Length; i++ )
 					{
-						if( selectionIndex == i + 1 )
-							roomRect = new Rect( Screen.width * 0.5f - 25, 75 + ( 150 * i ), 350, 150 );
-						else
-							roomRect = new Rect( Screen.width * 0.5f, 100 + ( 150 * i ), 300, 100 );
+						roomRect = new Rect( Screen.width * 0.5f, 100 + ( 150 * i ), 300, 100 );
 
-						GUI.Button( roomRect, "Join\nRoom " + i );
+						if( selectionIndex == i + 1 )
+							GUI.DrawTexture( new Rect( roomRect.center.x - 225, roomRect.center.y - 390, 512, 512 ), selectionCursor );
+
+						GUI.Label( new Rect( roomRect.x + 3, roomRect.y, roomRect.width, roomRect.height ), "Join Room " + i, shadowStyle );
+						GUI.Label( roomRect, "Join Room " + i, textStyle );
 					}
 				}
 			}
@@ -109,12 +119,13 @@ public class NetworkAgent : MonoBehaviour {
 		{
 			if( isHost )
 			{
-				GUI.Button( new Rect( Screen.width * 0.1f, 75, Screen.width * 0.8f, 100 ), "Host of Room" );
-				GUI.Button( new Rect( 100, 375, 300, 100 ), "A to Start Game" );
+				GUI.Label( new Rect( Screen.width * 0.1f + 3, 75, Screen.width * 0.8f, 100 ), "Hosting Room", shadowStyle );
+				GUI.Label( new Rect( Screen.width * 0.1f, 75, Screen.width * 0.8f, 100 ), "Hosting Room", textStyle );
 			}
 			else
 			{
-				GUI.Button( new Rect( Screen.width * 0.1f, 75, Screen.width * 0.8f, 100 ), "Joined Room" );
+				GUI.Label( new Rect( Screen.width * 0.1f + 3, 75, Screen.width * 0.8f, 100 ), "Joined Room", shadowStyle );
+				GUI.Label( new Rect( Screen.width * 0.1f, 75, Screen.width * 0.8f, 100 ), "Joined Room", textStyle );
 			}
 
 			int playersConnected = PhotonNetwork.playerList.Length;
@@ -126,8 +137,8 @@ public class NetworkAgent : MonoBehaviour {
 			else
 				playersConnectedString += playersConnected + " players connected";
 
-			GUI.Button( new Rect( Screen.width * 0.3f, 225, Screen.width * 0.4f, 100 ), playersConnectedString );
-			GUI.Button( new Rect( Screen.width * 0.9f - 300, 375, 300, 100 ), "B to Leave Room" );
+			GUI.Label( new Rect( Screen.width * 0.3f + 3, 225, Screen.width * 0.4f, 100 ), playersConnectedString, shadowStyle );
+			GUI.Label( new Rect( Screen.width * 0.3f, 225, Screen.width * 0.4f, 100 ), playersConnectedString, textStyle );
 		}
 	}
 
