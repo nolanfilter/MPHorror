@@ -480,13 +480,17 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( photonView.isMine )
 		{
 			if( isZoomingIn )
+			{
 				zoomProgress = Mathf.Clamp01( zoomProgress + Time.deltaTime / zoomDuration );
+			}
 			else
+			{
 				zoomProgress = Mathf.Clamp01( zoomProgress - Time.deltaTime / zoomDuration );
+			}
 
 			//check for jumps
 			if( Mathf.Abs( oldZoomProgress - zoomProgress ) > 0.5f )
-				zoomProgress = oldZoomProgress + 0.1f * Mathf.Sign( oldZoomProgress - zoomProgress );
+				zoomProgress = Mathf.Clamp01( oldZoomProgress + 0.1f * Mathf.Sign( oldZoomProgress - zoomProgress ) );
 
 			if( zoomProgress == 1f )
 			{
