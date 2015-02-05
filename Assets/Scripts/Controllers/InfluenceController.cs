@@ -79,12 +79,15 @@ public class InfluenceController : MonoBehaviour {
 				if( playerController.GetCurrentState() == PlayerController.State.Monster && ( otherPlayerController.GetCurrentState() == PlayerController.State.Normal || otherPlayerController.GetCurrentState() == PlayerController.State.None ) )
 				{
 					otherPlayerController.IncreaseFear();
-					playerController.MonsterReveal();
+					//playerController.MonsterReveal();
 				}
 
-				if( otherPlayerController.GetCurrentState() == PlayerController.State.Monster && ( playerController.GetCurrentState() == PlayerController.State.Normal || playerController.GetCurrentState() == PlayerController.State.None ) )
+				if( playerController.GetCurrentState() == PlayerController.State.Normal || playerController.GetCurrentState() == PlayerController.State.None )
 				{
-					otherPlayerController.MonsterReveal();
+					if( otherPlayerController.GetCurrentState() == PlayerController.State.Monster  )
+						otherPlayerController.MonsterReveal();
+					else if( otherPlayerController.GetCurrentState() == PlayerController.State.Normal || otherPlayerController.GetCurrentState() == PlayerController.State.None )
+						otherPlayerController.SurvivorReveal();
 				}
 			}
 		}

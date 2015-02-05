@@ -9,7 +9,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		Monster = 1,
 		Dead = 2,
 		Voyeur = 3,
-		None = 4,
+		Stunned = 4,
+		None = 5,
 	}
 	private State currentState = State.None;
 
@@ -99,6 +100,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	private Color whiteClear = new Color( 1f, 1f, 1f, 0f );
 
 	private bool isWaitingForPhotoFinish = false;
+	private float stunDuration = 7.5f;
 
 	//new movement variables
 	private Vector3 moveDirection = Vector3.zero;
@@ -479,18 +481,14 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		if( photonView.isMine )
 		{
-			if( isZoomingIn )
-			{
+			if( isZoomingIn && currentState != State.Stunned )
 				zoomProgress = Mathf.Clamp01( zoomProgress + Time.deltaTime / zoomDuration );
-			}
 			else
-			{
 				zoomProgress = Mathf.Clamp01( zoomProgress - Time.deltaTime / zoomDuration );
-			}
 
 			//check for jumps
 			if( Mathf.Abs( oldZoomProgress - zoomProgress ) > 0.5f )
-				zoomProgress = Mathf.Clamp01( oldZoomProgress + 0.1f * Mathf.Sign( oldZoomProgress - zoomProgress ) );
+				zoomProgress = oldZoomProgress + 0.1f * Mathf.Sign( oldZoomProgress - zoomProgress );
 
 			if( zoomProgress == 1f )
 			{
@@ -829,6 +827,22 @@ public class PlayerController : Photon.MonoBehaviour {
 		
 		material.color = toColor;
 	}
+
+	private IEnumerator DoStun()
+	{
+		if( currentState == State.Stunned || currentState == State.Dead || currentState == State.Voyeur )
+			yield break;
+
+		State originalState = currentState;
+
+		ChangeState( (int)State.Stunned );
+
+		yield return new WaitForSeconds( stunDuration );
+
+		ChangeColor( new Quaternion( 1f, 0.9f, 0.9f, 1f ) );
+
+		ChangeState( (int)originalState );
+	}
 	//end coroutines
 
 	//server calls
@@ -1101,6 +1115,7 @@ public class PlayerController : Photon.MonoBehaviour {
 			return;
 
 		cameraTransform.gameObject.AddComponent<NegativeEffect>();
+		StopCoroutine( "DoStun" );
 		ChangeState( (int)State.Monster );
 		DisplayMessage( "Steal souls with Photos" );
 	}
@@ -1108,6 +1123,13 @@ public class PlayerController : Photon.MonoBehaviour {
 	public void MonsterReveal()
 	{
 		ChangeColor( new Quaternion( 0.75f, 0f, 0f, 1f ) );
+		StartCoroutine( "DoStun" );
+	}
+
+	public void SurvivorReveal()
+	{
+		ChangeColor( new Quaternion( 0f, 0.75f, 0f, 1f ) );
+		StartCoroutine( "DoStun" );
 	}
 
 	public void SetFlashBulbTo( bool on )
