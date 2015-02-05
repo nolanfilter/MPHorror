@@ -401,15 +401,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  subId: 0
   ownerId: 0
   group: 0
   prefixBackup: -1
-  observed: {fileID: 11400002}
+  observed: {fileID: 0}
   synchronization: 1
   onSerializeTransformOption: 3
   onSerializeRigidBodyOption: 2
+  ownershipTransfer: 0
+  ObservedComponents:
+  - {fileID: 11400002}
+  ObservedComponentsFoldoutOpen: 1
+  viewIdField: 0
   instantiationId: -1
+  isRuntimeInstantiated: 0
 --- !u!114 &11400002
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -424,6 +429,8 @@ MonoBehaviour:
   meterTexture: {fileID: 2800000, guid: ef046fff5043b4ce59c31bd90d47cb71, type: 3}
   flashQuadPrefab: {fileID: 100000, guid: 6e7de32a852f645ee91e6d64325dadd8, type: 2}
   screenshotQuadPrefab: {fileID: 100000, guid: 03dea27ec7fb4488c97fa493552293dd, type: 2}
+  camQuadPrefab: {fileID: 100000, guid: 3ea4db094ed1844219a2246fbfbd555f, type: 2}
+  rageQuadPrefab: {fileID: 100000, guid: 804e83294828c458295e854431bedfb8, type: 2}
   flashlight: {fileID: 10800000}
   flashBulb: {fileID: 10800002}
 --- !u!114 &11400004
@@ -448,10 +455,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 473b8e75806d34918a15fef18552ab6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 2
-  radiusZoom: .5
-  zoomDistance: 2.5
-  showDebugRay: 0
+  showDebugRay: 1
 --- !u!143 &14300000
 CharacterController:
   m_ObjectHideFlags: 1
