@@ -120,7 +120,6 @@ public class InfluenceController : MonoBehaviour {
 			if( playerController.GetCurrentState() == PlayerController.State.Raging  )
 			{
 				playerController.MonsterReveal();
-				return;
 			}
 			
 			fsm.SendEvent( "ObjectSeen" );
