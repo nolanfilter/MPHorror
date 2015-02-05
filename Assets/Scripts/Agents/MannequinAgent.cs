@@ -60,6 +60,9 @@ public class MannequinAgent : MonoBehaviour {
 
 	private void internalSetKeys()
 	{
+		if( mannequins.Count == 0 )
+			return;
+
 		int seed = Utilities.HexToInt( PhotonNetwork.room.name[ PhotonNetwork.room.name.Length - 2 ] );
 		
 		Random.seed = seed;

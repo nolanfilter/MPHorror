@@ -10,7 +10,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		Dead = 2,
 		Voyeur = 3,
 		Stunned = 4,
-		None = 5,
+		Raging = 5,
+		None = 6,
 	}
 	private State currentState = State.None;
 
@@ -89,6 +90,8 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public GameObject flashQuadPrefab;
 	public GameObject screenshotQuadPrefab;
+	public GameObject camQuadPrefab;
+	public GameObject rageQuadPrefab;
 
 	private Renderer[] modelRenderers = null;
 
@@ -97,6 +100,9 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private GameObject flashQuad;
 	private GameObject screenshotQuad;
+	private GameObject camQuad;
+	private GameObject rageQuad;
+
 	private Color whiteClear = new Color( 1f, 1f, 1f, 0f );
 
 	private bool isWaitingForPhotoFinish = false;
@@ -173,7 +179,8 @@ public class PlayerController : Photon.MonoBehaviour {
 					flashBulb = lights[i];
 		}
 
-		SetFlashBulbTo( false );
+		if( flashBulb )
+			flashBulb.enabled = false;
 
 		moveDirection = transform.TransformDirection(Vector3.forward);
 
@@ -182,7 +189,15 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( photonView.isMine )
 			gameObject.name += "(Client)";
 
-		ChangeColor( new Quaternion( 1f, 0.9f, 0.9f, 1f ) );
+
+
+		if( modelRenderers != null )
+		{
+			Color color = new Color( 1f, 0.9f, 0.9f, 1f );
+			
+			for( int i = 0; i < modelRenderers.Length; i++ )
+				modelRenderers[i].material.color = color;
+		}
 	}
 	
 	void Start()
@@ -204,6 +219,18 @@ public class PlayerController : Photon.MonoBehaviour {
 		{
 			screenshotQuad = Instantiate( screenshotQuadPrefab ) as GameObject;
 			screenshotQuad.renderer.material.color = whiteClear;
+		}
+
+		if( camQuadPrefab )
+		{
+			camQuad = Instantiate( camQuadPrefab ) as GameObject;
+			camQuad.renderer.enabled = false;
+		}
+
+		if( rageQuadPrefab )
+		{
+			rageQuad = Instantiate( rageQuadPrefab ) as GameObject;
+			rageQuad.renderer.enabled = false;
 		}
 
 		viewChangeVector = Vector2.zero;
@@ -385,7 +412,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	
 	private void InputMovement()
 	{
-		if( currentState == State.Dead )
+		if( currentState == State.Dead || currentState == State.Raging )
 			return;
 
 		float fearFactor = Mathf.Clamp01( currentFear );
@@ -443,9 +470,25 @@ public class PlayerController : Photon.MonoBehaviour {
 		characterController.Move( movement );
 
 		if( zoomProgress == 1f )
+		{
 			transform.rotation = Quaternion.LookRotation( zoomOffset.normalized );
+
+			if( rageQuad && currentState == State.Monster )
+				rageQuad.renderer.enabled = true;
+
+			if( camQuad && ( currentState == State.Normal || currentState == State.None ) )
+				camQuad.renderer.enabled = !isWaitingForPhotoFinish && !hasPhoto;
+		}
 		else
+		{
 			transform.rotation = Quaternion.LookRotation( moveDirection );
+
+			if( rageQuad )
+				rageQuad.renderer.enabled = false;
+			
+			if( camQuad )
+				camQuad.renderer.enabled = false;
+		}
 
 		movementVector = Vector3.zero;
 	}
@@ -481,7 +524,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		if( photonView.isMine )
 		{
-			if( isZoomingIn && currentState != State.Stunned )
+			if( ( isZoomingIn && currentState != State.Stunned ) || currentState == State.Raging )
 				zoomProgress = Mathf.Clamp01( zoomProgress + Time.deltaTime / zoomDuration );
 			else
 				zoomProgress = Mathf.Clamp01( zoomProgress - Time.deltaTime / zoomDuration );
@@ -766,10 +809,10 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( ( zoomProgress != 1f ) || isWaitingForPhotoFinish || hasPhoto )
 			yield break;
 
+		isWaitingForPhotoFinish = true;
+
 		ScreenshotAgent.instance.OnPostRenderFinish += OnScreenshotFinish;
 		ScreenshotAgent.Enable();
-
-		isWaitingForPhotoFinish = true;
 
 		while( isWaitingForPhotoFinish )
 			yield return null;
@@ -796,14 +839,40 @@ public class PlayerController : Photon.MonoBehaviour {
 			yield return new WaitForSeconds( 1.25f );
 		}
 
-		hasPhoto = false;
-
 		SetFlashlightTo( oldFlashlightState );
 
 		if( screenshotQuad )
 		{
 			yield return StartCoroutine( DoColorFade( screenshotQuad.renderer.material, Color.white, whiteClear, 0.45f ) );
 		}
+
+		hasPhoto = false;
+	}
+
+	private IEnumerator RageMode()
+	{
+		ChangeState( (int)State.Raging );
+		ChangeColor(  new Quaternion( 0.75f, 0f, 0f, 1f ) );
+	
+		float distance = 10f;
+		float currentDistance = 0f;
+
+		float speed = 20f;
+		float deltaDistance;
+
+		do
+		{
+			deltaDistance = speed * Time.deltaTime;
+			currentDistance += speed * Time.deltaTime;
+
+			characterController.Move( transform.forward * speed * Time.deltaTime );
+
+			yield return null;
+
+		} while( currentDistance < distance );
+
+		ChangeState( (int)State.Monster );
+		MonsterReveal();
 	}
 
 	private IEnumerator DoColorFade( Material material, Color fromColor, Color toColor, float duration )
@@ -923,9 +992,12 @@ public class PlayerController : Photon.MonoBehaviour {
 			ToggleFlashlight();
 		} break;
 
-		case InputController.ButtonType.Photograph: 
+		case InputController.ButtonType.Action: 
 		{
-			StartCoroutine( "TakePhoto" );
+			if( currentState == State.Normal || currentState == State.None )
+				StartCoroutine( "TakePhoto" );
+			else if( currentState == State.Monster )
+				StartCoroutine( "RageMode" );
 		} break;
 
 		case InputController.ButtonType.LeftShoulder: 
@@ -1106,7 +1178,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public bool IsZoomedIn()
 	{
-		return hasPhoto;
+		return hasPhoto || currentState == State.Raging;
 	}
 
 	public void Monsterize()
@@ -1114,15 +1186,25 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( !photonView.isMine || currentState == State.Monster || currentState == State.Dead )
 			return;
 
+		if( camQuad )
+			camQuad.renderer.enabled = false;
+
 		cameraTransform.gameObject.AddComponent<NegativeEffect>();
 		StopCoroutine( "DoStun" );
 		ChangeState( (int)State.Monster );
 		DisplayMessage( "Steal souls with Photos" );
 	}
 
+	public void RageHit()
+	{
+		StopCoroutine( "RageMode" );
+		ChangeColor( new Quaternion( 1f, 0.9f, 0.9f, 1f ) );
+	}
+
 	public void MonsterReveal()
 	{
-		ChangeColor( new Quaternion( 0.75f, 0f, 0f, 1f ) );
+		StopCoroutine( "RageMode" );
+		ChangeColor( new Quaternion( 1f, 0.75f, 0.875f, 1f ) );
 		StartCoroutine( "DoStun" );
 	}
 
