@@ -3,9 +3,10 @@ using System.Collections;
 
 public class InfluenceController : MonoBehaviour {
 
-	public float radius = 2f;
-	public float radiusZoom = 0.5f;
-	public float zoomDistance = 2.5f;
+	private float radius = 2f;
+	private float radiusZoom = 0.5f;
+	private float zoomDistance = 2.5f;
+	private float rageDistance = 0.5f;
 	public bool showDebugRay = false;
 
 	private PlayerController playerController = null;
@@ -33,7 +34,10 @@ public class InfluenceController : MonoBehaviour {
 
 		if( playerController.IsZoomedIn() ) 
 		{
-			distance = radiusZoom + transform.root.localScale.z + zoomDistance;
+			if( playerController.GetCurrentState() == PlayerController.State.Raging )
+				distance = radiusZoom + transform.root.localScale.z + rageDistance;
+			else
+				distance = radiusZoom + transform.root.localScale.z + zoomDistance;
 
 			ray = new Ray( transform.position + transform.forward * distance, transform.forward * -1f );
 
@@ -49,7 +53,7 @@ public class InfluenceController : MonoBehaviour {
 		}
 
 		if( showDebugRay )
-			Debug.DrawRay( ray.origin, ray.direction * distance );
+			Debug.DrawRay( ray.origin, ray.direction * distance, Color.magenta );
 
 		foreach( RaycastHit hit in hits )
 			EvaluateCollider( hit.collider );
@@ -76,10 +80,10 @@ public class InfluenceController : MonoBehaviour {
 
 			if( playerController.IsZoomedIn() )
 			{
-				if( playerController.GetCurrentState() == PlayerController.State.Monster && ( otherPlayerController.GetCurrentState() == PlayerController.State.Normal || otherPlayerController.GetCurrentState() == PlayerController.State.None ) )
+				if( playerController.GetCurrentState() == PlayerController.State.Raging && otherPlayerController.GetCurrentState() != PlayerController.State.Dead && otherPlayerController.GetCurrentState() != PlayerController.State.Voyeur )
 				{
+					playerController.RageHit();
 					otherPlayerController.IncreaseFear();
-					//playerController.MonsterReveal();
 				}
 
 				if( playerController.GetCurrentState() == PlayerController.State.Normal || playerController.GetCurrentState() == PlayerController.State.None )
@@ -95,8 +99,14 @@ public class InfluenceController : MonoBehaviour {
 		{
 			PlayMakerFSM fsm = collider.GetComponent<PlayMakerFSM>();
 
-			if( fsm == null || playerController.GetCurrentState() == PlayerController.State.Monster || !playerController.IsZoomedIn() )
+			if( fsm == null || !playerController.IsZoomedIn() )
 				return;
+
+			if( playerController.GetCurrentState() == PlayerController.State.Raging  )
+			{
+				playerController.MonsterReveal();
+				return;
+			}
 
 			fsm.SendEvent( "ObjectSeen" );
 		}
@@ -106,6 +116,12 @@ public class InfluenceController : MonoBehaviour {
 			
 			if( fsm == null || !playerController.IsZoomedIn() )
 				return;
+
+			if( playerController.GetCurrentState() == PlayerController.State.Raging  )
+			{
+				playerController.MonsterReveal();
+				return;
+			}
 			
 			fsm.SendEvent( "ObjectSeen" );
 		}
