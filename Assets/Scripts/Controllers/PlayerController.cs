@@ -1204,6 +1204,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	public void MonsterReveal()
 	{
 		StopCoroutine( "RageMode" );
+		ChangeState( (int)State.Monster );
 		ChangeColor( new Quaternion( 1f, 0.75f, 0.875f, 1f ) );
 		StartCoroutine( "DoStun" );
 	}
