@@ -1,0 +1,147 @@
+fileFormatVersion: 2
+guid: 111dff3737fe34b0e9e30efb14c7bbae
+ModelImporter:
+  serializedVersion: 16
+  fileIDToRecycleName:
+    100000: Ballet_Shoes_Left
+    100002: Ballet_Shoes_Right
+    100004: pCube10
+    100006: pCube2
+    100008: pCube3
+    100010: pCube4
+    100012: pCube5
+    100014: pCube6
+    100016: pCube7
+    100018: pCube8
+    100020: pCube9
+    100022: polySurface2
+    100024: polySurface3
+    100026: polySurface4
+    100028: polySurface5
+    100030: polySurface6
+    100032: pPipe1
+    100034: //RootNode
+    100036: Ribbon
+    100038: Ribbon1
+    100040: transform10
+    100042: transform7
+    100044: transform8
+    100046: transform9
+    400000: Ballet_Shoes_Left
+    400002: Ballet_Shoes_Right
+    400004: pCube10
+    400006: pCube2
+    400008: pCube3
+    400010: pCube4
+    400012: pCube5
+    400014: pCube6
+    400016: pCube7
+    400018: pCube8
+    400020: pCube9
+    400022: polySurface2
+    400024: polySurface3
+    400026: polySurface4
+    400028: polySurface5
+    400030: polySurface6
+    400032: pPipe1
+    400034: //RootNode
+    400036: Ribbon
+    400038: Ribbon1
+    400040: transform10
+    400042: transform7
+    400044: transform8
+    400046: transform9
+    2300000: Ballet_Shoes_Left
+    2300002: Ballet_Shoes_Right
+    2300004: pCube10
+    2300006: pCube5
+    2300008: pCube6
+    2300010: pCube7
+    2300012: pCube8
+    2300014: pCube9
+    2300016: polySurface3
+    2300018: polySurface4
+    2300020: polySurface5
+    2300022: polySurface6
+    2300024: pPipe1
+    3300000: Ballet_Shoes_Left
+    3300002: Ballet_Shoes_Right
+    3300004: pCube10
+    3300006: pCube5
+    3300008: pCube6
+    3300010: pCube7
+    3300012: pCube8
+    3300014: pCube9
+    3300016: polySurface3
+    3300018: polySurface4
+    3300020: polySurface5
+    3300022: polySurface6
+    3300024: pPipe1
+    4300000: Ballet_Shoes_Left
+    4300002: Ballet_Shoes_Right
+    4300004: pCube7
+    4300006: pCube8
+    4300008: polySurface3
+    4300010: polySurface6
+    4300012: pPipe1
+    4300014: pCube6
+    4300016: polySurface4
+    4300018: polySurface5
+    4300020: pCube5
+    4300022: pCube9
+    4300024: pCube10
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: .00999999978
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 
