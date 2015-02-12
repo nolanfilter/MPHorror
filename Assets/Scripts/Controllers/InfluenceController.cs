@@ -26,8 +26,6 @@ public class InfluenceController : MonoBehaviour {
 
 	void FixedUpdate()
 	{
-		RaycastHit[] hits;
-
 		Ray ray;
 
 		float distance;
@@ -41,7 +39,10 @@ public class InfluenceController : MonoBehaviour {
 
 			ray = new Ray( transform.position + transform.forward * distance, transform.forward * -1f );
 
-			hits = Physics.SphereCastAll( ray, radiusZoom, distance );
+			RaycastHit[] hits = Physics.SphereCastAll( ray, radiusZoom, distance );
+
+			foreach( RaycastHit hit in hits )
+				EvaluateCollider( hit.collider );
 		}
 		else
 		{
@@ -49,14 +50,14 @@ public class InfluenceController : MonoBehaviour {
 
 			ray = new Ray( transform.position + Vector3.up * distance, Vector3.up * -1f );
 
-			hits = Physics.SphereCastAll( ray, radius, distance );
+			Collider[] colliders = Physics.OverlapSphere( transform.position, distance );
+
+			foreach( Collider collider in colliders )
+				EvaluateCollider( collider );
 		}
 
 		if( showDebugRay )
 			Debug.DrawRay( ray.origin, ray.direction * distance, Color.magenta );
-
-		foreach( RaycastHit hit in hits )
-			EvaluateCollider( hit.collider );
 	}
 
 	void OnTriggerEnter( Collider collider )
@@ -97,9 +98,7 @@ public class InfluenceController : MonoBehaviour {
 		}
 		else if( collider.tag == "Key" || collider.tag == "Key2" )
 		{
-			PlayMakerFSM fsm = collider.GetComponent<PlayMakerFSM>();
-
-			if( fsm == null || !playerController.IsZoomedIn() )
+			if( !playerController.IsZoomedIn() )
 				return;
 
 			if( playerController.GetCurrentState() == PlayerController.State.Raging  )
@@ -108,21 +107,35 @@ public class InfluenceController : MonoBehaviour {
 				return;
 			}
 
-			fsm.SendEvent( "ObjectSeen" );
+			PlayMakerFSM fsm = collider.GetComponent<PlayMakerFSM>();
+
+			if( fsm != null )
+				fsm.SendEvent( "ObjectSeen" );
 		}
 		else if( collider.tag == "Activatable" )
 		{
-			PlayMakerFSM fsm = collider.GetComponent<PlayMakerFSM>();
-			
-			if( fsm == null || !playerController.IsZoomedIn() )
+			if( !playerController.IsZoomedIn() )
 				return;
 
 			if( playerController.GetCurrentState() == PlayerController.State.Raging  )
 			{
 				playerController.MonsterReveal();
 			}
+
+			PlayMakerFSM fsm = collider.GetComponent<PlayMakerFSM>();
+
+			if( fsm != null )
+				fsm.SendEvent( "ObjectSeen" );
+		}
+		else if( collider.tag == "Door" )
+		{
+			if( !playerController.IsOpeningDoor() )
+				return;
+
+			PlayMakerFSM fsm = collider.GetComponent<PlayMakerFSM>();
 			
-			fsm.SendEvent( "ObjectSeen" );
+			if( fsm != null )
+				fsm.SendEvent( "ObjectSeen" );
 		}
 	}
 }
