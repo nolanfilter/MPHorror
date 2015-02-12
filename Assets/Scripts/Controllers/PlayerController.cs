@@ -499,7 +499,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		syncTime += Time.deltaTime;
 		
 		float lerp = syncTime / syncDelay;
-		
+
 		if( Vector3.Distance( syncStartPosition, syncEndPosition ) < 2f )
 		{
 			transform.position = Vector3.Lerp( syncStartPosition, syncEndPosition, lerp );
@@ -795,6 +795,14 @@ public class PlayerController : Photon.MonoBehaviour {
 		shoulderOffset = Mathf.Abs( shoulderOffset ) * sign;
 	}
 
+	private void RemoveGrayscaleEffect()
+	{
+		GrayscaleEffect grayscaleEffect = cameraTransform.gameObject.GetComponent<GrayscaleEffect>();
+	
+		if( grayscaleEffect )
+			Destroy( grayscaleEffect );
+	}
+
 	//coroutines
 	private IEnumerator DoDisplayMessage( string messageToDisplay )
 	{
@@ -907,9 +915,14 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		ChangeState( (int)State.Stunned );
 
+		if( photonView.isMine )
+			cameraTransform.gameObject.AddComponent<GrayscaleEffect>();
+
 		yield return new WaitForSeconds( stunDuration );
 
 		ChangeColor( new Quaternion( 1f, 0.9f, 0.9f, 1f ) );
+
+		RemoveGrayscaleEffect();
 
 		ChangeState( (int)originalState );
 	}
@@ -1207,13 +1220,15 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		cameraTransform.gameObject.AddComponent<NegativeEffect>();
 		StopCoroutine( "DoStun" );
+		RemoveGrayscaleEffect();
 		ChangeState( (int)State.Monster );
-		DisplayMessage( "Steal souls with Photos" );
+		DisplayMessage( "Attack your friends" );
 	}
 
 	public void RageHit()
 	{
 		StopCoroutine( "RageMode" );
+		ChangeState( (int)State.Monster );
 		ChangeColor( new Quaternion( 1f, 0.9f, 0.9f, 1f ) );
 	}
 
@@ -1221,7 +1236,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		StopCoroutine( "RageMode" );
 		ChangeState( (int)State.Monster );
-		ChangeColor( new Quaternion( 1f, 0.75f, 0.875f, 1f ) );
+		ChangeColor( new Quaternion( 1f, 0.5f, 0.75f, 1f ) );
 		StartCoroutine( "DoStun" );
 	}
 
