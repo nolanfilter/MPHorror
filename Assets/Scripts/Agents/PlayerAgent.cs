@@ -7,6 +7,7 @@ public class PlayerAgent : MonoBehaviour {
 	private List<PlayerController> playerControllers;
 
 	public Shader monsterShader;
+	public Shader stunShader;
 
 	public bool monsterize = true;
 	public bool monsterizeMaster = false;
@@ -74,6 +75,14 @@ public class PlayerAgent : MonoBehaviour {
 	{
 		if( instance )
 			return instance.monsterShader;
+
+		return null;
+	}
+
+	public static Shader GetStunShader()
+	{
+		if( instance )
+			return instance.stunShader;
 
 		return null;
 	}

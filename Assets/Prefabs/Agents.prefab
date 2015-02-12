@@ -119,6 +119,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   monsterShader: {fileID: 4800000, guid: a75f0ab14b53949168c63946615d7cad, type: 3}
+  stunShader: {fileID: 4800000, guid: 1c28e7fcf60ea438297ec9c18cbd0fa7, type: 3}
   monsterize: 1
   monsterizeMaster: 0
   waitTime: 25
