@@ -840,14 +840,14 @@ public class PlayerController : Photon.MonoBehaviour {
 			yield return new WaitForSeconds( 1.25f );
 		}
 
-		SetFlashlightTo( oldFlashlightState );
-
 		if( screenshotQuad )
 		{
 			yield return StartCoroutine( DoColorFade( screenshotQuad.renderer.material, Color.white, whiteClear, 0.45f ) );
 		}
 
 		hasPhoto = false;
+
+		SetFlashlightTo( oldFlashlightState );
 	}
 
 	private IEnumerator RageMode()
