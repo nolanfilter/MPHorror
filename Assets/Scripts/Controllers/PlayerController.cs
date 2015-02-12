@@ -17,6 +17,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private bool isZoomingIn = false;
 	private bool hasPhoto = false;
+	private bool isOpeningDoor = false;
 
 	private float currentFear = 1f;
 	private float currentSanity = 1f;
@@ -1009,6 +1010,11 @@ public class PlayerController : Photon.MonoBehaviour {
 		{
 			SetShoulderOffset( 1f );
 		} break;
+		
+		case InputController.ButtonType.A: case InputController.ButtonType.X:
+		{
+			isOpeningDoor = true;
+		} break;
 		}
 	}
 	
@@ -1024,6 +1030,11 @@ public class PlayerController : Photon.MonoBehaviour {
 			case InputController.ButtonType.Zoom:
 			{
 				ChangeZoom( 0 );
+			} break;
+
+			case InputController.ButtonType.A: case InputController.ButtonType.X:
+			{
+				isOpeningDoor = false;
 			} break;
 		}
 
@@ -1179,6 +1190,11 @@ public class PlayerController : Photon.MonoBehaviour {
 	public bool IsZoomedIn()
 	{
 		return hasPhoto || currentState == State.Raging;
+	}
+
+	public bool IsOpeningDoor()
+	{
+		return isOpeningDoor;
 	}
 
 	public void Monsterize()
