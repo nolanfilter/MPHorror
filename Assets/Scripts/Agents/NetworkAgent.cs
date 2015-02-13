@@ -140,6 +140,23 @@ public class NetworkAgent : MonoBehaviour {
 			GUI.Label( new Rect( Screen.width * 0.3f + 3, 225, Screen.width * 0.4f, 100 ), playersConnectedString, shadowStyle );
 			GUI.Label( new Rect( Screen.width * 0.3f, 225, Screen.width * 0.4f, 100 ), playersConnectedString, textStyle );
 		}
+		else if( GameAgent.GetCurrentGameState() == GameAgent.GameState.End )
+		{
+			GUI.Label( new Rect( Screen.width * 0.1f + 3, 75, Screen.width * 0.8f, 100 ), "THE END", shadowStyle );
+			GUI.Label( new Rect( Screen.width * 0.1f, 75, Screen.width * 0.8f, 100 ), "THE END", textStyle );
+
+			string endStatusString = "";
+
+			switch( PlayerAgent.GetClientState() )
+			{
+				case PlayerController.State.Dead: endStatusString = "Trapped forever"; break;
+				case PlayerController.State.Voyeur: endStatusString = "Sweet freedom"; break;
+				case PlayerController.State.Monster: endStatusString = "Betrayal suits you"; break;
+			}
+
+			GUI.Label( new Rect( Screen.width * 0.3f + 3, 225, Screen.width * 0.4f, 100 ), endStatusString, shadowStyle );
+			GUI.Label( new Rect( Screen.width * 0.3f, 225, Screen.width * 0.4f, 100 ), endStatusString, textStyle );
+		}
 	}
 
 	void OnReceivedRoomListUpdate()
@@ -175,8 +192,11 @@ public class NetworkAgent : MonoBehaviour {
 
 	public static void LeaveRoom()
 	{
-		PhotonNetwork.LeaveRoom();
-		GameAgent.ChangeGameState( GameAgent.GameState.Lobby );
+		if (PhotonNetwork.inRoom)
+		{
+			PhotonNetwork.LeaveRoom ();
+			GameAgent.ChangeGameState( GameAgent.GameState.Lobby );
+		}
 	}	
 
 	public static int GetNumPlayers()
@@ -238,8 +258,7 @@ public class NetworkAgent : MonoBehaviour {
 	{
 		return isHost;
 	}
-
-
+	
 	public static void ActivateSelected()
 	{
 		if( instance )

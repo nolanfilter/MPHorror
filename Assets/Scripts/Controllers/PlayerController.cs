@@ -12,6 +12,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		Stunned = 4,
 		Raging = 5,
 		None = 6,
+		Invalid = 7,
 	}
 	private State currentState = State.None;
 
@@ -250,7 +251,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		SnapCamera();
 
-		PlayerAgent.RegisterPlayer( this );
+		PlayerAgent.RegisterPlayer( this, photonView.isMine );
 	}
 	
 	void OnEnable()
@@ -766,6 +767,9 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private void EvaluateViewChange( InputController.ButtonType button )
 	{
+		if( GameAgent.GetCurrentGameState() != GameAgent.GameState.Game )
+			return;
+
 		switch( button )
 		{
 		case InputController.ButtonType.RLeft:
@@ -987,6 +991,22 @@ public class PlayerController : Photon.MonoBehaviour {
 		GameAgent.ChangeGameState( GameAgent.GameState.Game );
 		PlayerAgent.SetMonster();
 	}
+
+	[RPC]
+	public void RPCEndGame()
+	{
+		NegativeEffect negativeEffect = Camera.main.gameObject.GetComponent<NegativeEffect>();
+		
+		if( negativeEffect )
+			Destroy( negativeEffect );
+
+		RemoveGrayscaleEffect();
+		
+		GameAgent.ChangeGameState( GameAgent.GameState.End );
+
+		messageString = "";
+	}
+
 	// end server calls
 
 	//event handlers
@@ -1169,6 +1189,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		ChangeState( (int)State.Voyeur );
 		ChangeColor( new Quaternion( 0f, 0f, 0f, 0f ) );
 		DisplayMessage( "You escaped!" );
+
+		PlayerAgent.CheckForEnd();
 	}
 
 	public State GetCurrentState()
@@ -1184,7 +1206,9 @@ public class PlayerController : Photon.MonoBehaviour {
 		DisplayMessage( "Your soul was stolen" );
 		ChangeColor( new Quaternion( 0.175f, 0.175f, 0.175f, 0.5f ) );
 		ChangeColider( 0 );
-		
+
+		PlayerAgent.CheckForEnd();
+
 		return true;
 		//return ChangeFear( fearAttack );
 	}
@@ -1212,7 +1236,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public void Monsterize()
 	{
-		if( !photonView.isMine || currentState == State.Monster || currentState == State.Dead )
+		if( !photonView.isMine || GameAgent.GetCurrentGameState() != GameAgent.GameState.Game || currentState == State.Monster || currentState == State.Dead )
 			return;
 
 		if( camQuad )
@@ -1223,6 +1247,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		RemoveGrayscaleEffect();
 		ChangeState( (int)State.Monster );
 		DisplayMessage( "Attack your friends" );
+
+		PlayerAgent.CheckForEnd();
 	}
 
 	public void RageHit()
@@ -1268,6 +1294,22 @@ public class PlayerController : Photon.MonoBehaviour {
 		PlayerAgent.SetMonster();
 
 		photonView.RPC( "RPCStartGame", PhotonTargets.OthersBuffered );
+	}
+
+	public void EndGame()
+	{
+		NegativeEffect negativeEffect = Camera.main.gameObject.GetComponent<NegativeEffect>();
+		
+		if( negativeEffect )
+			Destroy( negativeEffect );
+
+		RemoveGrayscaleEffect();
+
+		GameAgent.ChangeGameState( GameAgent.GameState.End );
+
+		messageString = "";
+
+		photonView.RPC( "RPCEndGame", PhotonTargets.OthersBuffered );
 	}
 
 	public void TeleportTo( Vector3 coordinate )
