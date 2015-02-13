@@ -32,6 +32,9 @@ public class GameAgent : MonoBehaviour {
 
 	private bool isPendingChange = false;
 
+	private float resetTime;
+	private float resetDuration = 2f;
+
 	private static GameAgent mInstance = null;
 	public static GameAgent instance
 	{
@@ -78,6 +81,24 @@ public class GameAgent : MonoBehaviour {
 	{
 		if( Input.GetKeyDown( KeyCode.Escape ) )
 			Application.Quit();
+
+		if( GetCurrentGameState() == GameState.Game )
+		{
+			if( Input.GetKeyDown( KeyCode.R ) )
+				resetTime = 0f;
+
+			if( Input.GetKey( KeyCode.R ) )
+				resetTime += Time.deltaTime;
+
+			if( resetTime > resetDuration )
+			{
+				resetTime = 0f;
+				NetworkAgent.LeaveRoom();
+			}
+		}
+
+		//if( Input.GetKeyDown( KeyCode.E ) )
+		//	PlayerAgent.EndGame();
 	}
 
 	public static GameState GetCurrentGameState()
@@ -153,8 +174,11 @@ public class GameAgent : MonoBehaviour {
 
 		gameStateStack.RemoveAt( 0 ) ;
 
-		Destroy( gameStateObjectStack[0] );
-		gameStateObjectStack.RemoveAt( 0 );
+		if (gameStateObjectStack.Count > 0)
+		{
+			Destroy( gameStateObjectStack[0] );
+			gameStateObjectStack.RemoveAt( 0 );
+		}
 
 		if( !isPendingChange )
 		{

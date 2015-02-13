@@ -11,10 +11,16 @@ public class PlayerAgent : MonoBehaviour {
 
 	public bool monsterize = true;
 	public bool monsterizeMaster = false;
+	public bool checkForEnd = true;
+
+	private bool isEnding = false;
+
+	private PlayerController client;
 
 	private int monsterID = -1;
 
 	public float waitTime = 25f;
+	public float endBuffer = 8f;
 
 	private static PlayerAgent mInstance = null;
 	public static PlayerAgent instance
@@ -38,13 +44,13 @@ public class PlayerAgent : MonoBehaviour {
 		playerControllers = new List<PlayerController>();
 	}
 
-	public static void RegisterPlayer( PlayerController playerController )
+	public static void RegisterPlayer( PlayerController playerController, bool isClient )
 	{
 		if( instance )
-			instance.internalRegisterPlayer( playerController );
+			instance.internalRegisterPlayer( playerController, isClient );
 	}
 
-	private void internalRegisterPlayer( PlayerController playerController )
+	private void internalRegisterPlayer( PlayerController playerController, bool isClient )
 	{
 		if( !playerControllers.Contains( playerController ) )
 		{
@@ -57,6 +63,9 @@ public class PlayerAgent : MonoBehaviour {
 
 			playerControllers.Insert( index, playerController );
 		}
+
+		if( isClient )
+			client = playerController;
 	}
 
 	public static void UnregisterPlayer( PlayerController playerController )
@@ -69,6 +78,60 @@ public class PlayerAgent : MonoBehaviour {
 	{
 		if( playerControllers.Contains( playerController ) )
 			playerControllers.Remove( playerController );
+
+		if( client == playerController )
+			client = null;
+
+		if( playerControllers.Count == 0 )
+			monsterID = -1;
+	}
+
+	public static void CheckForEnd()
+	{
+		if( instance )
+			instance.internalCheckForEnd();
+	}
+
+	private void internalCheckForEnd()
+	{
+		if( !checkForEnd )
+			return;
+
+		bool isOver = true;
+
+		PlayerController.State state;
+
+		for( int i = 0; i < playerControllers.Count; i++ )
+		{
+			state = playerControllers[i].GetCurrentState();
+
+			if( i != monsterID && state != PlayerController.State.Dead && state != PlayerController.State.Voyeur )
+				isOver = false;
+		}
+
+		if( isOver )
+			StartCoroutine( "WaitAndEnd" );
+	}
+
+	public static PlayerController.State GetClientState()
+	{
+		if( instance )
+			return instance.internalGetClientState();
+
+		return PlayerController.State.Invalid;
+	}
+
+	private PlayerController.State internalGetClientState()
+	{
+		if( client != null )
+		{
+			if( client == playerControllers[ monsterID ] )
+				return PlayerController.State.Monster;
+
+			return client.GetCurrentState();
+		}
+
+		return PlayerController.State.Invalid;
 	}
 
 	public static Shader GetMonsterShader()
@@ -97,6 +160,18 @@ public class PlayerAgent : MonoBehaviour {
 	{
 		if( playerControllers.Count > 0 )
 			playerControllers[ 0 ].StartGame();
+	}
+
+	public static void EndGame()
+	{
+		if( instance )
+			instance.internalEndGame();
+	}
+
+	private void internalEndGame()
+	{
+		if( playerControllers.Count > 0 )
+			playerControllers[ 0 ].EndGame();
 	}
 
 	public static void SetMonster()
@@ -165,5 +240,19 @@ public class PlayerAgent : MonoBehaviour {
 	
 		if( monsterID < playerControllers.Count )
 			playerControllers[ monsterID ].Monsterize();
+	}
+
+	private IEnumerator WaitAndEnd()
+	{
+		if( isEnding )
+			yield break;
+
+		isEnding = true;
+
+		yield return new WaitForSeconds( endBuffer );
+
+		EndGame();
+
+		isEnding = false;
 	}
 }

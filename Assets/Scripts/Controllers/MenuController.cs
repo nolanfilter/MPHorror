@@ -4,7 +4,7 @@ using System.Collections;
 public class MenuController : MonoBehaviour {
 
 	private InputController inputController;
-	private float buttonBuffer = 0.3f;
+	private float buttonBuffer = 0.1f;
 	private float lastButtonTime;
 
 	void Awake()
@@ -114,6 +114,15 @@ public class MenuController : MonoBehaviour {
 						lastButtonTime = Time.time;
 					}
 				} else if( button == InputController.ButtonType.B )
+				{
+					NetworkAgent.LeaveRoom();
+					lastButtonTime = Time.time;
+				}
+			} break;
+
+			case GameAgent.GameState.End:
+			{
+				if( button == InputController.ButtonType.Start || button == InputController.ButtonType.A )
 				{
 					NetworkAgent.LeaveRoom();
 					lastButtonTime = Time.time;
