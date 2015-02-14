@@ -26,6 +26,9 @@ public class InfluenceController : MonoBehaviour {
 
 	void FixedUpdate()
 	{
+		if( GameAgent.GetCurrentGameState() != GameAgent.GameState.Game )
+			return;
+
 		Ray ray;
 
 		float distance;
