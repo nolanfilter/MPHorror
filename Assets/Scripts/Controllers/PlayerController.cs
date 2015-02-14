@@ -1319,6 +1319,9 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public void EndGame()
 	{
+		StopCoroutine( "DoStun" );
+		StopCoroutine( "RageMode" );
+
 		NegativeEffect negativeEffect = Camera.main.gameObject.GetComponent<NegativeEffect>();
 		
 		if( negativeEffect )
