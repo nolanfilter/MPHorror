@@ -108,7 +108,6 @@ public class PlayerController : Photon.MonoBehaviour {
 	private Color whiteClear = new Color( 1f, 1f, 1f, 0f );
 
 	private bool isWaitingForPhotoFinish = false;
-	private float stunDuration = 7.5f;
 
 	//new movement variables
 	private Vector3 moveDirection = Vector3.zero;
@@ -799,12 +798,12 @@ public class PlayerController : Photon.MonoBehaviour {
 		shoulderOffset = Mathf.Abs( shoulderOffset ) * sign;
 	}
 
-	private void RemoveGrayscaleEffect()
+	private void RemoveStunEffect()
 	{
-		GrayscaleEffect grayscaleEffect = cameraTransform.gameObject.GetComponent<GrayscaleEffect>();
+		StunController stunController = gameObject.GetComponent<StunController>();
 	
-		if( grayscaleEffect )
-			Destroy( grayscaleEffect );
+		if( stunController )
+			Destroy( stunController );
 	}
 
 	//coroutines
@@ -867,11 +866,18 @@ public class PlayerController : Photon.MonoBehaviour {
 		ChangeState( (int)State.Raging );
 		ChangeColor(  new Quaternion( 0.75f, 0f, 0f, 1f ) );
 	
+		MotionBlur motionBlur = cameraTransform.gameObject.GetComponent<MotionBlur>();
+
+		if( motionBlur )
+			motionBlur.enabled = true;
+
 		float distance = 10f;
 		float currentDistance = 0f;
 
 		float speed = 20f;
 		float deltaDistance;
+
+		yield return null;
 
 		do
 		{
@@ -883,6 +889,9 @@ public class PlayerController : Photon.MonoBehaviour {
 			yield return null;
 
 		} while( currentDistance < distance );
+
+		if( motionBlur )
+			motionBlur.enabled = false;
 
 		ChangeState( (int)State.Monster );
 		MonsterReveal();
@@ -920,13 +929,13 @@ public class PlayerController : Photon.MonoBehaviour {
 		ChangeState( (int)State.Stunned );
 
 		if( photonView.isMine )
-			cameraTransform.gameObject.AddComponent<GrayscaleEffect>();
+			gameObject.AddComponent<StunController>();
 
-		yield return new WaitForSeconds( stunDuration );
+		yield return new WaitForSeconds( StunController.StunDuration );
 
 		ChangeColor( new Quaternion( 1f, 0.9f, 0.9f, 1f ) );
 
-		RemoveGrayscaleEffect();
+		RemoveStunEffect();
 
 		ChangeState( (int)originalState );
 	}
@@ -1000,7 +1009,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( negativeEffect )
 			Destroy( negativeEffect );
 
-		RemoveGrayscaleEffect();
+		RemoveStunEffect();
 		
 		GameAgent.ChangeGameState( GameAgent.GameState.End );
 
@@ -1244,7 +1253,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		cameraTransform.gameObject.AddComponent<NegativeEffect>();
 		StopCoroutine( "DoStun" );
-		RemoveGrayscaleEffect();
+		RemoveStunEffect();
 		ChangeState( (int)State.Monster );
 		DisplayMessage( "Attack your friends" );
 
@@ -1255,6 +1264,12 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		StopCoroutine( "RageMode" );
 		ChangeState( (int)State.Monster );
+
+		MotionBlur motionBlur = cameraTransform.gameObject.GetComponent<MotionBlur>();
+		
+		if( motionBlur )
+			motionBlur.enabled = false;
+
 		ChangeColor( new Quaternion( 1f, 0.9f, 0.9f, 1f ) );
 	}
 
@@ -1262,6 +1277,12 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		StopCoroutine( "RageMode" );
 		ChangeState( (int)State.Monster );
+
+		MotionBlur motionBlur = cameraTransform.gameObject.GetComponent<MotionBlur>();
+		
+		if( motionBlur )
+			motionBlur.enabled = false;
+
 		ChangeColor( new Quaternion( 1f, 0.5f, 0.75f, 1f ) );
 		StartCoroutine( "DoStun" );
 	}
@@ -1303,7 +1324,12 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( negativeEffect )
 			Destroy( negativeEffect );
 
-		RemoveGrayscaleEffect();
+		RemoveStunEffect();
+
+		MotionBlur motionBlur = cameraTransform.gameObject.GetComponent<MotionBlur>();
+		
+		if( motionBlur )
+			motionBlur.enabled = false;
 
 		GameAgent.ChangeGameState( GameAgent.GameState.End );
 

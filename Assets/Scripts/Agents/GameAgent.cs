@@ -96,9 +96,6 @@ public class GameAgent : MonoBehaviour {
 				NetworkAgent.LeaveRoom();
 			}
 		}
-
-		//if( Input.GetKeyDown( KeyCode.E ) )
-		//	PlayerAgent.EndGame();
 	}
 
 	public static GameState GetCurrentGameState()

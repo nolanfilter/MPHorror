@@ -8,6 +8,10 @@ public class PlayerAgent : MonoBehaviour {
 
 	public Shader monsterShader;
 	public Shader stunShader;
+	public Shader compositeShader;
+	public Shader blurShader;
+	public Shader downsampleShader;
+	public Shader motionBlurShader;
 
 	public bool monsterize = true;
 	public bool monsterizeMaster = false;
@@ -42,6 +46,21 @@ public class PlayerAgent : MonoBehaviour {
 		mInstance = this;
 
 		playerControllers = new List<PlayerController>();
+	}
+
+	void Start()
+	{
+		GlowEffect glowEffect = Camera.main.gameObject.AddComponent<GlowEffect>();
+
+		glowEffect.enabled = false;
+		glowEffect.compositeShader = compositeShader;
+		glowEffect.blurShader = blurShader;
+		glowEffect.downsampleShader = downsampleShader;
+
+		MotionBlur motionBlur = Camera.main.gameObject.AddComponent<MotionBlur>();
+
+		motionBlur.enabled = false;
+		motionBlur.shader = motionBlurShader;
 	}
 
 	public static void RegisterPlayer( PlayerController playerController, bool isClient )
