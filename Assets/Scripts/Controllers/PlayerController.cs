@@ -1016,6 +1016,11 @@ public class PlayerController : Photon.MonoBehaviour {
 		messageString = "";
 	}
 
+	[RPC]
+	public void RPCStun()
+	{
+		StartCoroutine( "DoStun" );
+	}
 	// end server calls
 
 	//event handlers
@@ -1284,13 +1289,13 @@ public class PlayerController : Photon.MonoBehaviour {
 			motionBlur.enabled = false;
 
 		ChangeColor( new Quaternion( 1f, 0.5f, 0.75f, 1f ) );
-		StartCoroutine( "DoStun" );
+		Stun();
 	}
 
 	public void SurvivorReveal()
 	{
 		ChangeColor( new Quaternion( 0f, 0.75f, 0f, 1f ) );
-		StartCoroutine( "DoStun" );
+		Stun();
 	}
 
 	public void SetFlashBulbTo( bool on )
@@ -1339,6 +1344,13 @@ public class PlayerController : Photon.MonoBehaviour {
 		messageString = "";
 
 		photonView.RPC( "RPCEndGame", PhotonTargets.OthersBuffered );
+	}
+
+	public void Stun()
+	{
+		StartCoroutine( "DoStun" );
+
+		photonView.RPC( "RPCStun", PhotonTargets.OthersBuffered );
 	}
 
 	public void TeleportTo( Vector3 coordinate )
