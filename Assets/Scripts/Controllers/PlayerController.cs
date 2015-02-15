@@ -863,6 +863,9 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private IEnumerator RageMode()
 	{
+		if( ( zoomProgress != 1f ) )
+			yield break;
+
 		ChangeState( (int)State.Raging );
 		ChangeColor(  new Quaternion( 0.75f, 0f, 0f, 1f ) );
 	
@@ -1014,6 +1017,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		GameAgent.ChangeGameState( GameAgent.GameState.End );
 
 		messageString = "";
+
+		TurnOffQuads();
 	}
 
 	[RPC]
@@ -1343,6 +1348,8 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		messageString = "";
 
+		TurnOffQuads();
+
 		photonView.RPC( "RPCEndGame", PhotonTargets.OthersBuffered );
 	}
 
@@ -1351,6 +1358,15 @@ public class PlayerController : Photon.MonoBehaviour {
 		photonView.RPC( "RPCStun", PhotonTargets.OthersBuffered );
 
 		StartCoroutine( "DoStun" );
+	}
+
+	public void TurnOffQuads()
+	{
+		if( rageQuad )
+			rageQuad.renderer.enabled = false;
+		
+		if( camQuad )
+			camQuad.renderer.enabled = false;
 	}
 
 	public void TeleportTo( Vector3 coordinate )
