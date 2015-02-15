@@ -1348,9 +1348,9 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public void Stun()
 	{
-		StartCoroutine( "DoStun" );
-
 		photonView.RPC( "RPCStun", PhotonTargets.OthersBuffered );
+
+		StartCoroutine( "DoStun" );
 	}
 
 	public void TeleportTo( Vector3 coordinate )
