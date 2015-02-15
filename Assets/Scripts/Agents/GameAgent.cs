@@ -93,6 +93,23 @@ public class GameAgent : MonoBehaviour {
 			if( resetTime > resetDuration )
 			{
 				resetTime = 0f;
+
+				NegativeEffect negativeEffect = Camera.main.gameObject.GetComponent<NegativeEffect>();
+				
+				if( negativeEffect )
+					Destroy( negativeEffect );
+				
+				StunController stunController = gameObject.GetComponent<StunController>();
+				
+				if( stunController )
+					Destroy( stunController );
+				
+				MotionBlur motionBlur = Camera.main.gameObject.GetComponent<MotionBlur>();
+				
+				if( motionBlur )
+					motionBlur.enabled = false;
+
+
 				NetworkAgent.LeaveRoom();
 			}
 		}
