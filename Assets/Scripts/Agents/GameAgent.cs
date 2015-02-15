@@ -109,6 +109,7 @@ public class GameAgent : MonoBehaviour {
 				if( motionBlur )
 					motionBlur.enabled = false;
 
+				PlayerAgent.TurnOffAllQuads();
 
 				NetworkAgent.LeaveRoom();
 			}
