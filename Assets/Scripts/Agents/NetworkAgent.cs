@@ -187,12 +187,13 @@ public class NetworkAgent : MonoBehaviour {
 
 			PhotonNetwork.Instantiate( playerPrefab.name, playerStartPositions[ playerNumber%playerStartPositions.Length ], Quaternion.Euler( playerStartRotations[ playerNumber%playerStartRotations.Length ] ), 0 );
 			MannequinAgent.SetKeys();
+			FSMAgent.Reset();
 		}
 	}
 
 	public static void LeaveRoom()
 	{
-		if (PhotonNetwork.inRoom)
+		if( PhotonNetwork.inRoom )
 		{
 			PhotonNetwork.LeaveRoom ();
 			GameAgent.ChangeGameState( GameAgent.GameState.Lobby );

@@ -1202,7 +1202,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public void Escape()
 	{
-		if( currentState == State.Monster || currentState == State.Voyeur || currentState == State.Dead )
+		if( currentState == State.Monster || currentState == State.Voyeur || currentState == State.Dead || currentState == State.Raging )
 			return;
 
 		ChangeState( (int)State.Voyeur );

@@ -63,6 +63,12 @@ public class MannequinAgent : MonoBehaviour {
 		if( mannequins.Count == 0 )
 			return;
 
+		for (int i = 0; i < mannequins.Count; i++)
+		{
+			mannequins[i].SetActive( true );
+			mannequins[i].tag = "Activatable";
+		}
+
 		int seed = Utilities.HexToInt( PhotonNetwork.room.name[ PhotonNetwork.room.name.Length - 2 ] );
 		
 		Random.seed = seed;
