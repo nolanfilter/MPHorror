@@ -189,7 +189,7 @@ public class GameAgent : MonoBehaviour {
 
 		gameStateStack.RemoveAt( 0 ) ;
 
-		if (gameStateObjectStack.Count > 0)
+		if( gameStateObjectStack.Count > 0 )
 		{
 			Destroy( gameStateObjectStack[0] );
 			gameStateObjectStack.RemoveAt( 0 );
