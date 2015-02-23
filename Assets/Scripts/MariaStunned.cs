@@ -30,6 +30,10 @@ public class MariaStunned : Photon.MonoBehaviour {
 	private float fromBlurArea = 7f;
 	private float toBlurArea = 1.5f;
 
+	//Vignetting
+	private float fromChromAberration = 24f;
+	private float toChromAberration = 0f;
+
 
 	// Use this for initialization
 	void Start () {
@@ -111,16 +115,22 @@ public class MariaStunned : Photon.MonoBehaviour {
 		bool _state = state;
 		//float _currentFieldOfView = /*cameraTransform*/this.camera.fieldOfView;
 		TiltShiftHdr _tiltShiftHdr = transform.GetComponent<TiltShiftHdr>();
+		Vignetting _vignetting = transform.GetComponent<Vignetting>();
 		//_tiltShiftHdr.blurArea = fromBlurArea;
 
 		if (state){
 			this.camera.fieldOfView = Mathf.Lerp(this.camera.fieldOfView, cameraZoomFoV, Time.deltaTime * smooth);
 			_tiltShiftHdr.blurArea = Mathf.Lerp (_tiltShiftHdr.blurArea, fromBlurArea, Time.deltaTime * smooth);
+			_vignetting.chromaticAberration = Mathf.Lerp (_vignetting.chromaticAberration, fromChromAberration, Time.deltaTime * smooth);
+			//chromatic aberration when pouncing 100
+			//chromatic aberration when cooling down from 200
+
 			//this.camera.fieldOfView = Mathf.RoundToInt( Mathf.Lerp( cameraFoV, cameraZoomFoV, zoomProgress ) );
 		}
 		else {
 			this.camera.fieldOfView = Mathf.Lerp(this.camera.fieldOfView, cameraFoV, Time.deltaTime * smooth);
 			_tiltShiftHdr.blurArea = Mathf.Lerp (_tiltShiftHdr.blurArea, toBlurArea, Time.deltaTime * smooth);
+			_vignetting.chromaticAberration = Mathf.Lerp (_vignetting.chromaticAberration, toChromAberration, Time.deltaTime * smooth);
 		}
 
 		yield return null;

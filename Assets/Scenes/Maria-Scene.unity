@@ -4497,6 +4497,7 @@ GameObject:
   - 114: {fileID: 1818418294}
   - 114: {fileID: 1818418293}
   - 114: {fileID: 1818418292}
+  - 114: {fileID: 1818418305}
   - 114: {fileID: 1818418303}
   - 114: {fileID: 1818418304}
   m_Layer: 0
@@ -4857,6 +4858,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   smooth: 2
+--- !u!114 &1818418305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1818418290}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bef3d242a13c447ac90c2d2dc213b1ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mode: 0
+  intensity: 1
+  chromaticAberration: 100
+  axialAberration: 5.82000017
+  blur: 0
+  blurSpread: .75
+  luminanceDependency: .129999995
+  blurDistance: 1.83000004
+  vignetteShader: {fileID: 4800000, guid: 627943dc7a9a74286b70a4f694a0acd5, type: 3}
+  separableBlurShader: {fileID: 4800000, guid: e97c14fbb5ea04c3a902cc533d7fc5d1, type: 3}
+  chromAberrationShader: {fileID: 4800000, guid: 2b4f29398d9484ccfa9fd220449f5eee,
+    type: 3}
 --- !u!1 &1829753722
 GameObject:
   m_ObjectHideFlags: 0
