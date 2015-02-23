@@ -13,6 +13,8 @@ public class PlayerAgent : MonoBehaviour {
 	public Shader downsampleShader;
 	public Shader motionBlurShader;
 
+	public AudioClip cameraCooldownClip;
+
 	public bool monsterize = true;
 	public bool monsterizeMaster = false;
 	public bool checkForEnd = true;
@@ -165,6 +167,15 @@ public class PlayerAgent : MonoBehaviour {
 	{
 		if( instance )
 			return instance.stunShader;
+
+		return null;
+	}
+
+	//TODO move to AudioAgent
+	public static AudioClip GetCameraCooldownClip()
+	{
+		if( instance )
+			return instance.cameraCooldownClip;
 
 		return null;
 	}

@@ -835,6 +835,8 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		hasPhoto = true;
 
+		StartCoroutine( "PlayCameraCooldown" );
+
 		SetFlashBulbTo( true );
 
 		if( flashQuad )
@@ -843,16 +845,13 @@ public class PlayerController : Photon.MonoBehaviour {
 		}
 
 		SetFlashBulbTo( false );
-	
+
 		if( screenshotQuad )
 		{
 			yield return StartCoroutine( DoColorFade( screenshotQuad.renderer.material, whiteClear, Color.white, 0.25f ) );
 
 			yield return new WaitForSeconds( 1.25f );
-		}
 
-		if( screenshotQuad )
-		{
 			yield return StartCoroutine( DoColorFade( screenshotQuad.renderer.material, Color.white, whiteClear, 0.45f ) );
 		}
 
@@ -941,6 +940,39 @@ public class PlayerController : Photon.MonoBehaviour {
 		RemoveStunEffect();
 
 		ChangeState( (int)originalState );
+	}
+
+	//TODO generalize
+	private IEnumerator PlayCameraCooldown()
+	{
+		if( !photonView.isMine )
+			yield break;
+
+		AudioClip cameraCooldownClip = PlayerAgent.GetCameraCooldownClip();
+			
+		if( cameraCooldownClip )
+		{
+			AudioSource source = Camera.main.gameObject.AddComponent<AudioSource>();
+			source.clip = cameraCooldownClip;
+			source.loop = false;
+			source.volume = 1f;
+			source.Play();
+				
+			float duration = 2.5f;
+			float lerp;
+
+			do
+			{
+				lerp = Mathf.Clamp01( source.time / duration );
+
+				source.volume = Mathf.Lerp( 1f, 0f, lerp );
+
+				yield return null;
+
+			} while( source.time < duration );
+
+			Destroy( source );
+		}
 	}
 	//end coroutines
 
