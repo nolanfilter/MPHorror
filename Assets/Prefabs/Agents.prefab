@@ -125,6 +125,7 @@ MonoBehaviour:
   blurShader: {fileID: 4800000, guid: fb52973118cf00648825ced2fcca240c, type: 3}
   downsampleShader: {fileID: 4800000, guid: b14b79b8936134d3f8238f0c2d40d634, type: 3}
   motionBlurShader: {fileID: 4800000, guid: e9ba2083ad114a07d000fbfb8d76c639, type: 3}
+  cameraCooldownClip: {fileID: 8300000, guid: 9a28f07e49fe741c0bc2741588021257, type: 3}
   monsterize: 1
   monsterizeMaster: 0
   checkForEnd: 1

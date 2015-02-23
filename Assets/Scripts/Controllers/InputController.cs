@@ -183,9 +183,9 @@ public class InputController : MonoBehaviour {
 				codes[ (int)ButtonType.RightShoulder ] = KeyCode.RightCommand;
 
 				codes[ (int)ButtonType.Start ] = KeyCode.Return;
-				codes[ (int)ButtonType.A ] = KeyCode.Return;
+				codes[ (int)ButtonType.A ] = KeyCode.RightCommand;
 				codes[ (int)ButtonType.B ] = KeyCode.Backspace;
-				codes[ (int)ButtonType.X ] = KeyCode.Return;
+				codes[ (int)ButtonType.X ] = KeyCode.LeftCommand;
 				
 				currentInputType = "Keyboard";
 			}
