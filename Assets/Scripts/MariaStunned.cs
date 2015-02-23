@@ -6,14 +6,14 @@ public class MariaStunned : Photon.MonoBehaviour {
 
 	public static float StunDuration = 5f;
 
-	//Bloom
+	//Bloom (stun)
 	public static float BloomDuration = 1.5f;
 	private float fromThreshhold = 0f;
 	private float toThreshhold = .25f;
 	private float fromIntensity = 4f;
 	private float toIntensity = .5f;
 
-	//Blur
+	//Blur (stun)
 	private int fromDownsample = 1;
 	private int toDownsample = 0;
 	private float fromBlurSize = 5f;
@@ -21,12 +21,12 @@ public class MariaStunned : Photon.MonoBehaviour {
 	private int fromBlurIterations = 2;
 	private int toBlurIterations = 0;
 
-	//FoV
+	//FoV (field of view)
 	private float cameraFoV = 40f;
 	private float cameraZoomFoV = 20f;
 	public float smooth = 2.0F;
 
-	//TiltShift HDR
+	//TiltShift HDR -- blur from the edges
 	private float fromBlurArea = 7f;
 	private float toBlurArea = 1.5f;
 
@@ -35,16 +35,18 @@ public class MariaStunned : Photon.MonoBehaviour {
 	private float toChromAberration = 0f;
 
 
-	// Use this for initialization
+
 	void Start () {
 
 	}
 	
-	// Update is called once per frame
+
 	void Update () {
 
 	}
 
+
+	//noise for proximity with another player
 	void NoiseToggle (int changeNoise) {
 
 		int _changeNoise = changeNoise;
@@ -63,7 +65,7 @@ public class MariaStunned : Photon.MonoBehaviour {
 			//_noise.enabled = false;
 		}
 	}
-
+	// stun for all players
 	private IEnumerator Stun (){
 
 		FastBloom _fastBloom = transform.GetComponent<FastBloom>();
@@ -110,7 +112,7 @@ public class MariaStunned : Photon.MonoBehaviour {
 		_blur.enabled = false;
 
 	}
-
+	//Zoom for monster
 	private IEnumerator Zoom (bool state){
 		bool _state = state;
 		//float _currentFieldOfView = /*cameraTransform*/this.camera.fieldOfView;
@@ -118,6 +120,8 @@ public class MariaStunned : Photon.MonoBehaviour {
 		Vignetting _vignetting = transform.GetComponent<Vignetting>();
 		//_tiltShiftHdr.blurArea = fromBlurArea;
 
+
+		//if zooming in
 		if (state){
 			this.camera.fieldOfView = Mathf.Lerp(this.camera.fieldOfView, cameraZoomFoV, Time.deltaTime * smooth);
 			_tiltShiftHdr.blurArea = Mathf.Lerp (_tiltShiftHdr.blurArea, fromBlurArea, Time.deltaTime * smooth);
@@ -125,8 +129,9 @@ public class MariaStunned : Photon.MonoBehaviour {
 			//chromatic aberration when pouncing 100
 			//chromatic aberration when cooling down from 200
 
-			//this.camera.fieldOfView = Mathf.RoundToInt( Mathf.Lerp( cameraFoV, cameraZoomFoV, zoomProgress ) );
+
 		}
+		// if zooming out
 		else {
 			this.camera.fieldOfView = Mathf.Lerp(this.camera.fieldOfView, cameraFoV, Time.deltaTime * smooth);
 			_tiltShiftHdr.blurArea = Mathf.Lerp (_tiltShiftHdr.blurArea, toBlurArea, Time.deltaTime * smooth);
