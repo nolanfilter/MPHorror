@@ -18,13 +18,13 @@ Material:
           name: _MainTex
         second:
           m_Texture: {fileID: 2800000, guid: 1711a7902e5cc4a6ca26f4c5073ff798, type: 3}
-          m_Scale: {x: 80, y: 80}
+          m_Scale: {x: 6, y: 6}
           m_Offset: {x: 0, y: 0}
     m_Floats:
       data:
         first:
           name: _Shininess
-        second: .078125
+        second: .191872939
     m_Colors:
       data:
         first:
