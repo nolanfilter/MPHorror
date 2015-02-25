@@ -18,14 +18,14 @@ class TiltShiftHdr extends PostEffectsBase {
 		High,
 	}	
 
-	public var mode : TiltShiftMode = TiltShiftMode.TiltShiftMode;
+	public var mode : TiltShiftMode = TiltShiftMode.IrisMode;
 	public var quality : TiltShiftQuality = TiltShiftQuality.Normal;
 
 	@Range(0.0f, 15.0f)
-	public var blurArea : float = 1.0f;
+	public var blurArea : float = 1.5f;
 
 	@Range(0.0f, 25.0f)
-	public var maxBlurSize : float = 5.0f;
+	public var maxBlurSize : float = 25.0f;
 	
 	@Range(0, 1)
 	public var downsample : int = 0;

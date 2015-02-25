@@ -14,8 +14,8 @@ class Vignetting /* And Chromatic Aberration */ extends PostEffectsBase {
 
 	public var mode : AberrationMode = AberrationMode.Simple;
 	
-	public var intensity : float = 0.375f; // intensity == 0 disables pre pass (optimization)
-	public var chromaticAberration : float = 0.2f;
+	public var intensity : float = 1f; // intensity == 0 disables pre pass (optimization)
+	public var chromaticAberration : float = 100f;
 	public var axialAberration : float = 0.5f;
 
 	public var blur : float = 0.0f; // blur == 0 disables blur pass (optimization)
