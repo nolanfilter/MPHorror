@@ -6,14 +6,14 @@ public class MariaStunned : Photon.MonoBehaviour {
 
 	public static float StunDuration = 5f;
 
-	//Bloom (stun)
+	//Bloom (STUN)
 	public static float BloomDuration = 1.5f;
 	private float fromThreshhold = 0f;
 	private float toThreshhold = .25f;
 	private float fromIntensity = 4f;
 	private float toIntensity = .5f;
 
-	//Blur (stun)
+	//Blur (STUN)
 	private int fromDownsample = 1;
 	private int toDownsample = 0;
 	private float fromBlurSize = 5f;
@@ -21,16 +21,16 @@ public class MariaStunned : Photon.MonoBehaviour {
 	private int fromBlurIterations = 2;
 	private int toBlurIterations = 0;
 
-	//FoV (field of view)
+	//FoV (field of view) (ZOOM IN MONSTER)
 	private float cameraFoV = 40f;
 	private float cameraZoomFoV = 20f;
 	public float smooth = 2.0F;
 
-	//TiltShift HDR -- blur from the edges
+	//TiltShift HDR -- blur from the edges (ALWAYS BUT ENHANCED WHEN ZOOM IN MONSTER)
 	private float fromBlurArea = 7f;
 	private float toBlurArea = 1.5f;
 
-	//Vignetting
+	//Vignetting (ZOOM IN MONSTER)
 	private float fromChromAberration = 24f;
 	private float toChromAberration = 0f;
 
@@ -46,7 +46,7 @@ public class MariaStunned : Photon.MonoBehaviour {
 	}
 
 
-	//noise for proximity with another player
+	//NOISE for proximity with another player
 	void NoiseToggle (int changeNoise) {
 
 		int _changeNoise = changeNoise;
@@ -65,7 +65,8 @@ public class MariaStunned : Photon.MonoBehaviour {
 			//_noise.enabled = false;
 		}
 	}
-	// stun for all players
+
+	// STUN for all players
 	private IEnumerator Stun (){
 
 		FastBloom _fastBloom = transform.GetComponent<FastBloom>();
@@ -112,7 +113,8 @@ public class MariaStunned : Photon.MonoBehaviour {
 		_blur.enabled = false;
 
 	}
-	//Zoom for monster
+
+	//ZOOM FOR MONSTER
 	private IEnumerator Zoom (bool state){
 		bool _state = state;
 		//float _currentFieldOfView = /*cameraTransform*/this.camera.fieldOfView;
@@ -126,8 +128,9 @@ public class MariaStunned : Photon.MonoBehaviour {
 			this.camera.fieldOfView = Mathf.Lerp(this.camera.fieldOfView, cameraZoomFoV, Time.deltaTime * smooth);
 			_tiltShiftHdr.blurArea = Mathf.Lerp (_tiltShiftHdr.blurArea, fromBlurArea, Time.deltaTime * smooth);
 			_vignetting.chromaticAberration = Mathf.Lerp (_vignetting.chromaticAberration, fromChromAberration, Time.deltaTime * smooth);
-			//chromatic aberration when pouncing 100
-			//chromatic aberration when cooling down from 200
+
+			//POUNCING: chromatic aberration when pouncing 100
+			//COOLING DOWN MONSTER: chromatic aberration when cooling down from 200
 
 
 		}
