@@ -8,7 +8,7 @@
 class Blur extends PostEffectsBase {
 
 	@Range(0, 2)
-	public var downsample : int = 1;
+	public var downsample : int = 0;
 
 	public enum BlurType {
 		StandardGauss = 0,
@@ -16,10 +16,10 @@ class Blur extends PostEffectsBase {
 	}
 
 	@Range(0.0f, 10.0f)
-	public var blurSize : float = 3.0f;
+	public var blurSize : float = 0f;
 	
 	@Range(1, 4)
-	public var blurIterations : int = 2;
+	public var blurIterations : int = 1;
 
 	public var blurType = BlurType.StandardGauss;
 

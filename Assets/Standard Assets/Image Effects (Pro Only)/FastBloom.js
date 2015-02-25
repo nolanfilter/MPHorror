@@ -20,7 +20,7 @@ class FastBloom extends PostEffectsBase {
 	@Range(0.0f, 1.5f)
 	public var threshhold : float = 0.25f;
 	@Range(0.0f, 2.5f)
-	public var intensity : float = 0.75f;
+	public var intensity : float = 0.5f;
 
 	@Range(0.25f, 5.5f)
 	public var blurSize : float = 1.0f;

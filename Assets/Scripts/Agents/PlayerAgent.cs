@@ -6,12 +6,21 @@ public class PlayerAgent : MonoBehaviour {
 
 	private List<PlayerController> playerControllers;
 
-	public Shader monsterShader;
 	public Shader stunShader;
-	public Shader compositeShader;
+	public Shader monsterShader;
+	public Shader ssaoShader;
+	public Shader fastBloomShader;
 	public Shader blurShader;
-	public Shader downsampleShader;
-	public Shader motionBlurShader;
+	public Shader tiltShiftShader;
+	public Shader rgbShader;
+	public Shader yuvShader;
+	public Shader vignetteShader;
+	public Shader separableBlurShader;
+	public Shader chromaticAberrationShader;
+
+	public Texture2D randomTexture;
+	public Texture grainTexture;
+	public Texture scratchTexture;
 
 	public AudioClip cameraCooldownClip;
 
@@ -52,17 +61,45 @@ public class PlayerAgent : MonoBehaviour {
 
 	void Start()
 	{
-		GlowEffect glowEffect = Camera.main.gameObject.AddComponent<GlowEffect>();
+		SSAOEffect ssaoEffect = Camera.main.gameObject.AddComponent<SSAOEffect>();
 
-		glowEffect.enabled = false;
-		glowEffect.compositeShader = compositeShader;
-		glowEffect.blurShader = blurShader;
-		glowEffect.downsampleShader = downsampleShader;
+		ssaoEffect.m_SSAOShader = ssaoShader;
+		ssaoEffect.m_RandomTexture = randomTexture;
 
-		MotionBlur motionBlur = Camera.main.gameObject.AddComponent<MotionBlur>();
+		//js
+		FastBloom fastBloom = Camera.main.gameObject.AddComponent<FastBloom>();
 
-		motionBlur.enabled = false;
-		motionBlur.shader = motionBlurShader;
+		fastBloom.enabled = false;
+		fastBloom.fastBloomShader = fastBloomShader;
+
+		Blur blur = Camera.main.gameObject.AddComponent<Blur>();
+
+		blur.enabled = false;
+		blur.blurShader = blurShader;
+
+		TiltShiftHdr tiltShiftHdr = Camera.main.gameObject.AddComponent<TiltShiftHdr>();
+
+		tiltShiftHdr.enabled = false;
+		tiltShiftHdr.tiltShiftShader = tiltShiftShader;
+
+		//TODO figure out how to add shaders
+		//Camera.main.gameObject.AddComponent<ColorCorrectionCurves>();
+
+		Vignetting vignetting = Camera.main.gameObject.AddComponent<Vignetting>();
+
+		vignetting.enabled = false;
+		vignetting.vignetteShader = vignetteShader;
+		vignetting.separableBlurShader = separableBlurShader;
+		vignetting.chromAberrationShader = chromaticAberrationShader;
+		//end js
+
+		NoiseEffect noiseEffect = Camera.main.gameObject.AddComponent<NoiseEffect>();
+
+		noiseEffect.enabled = false;
+		noiseEffect.grainTexture = grainTexture;
+		noiseEffect.scratchTexture = scratchTexture;
+		noiseEffect.shaderRGB = rgbShader;
+		noiseEffect.shaderYUV = yuvShader;
 	}
 
 	public static void RegisterPlayer( PlayerController playerController, bool isClient )
@@ -231,6 +268,33 @@ public class PlayerAgent : MonoBehaviour {
 			else
 				StartCoroutine( "WaitAndMonsterizeRandom" );
 		}
+	}
+
+	public static float GetClosestPlayerPosition( Vector3 currentPosition )
+	{
+		if( instance )
+			return instance.internalGetClosestPlayerPosition( currentPosition );
+
+		return Mathf.Infinity;
+	}
+
+	private float internalGetClosestPlayerPosition( Vector3 currentPosition )
+	{
+		float distance;
+		float closestDistance = Mathf.Infinity;
+
+		for( int i = 0; i < playerControllers.Count; i++ )
+		{
+			if( playerControllers[i].transform.position != currentPosition && playerControllers[i].GetCurrentState() != PlayerController.State.Dead )
+			{
+				distance = Vector3.Distance( playerControllers[i].transform.position, currentPosition );
+
+				if( distance < closestDistance )
+					closestDistance = distance;
+			}
+		}
+
+		return closestDistance;
 	}
 
 	public void SetAllFlashlightsTo( bool on )

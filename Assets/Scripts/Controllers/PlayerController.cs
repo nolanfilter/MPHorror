@@ -413,7 +413,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	
 	private void InputMovement()
 	{
-		if( currentState == State.Dead || currentState == State.Raging )
+		if( currentState == State.Dead )
 			return;
 
 		float fearFactor = Mathf.Clamp01( currentFear );
@@ -468,7 +468,8 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		Vector3 movement = moveDirection * moveSpeed * Time.deltaTime;
 
-		characterController.Move( movement );
+		if( currentState != State.Raging )
+			characterController.Move( movement );
 
 		if( zoomProgress == 1f )
 		{
@@ -867,17 +868,20 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		ChangeState( (int)State.Raging );
 		ChangeColor(  new Quaternion( 0.75f, 0f, 0f, 1f ) );
-	
-		MotionBlur motionBlur = cameraTransform.gameObject.GetComponent<MotionBlur>();
 
-		if( motionBlur )
-			motionBlur.enabled = true;
+		RageController rageController = null;
 
-		float distance = 10f;
+		if( photonView.isMine )
+			rageController = gameObject.AddComponent<RageController>();
+
+		float speed = 12.5f;
+
+		float distance = speed * RageController.RageDuration;
 		float currentDistance = 0f;
-
-		float speed = 20f;
+	
 		float deltaDistance;
+
+		Vector3 direction = transform.forward;
 
 		yield return null;
 
@@ -886,39 +890,39 @@ public class PlayerController : Photon.MonoBehaviour {
 			deltaDistance = speed * Time.deltaTime;
 			currentDistance += speed * Time.deltaTime;
 
-			characterController.Move( transform.forward * speed * Time.deltaTime );
+			characterController.Move( direction * speed * Time.deltaTime );
 
 			yield return null;
 
 		} while( currentDistance < distance );
 
-		if( motionBlur )
-			motionBlur.enabled = false;
+		ChangeState( (int)State.Stunned );
+		//MonsterReveal();
 
-		ChangeState( (int)State.Monster );
-		MonsterReveal();
-	}
+		speed = 0.5f;
+		
+		distance = speed * RageController.RageCooldown;
+		currentDistance = 0f;
 
-	private IEnumerator DoColorFade( Material material, Color fromColor, Color toColor, float duration )
-	{
-		material.color = fromColor;
-
-		float beginTime = Time.time;
-		float currentTime = 0f;
-		float lerp = 0f;
-
+		yield return null;
+		
 		do
 		{
-			currentTime += Time.deltaTime;
-			lerp = currentTime / duration;
+			deltaDistance = speed * Time.deltaTime;
+			currentDistance += speed * Time.deltaTime;
 			
-			material.color = Color.Lerp( fromColor, toColor, lerp );
+			characterController.Move( direction * speed * Time.deltaTime );
 			
 			yield return null;
 			
-		} while ( currentTime < duration );
-		
-		material.color = toColor;
+		} while( currentDistance < distance );
+
+
+		if( rageController )
+			Destroy( rageController );
+
+		ChangeColor( new Quaternion( 1f, 0.9f, 0.9f, 1f ) );
+		ChangeState( (int)State.Monster );
 	}
 
 	private IEnumerator DoStun()
@@ -940,6 +944,28 @@ public class PlayerController : Photon.MonoBehaviour {
 		RemoveStunEffect();
 
 		ChangeState( (int)originalState );
+	}
+
+	private IEnumerator DoColorFade( Material material, Color fromColor, Color toColor, float duration )
+	{
+		material.color = fromColor;
+		
+		float beginTime = Time.time;
+		float currentTime = 0f;
+		float lerp = 0f;
+		
+		do
+		{
+			currentTime += Time.deltaTime;
+			lerp = currentTime / duration;
+			
+			material.color = Color.Lerp( fromColor, toColor, lerp );
+			
+			yield return null;
+			
+		} while ( currentTime < duration );
+		
+		material.color = toColor;
 	}
 
 	//TODO generalize
@@ -1032,6 +1058,16 @@ public class PlayerController : Photon.MonoBehaviour {
 	[RPC]
 	public void RPCStartGame()
 	{
+		if( photonView.isMine )
+		{
+			FastBloom fastBloom = Camera.main.gameObject.GetComponent<FastBloom>();
+			
+			if( fastBloom )
+				fastBloom.enabled = true;
+		}
+		
+		gameObject.AddComponent<NoiseController>();
+		
 		GameAgent.ChangeGameState( GameAgent.GameState.Game );
 		PlayerAgent.SetMonster();
 	}
@@ -1039,17 +1075,38 @@ public class PlayerController : Photon.MonoBehaviour {
 	[RPC]
 	public void RPCEndGame()
 	{
+		StopCoroutine( "DoStun" );
+		StopCoroutine( "RageMode" );
+		
 		NegativeEffect negativeEffect = Camera.main.gameObject.GetComponent<NegativeEffect>();
 		
 		if( negativeEffect )
 			Destroy( negativeEffect );
-
+		
 		RemoveStunEffect();
 		
+		if( photonView.isMine )
+		{
+			FastBloom fastBloom = Camera.main.gameObject.GetComponent<FastBloom>();
+			
+			if( fastBloom )
+				fastBloom.enabled = false;
+		}
+		
+		RageController rageController = gameObject.GetComponent<RageController>();
+		
+		if( rageController )
+			Destroy( rageController );
+		
+		NoiseController noiseController = gameObject.GetComponent<NoiseController>();
+		
+		if( noiseController )
+			Destroy( noiseController );
+		
 		GameAgent.ChangeGameState( GameAgent.GameState.End );
-
+		
 		messageString = "";
-
+		
 		TurnOffQuads();
 	}
 
@@ -1293,7 +1350,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( camQuad )
 			camQuad.renderer.enabled = false;
 
-		cameraTransform.gameObject.AddComponent<NegativeEffect>();
+		//cameraTransform.gameObject.AddComponent<NegativeEffect>();
 		StopCoroutine( "DoStun" );
 		RemoveStunEffect();
 		ChangeState( (int)State.Monster );
@@ -1306,12 +1363,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		StopCoroutine( "RageMode" );
 		ChangeState( (int)State.Monster );
-
-		MotionBlur motionBlur = cameraTransform.gameObject.GetComponent<MotionBlur>();
-		
-		if( motionBlur )
-			motionBlur.enabled = false;
-
+		DisplayMessage( "Killer" );
 		ChangeColor( new Quaternion( 1f, 0.9f, 0.9f, 1f ) );
 	}
 
@@ -1319,11 +1371,6 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		StopCoroutine( "RageMode" );
 		ChangeState( (int)State.Monster );
-
-		MotionBlur motionBlur = cameraTransform.gameObject.GetComponent<MotionBlur>();
-		
-		if( motionBlur )
-			motionBlur.enabled = false;
 
 		ChangeColor( new Quaternion( 1f, 0.5f, 0.75f, 1f ) );
 		Stun();
@@ -1353,6 +1400,16 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public void StartGame()
 	{
+		if( photonView.isMine )
+		{
+			FastBloom fastBloom = Camera.main.gameObject.GetComponent<FastBloom>();
+
+			if( fastBloom )
+				fastBloom.enabled = true;
+		}
+
+		gameObject.AddComponent<NoiseController>();
+
 		GameAgent.ChangeGameState( GameAgent.GameState.Game );
 		PlayerAgent.SetMonster();
 
@@ -1371,10 +1428,23 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		RemoveStunEffect();
 
-		MotionBlur motionBlur = cameraTransform.gameObject.GetComponent<MotionBlur>();
-		
-		if( motionBlur )
-			motionBlur.enabled = false;
+		if( photonView.isMine )
+		{
+			FastBloom fastBloom = Camera.main.gameObject.GetComponent<FastBloom>();
+			
+			if( fastBloom )
+				fastBloom.enabled = false;
+		}
+
+		RageController rageController = gameObject.GetComponent<RageController>();
+
+		if( rageController )
+			Destroy( rageController );
+
+		NoiseController noiseController = gameObject.GetComponent<NoiseController>();
+
+		if( noiseController )
+			Destroy( noiseController );
 
 		GameAgent.ChangeGameState( GameAgent.GameState.End );
 
