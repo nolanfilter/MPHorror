@@ -4,8 +4,8 @@ using System.Collections;
 public class InfluenceController : MonoBehaviour {
 
 	private float radius = 2f;
-	private float radiusZoom = 0.5f;
-	private float zoomDistance = 2.5f;
+	private float radiusZoom = 0.25f;
+	private float zoomDistance = 3f;
 	private float rageDistance = 0.5f;
 	public bool showDebugRay = false;
 

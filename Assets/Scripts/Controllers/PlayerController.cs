@@ -64,10 +64,8 @@ public class PlayerController : Photon.MonoBehaviour {
 	private float height = 0.96f;
 	
  	private Transform cameraTransform;
-	private Vector3 cameraPositionOffset = new Vector3( 0f, 1.5f, -1.75f );
-	private Vector3 cameraPositionZoomOffset = new Vector3( 0f, 1.5f, -1.5f );
-	private float cameraFoV = 60f;
-	private float cameraZoomFoV = 30f;
+	private float cameraFoV = 40f;
+	private float cameraZoomFoV = 20f;
 	private Quaternion cameraRotationOffset = Quaternion.Euler( new Vector3( 0f, 0f, 0f ) );
 	private float cameraRotationRate = 0.025f;
 
@@ -127,12 +125,12 @@ public class PlayerController : Photon.MonoBehaviour {
 	private float snapSmoothLag = 0.2f;
 	private float snapMaxSpeed = 720.0f;
 	private float clampHeadPositionScreenSpace = 0.75f;
-	private Vector3 headOffset = Vector3.zero;
-	private Vector3 centerOffset = Vector3.zero;
-	private float shoulderOffset = 0.4f;
+	private Vector3 headOffset = new Vector3( 0f, 0f, 0f );
+	private Vector3 centerOffset = new Vector3( 0f, 0.6125f, 0f );
+	private float shoulderOffset = 0.325f;
 	private float angleVelocity = 0.0f;
 	private bool snap = false;
-	private float distance = 1.25f;
+	private float distance = 0.75f;
 
 	void Awake()
 	{
@@ -259,8 +257,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		inputController.OnButtonHeld += OnButtonHeld;
 		inputController.OnButtonUp += OnButtonUp;
 
-		centerOffset = Vector3.up * 1.25f;
-		headOffset = centerOffset;
+		//centerOffset = Vector3.up * 0.25f;
+		//headOffset = centerOffset + Vector3.up * 0.25f;
 		//headOffset.y = characterController.bounds.max.y - transform.position.y;
 		
 		
@@ -556,7 +554,7 @@ public class PlayerController : Photon.MonoBehaviour {
 			
 			clippingOffset = cameraTransform.forward * longestDistance;
 
-			zoomOffset = Vector3.Lerp( clippingOffset, Quaternion.AngleAxis( cameraTransform.eulerAngles.y, Vector3.up ) * Vector3.forward * 1.25f, zoomProgress );
+			zoomOffset = Vector3.Lerp( clippingOffset, Quaternion.AngleAxis( cameraTransform.eulerAngles.y, Vector3.up ) * Vector3.forward * 0.75f, zoomProgress );
 			cameraTransform.position += zoomOffset;
 
 			cameraTransform.camera.fieldOfView = Mathf.RoundToInt( Mathf.Lerp( cameraFoV, cameraZoomFoV, zoomProgress ) );
@@ -618,7 +616,7 @@ public class PlayerController : Photon.MonoBehaviour {
 				currentAngle = Mathf.SmoothDampAngle(currentAngle, targetAngle, ref angleVelocity, angularSmoothLag, angularMaxSpeed);
 			}
 			
-			float currentHeight = transform.position.y + height;
+			float currentHeight = transform.position.y + centerOffset.y;
 			
 			Quaternion currentRotation = Quaternion.Euler(0, currentAngle, 0);
 			
@@ -1058,44 +1056,38 @@ public class PlayerController : Photon.MonoBehaviour {
 	[RPC]
 	public void RPCStartGame()
 	{
-		if( photonView.isMine )
-		{
-			FastBloom fastBloom = Camera.main.gameObject.GetComponent<FastBloom>();
+		FastBloom fastBloom = Camera.main.gameObject.GetComponent<FastBloom>();
 			
-			if( fastBloom )
-				fastBloom.enabled = true;
+		if( fastBloom )
+			fastBloom.enabled = true;
 
-			ColorCorrectionCurves colorCorrectionCurves = Camera.main.gameObject.GetComponent<ColorCorrectionCurves>();
+		ColorCorrectionCurves colorCorrectionCurves = Camera.main.gameObject.GetComponent<ColorCorrectionCurves>();
 			
-			if( colorCorrectionCurves )
-				colorCorrectionCurves.enabled = true;
+		if( colorCorrectionCurves )
+			colorCorrectionCurves.enabled = true;
 			
-			//js
-			DepthOfField34 depthOfField34 = Camera.main.gameObject.GetComponent<DepthOfField34>();
+		//js
+		DepthOfField34 depthOfField34 = Camera.main.gameObject.GetComponent<DepthOfField34>();
 			
-			//if( depthOfField34 )
-			//	depthOfField34.enabled = true;
+		//if( depthOfField34 )
+		//	depthOfField34.enabled = true;
 			
-			SSAOEffect ssaoEffect = Camera.main.gameObject.GetComponent<SSAOEffect>();
+		SSAOEffect ssaoEffect = Camera.main.gameObject.GetComponent<SSAOEffect>();
 			
-			if( ssaoEffect )
-				ssaoEffect.enabled = true;
+		if( ssaoEffect )
+			ssaoEffect.enabled = true;
 			
-			//js
-			Vignetting vignetting = Camera.main.GetComponent<Vignetting>();
+		//js
+		Vignetting vignetting = Camera.main.GetComponent<Vignetting>();
 			
-			if( vignetting )
-				vignetting.enabled = true;
-		}
+		if( vignetting )
+			vignetting.enabled = true;
 
 		ZoomSurvivorController zoomSurvivorController = gameObject.AddComponent<ZoomSurvivorController>();
 		
 		zoomSurvivorController.playerController = this;
 
 		gameObject.AddComponent<NoiseController>();
-		
-		GameAgent.ChangeGameState( GameAgent.GameState.Game );
-		PlayerAgent.SetMonster();
 		
 		GameAgent.ChangeGameState( GameAgent.GameState.Game );
 		PlayerAgent.SetMonster();
@@ -1478,42 +1470,39 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public void StartGame()
 	{
-		if( photonView.isMine )
-		{
-			FastBloom fastBloom = Camera.main.gameObject.GetComponent<FastBloom>();
-
-			if( fastBloom )
-				fastBloom.enabled = true;
-
-			ColorCorrectionCurves colorCorrectionCurves = Camera.main.gameObject.GetComponent<ColorCorrectionCurves>();
-			
-			if( colorCorrectionCurves )
-				colorCorrectionCurves.enabled = true;
-			
-			//js
-			DepthOfField34 depthOfField34 = Camera.main.gameObject.GetComponent<DepthOfField34>();
-			
-			//if( depthOfField34 )
-			//	depthOfField34.enabled = true;
-			
-			SSAOEffect ssaoEffect = Camera.main.gameObject.GetComponent<SSAOEffect>();
-			
-			if( ssaoEffect )
-				ssaoEffect.enabled = true;
-			
-			//js
-			Vignetting vignetting = Camera.main.GetComponent<Vignetting>();
-			
-			if( vignetting )
-				vignetting.enabled = true;
-		}
+		FastBloom fastBloom = Camera.main.gameObject.GetComponent<FastBloom>();
+		
+		if( fastBloom )
+			fastBloom.enabled = true;
+		
+		ColorCorrectionCurves colorCorrectionCurves = Camera.main.gameObject.GetComponent<ColorCorrectionCurves>();
+		
+		if( colorCorrectionCurves )
+			colorCorrectionCurves.enabled = true;
+		
+		//js
+		DepthOfField34 depthOfField34 = Camera.main.gameObject.GetComponent<DepthOfField34>();
+		
+		//if( depthOfField34 )
+		//	depthOfField34.enabled = true;
+		
+		SSAOEffect ssaoEffect = Camera.main.gameObject.GetComponent<SSAOEffect>();
+		
+		if( ssaoEffect )
+			ssaoEffect.enabled = true;
+		
+		//js
+		Vignetting vignetting = Camera.main.GetComponent<Vignetting>();
+		
+		if( vignetting )
+			vignetting.enabled = true;
 		
 		ZoomSurvivorController zoomSurvivorController = gameObject.AddComponent<ZoomSurvivorController>();
 		
 		zoomSurvivorController.playerController = this;
-
+		
 		gameObject.AddComponent<NoiseController>();
-
+		
 		GameAgent.ChangeGameState( GameAgent.GameState.Game );
 		PlayerAgent.SetMonster();
 
