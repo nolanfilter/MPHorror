@@ -1,0 +1,82 @@
+fileFormatVersion: 2
+guid: 8a07748a10d783d4abb6dbd7272e6ab1
+ModelImporter:
+  serializedVersion: 16
+  fileIDToRecycleName:
+    100000: //RootNode
+    400000: //RootNode
+    2300000: //RootNode
+    3300000: //RootNode
+    4300000: Plane.007
+    4300002: cardboardBox_02
+    7400000: Plane.007|choinka.001|choinka.001|choinka|Take 001|BaseLayer|choinka.001|
+    7400002: Plane.007|Cube_003|Take 001|BaseLayer
+    7400004: Plane.007|Cube_004|Take 001|BaseLayer
+    7400006: Plane.007|Cube_006|Take 001|BaseLayer
+    7400008: Plane.007|Plane.022|Plane.001|choinka.001|choinka.001|choinka|Take 001|Ba
+    7400010: Plane.007|Plane.027|Plane.025|choinka.001|choinka.001|choinka|Take 001|Ba
+    7400012: Plane.007|Plane.027|Plane.025|Plane.022|Plane.001|choinka.001|choinka.001
+    7400014: cardboardBox_02|choinka.001|choinka.001|choinka|Take 001|BaseLayer|choinka.001|
+    7400016: cardboardBox_02|Cube_003|Take 001|BaseLayer
+    7400018: cardboardBox_02|Cube_004|Take 001|BaseLayer
+    7400020: cardboardBox_02|Cube_006|Take 001|BaseLayer
+    7400022: cardboardBox_02|Plane.022|Plane.001|choinka.001|choinka.001|choinka|Take
+      001|Ba
+    7400024: cardboardBox_02|Plane.027|Plane.025|choinka.001|choinka.001|choinka|Take
+      001|Ba
+    7400026: cardboardBox_02|Plane.027|Plane.025|Plane.022|Plane.001|choinka.001|choinka.001
+    11100000: //RootNode
+  materials:
+    importMaterials: 0
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: .00999999978
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 1
+  additionalBone: 0
+  userData: 
