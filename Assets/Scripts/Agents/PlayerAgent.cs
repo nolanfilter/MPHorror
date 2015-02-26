@@ -8,17 +8,11 @@ public class PlayerAgent : MonoBehaviour {
 
 	public Shader stunShader;
 	public Shader monsterShader;
-	public Shader ssaoShader;
 	public Shader fastBloomShader;
 	public Shader blurShader;
-	public Shader tiltShiftShader;
 	public Shader rgbShader;
 	public Shader yuvShader;
-	public Shader vignetteShader;
-	public Shader separableBlurShader;
-	public Shader chromaticAberrationShader;
 
-	public Texture2D randomTexture;
 	public Texture grainTexture;
 	public Texture scratchTexture;
 
@@ -61,37 +55,42 @@ public class PlayerAgent : MonoBehaviour {
 
 	void Start()
 	{
-		SSAOEffect ssaoEffect = Camera.main.gameObject.AddComponent<SSAOEffect>();
+		//turn off camera effects to start
+		//js
+		ColorCorrectionCurves colorCorrectionCurves = Camera.main.gameObject.GetComponent<ColorCorrectionCurves>();
 
-		ssaoEffect.m_SSAOShader = ssaoShader;
-		ssaoEffect.m_RandomTexture = randomTexture;
+		if( colorCorrectionCurves )
+			colorCorrectionCurves.enabled = false;
 
+		//js
+		DepthOfField34 depthOfField34 = Camera.main.gameObject.GetComponent<DepthOfField34>();
+
+		if( depthOfField34 )
+			depthOfField34.enabled = false;
+
+		SSAOEffect ssaoEffect = Camera.main.gameObject.GetComponent<SSAOEffect>();
+	
+		if( ssaoEffect )
+			ssaoEffect.enabled = false;
+
+		//js
+		Vignetting vignetting = Camera.main.GetComponent<Vignetting>();
+
+		if( vignetting )
+			vignetting.enabled = false;
+
+		//add new effects
 		//js
 		FastBloom fastBloom = Camera.main.gameObject.AddComponent<FastBloom>();
 
 		fastBloom.enabled = false;
 		fastBloom.fastBloomShader = fastBloomShader;
 
+		//js
 		Blur blur = Camera.main.gameObject.AddComponent<Blur>();
 
 		blur.enabled = false;
 		blur.blurShader = blurShader;
-
-		TiltShiftHdr tiltShiftHdr = Camera.main.gameObject.AddComponent<TiltShiftHdr>();
-
-		tiltShiftHdr.enabled = false;
-		tiltShiftHdr.tiltShiftShader = tiltShiftShader;
-
-		//TODO figure out how to add shaders
-		//Camera.main.gameObject.AddComponent<ColorCorrectionCurves>();
-
-		Vignetting vignetting = Camera.main.gameObject.AddComponent<Vignetting>();
-
-		vignetting.enabled = false;
-		vignetting.vignetteShader = vignetteShader;
-		vignetting.separableBlurShader = separableBlurShader;
-		vignetting.chromAberrationShader = chromaticAberrationShader;
-		//end js
 
 		NoiseEffect noiseEffect = Camera.main.gameObject.AddComponent<NoiseEffect>();
 
