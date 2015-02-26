@@ -1064,12 +1064,6 @@ public class PlayerController : Photon.MonoBehaviour {
 			
 			if( fastBloom )
 				fastBloom.enabled = true;
-			
-			gameObject.AddComponent<NoiseController>();
-			
-			ZoomSurvivorController zoomSurvivorController = gameObject.AddComponent<ZoomSurvivorController>();
-			
-			zoomSurvivorController.playerController = this;
 
 			ColorCorrectionCurves colorCorrectionCurves = Camera.main.gameObject.GetComponent<ColorCorrectionCurves>();
 			
@@ -1093,6 +1087,12 @@ public class PlayerController : Photon.MonoBehaviour {
 			if( vignetting )
 				vignetting.enabled = true;
 		}
+
+		ZoomSurvivorController zoomSurvivorController = gameObject.AddComponent<ZoomSurvivorController>();
+		
+		zoomSurvivorController.playerController = this;
+
+		gameObject.AddComponent<NoiseController>();
 		
 		GameAgent.ChangeGameState( GameAgent.GameState.Game );
 		PlayerAgent.SetMonster();
@@ -1113,36 +1113,33 @@ public class PlayerController : Photon.MonoBehaviour {
 			Destroy( negativeEffect );
 		
 		RemoveStunEffect();
-		
-		if( photonView.isMine )
-		{
-			FastBloom fastBloom = Camera.main.gameObject.GetComponent<FastBloom>();
-			
-			if( fastBloom )
-				fastBloom.enabled = false;
 
-			ColorCorrectionCurves colorCorrectionCurves = Camera.main.gameObject.GetComponent<ColorCorrectionCurves>();
+		FastBloom fastBloom = Camera.main.gameObject.GetComponent<FastBloom>();
 			
-			if( colorCorrectionCurves )
-				colorCorrectionCurves.enabled = false;
+		if( fastBloom )
+			fastBloom.enabled = false;
+
+		ColorCorrectionCurves colorCorrectionCurves = Camera.main.gameObject.GetComponent<ColorCorrectionCurves>();
 			
-			//js
-			DepthOfField34 depthOfField34 = Camera.main.gameObject.GetComponent<DepthOfField34>();
+		if( colorCorrectionCurves )
+			colorCorrectionCurves.enabled = false;
 			
-			if( depthOfField34 )
-				depthOfField34.enabled = false;
+		//js
+		DepthOfField34 depthOfField34 = Camera.main.gameObject.GetComponent<DepthOfField34>();
 			
-			SSAOEffect ssaoEffect = Camera.main.gameObject.GetComponent<SSAOEffect>();
+		if( depthOfField34 )
+			depthOfField34.enabled = false;
 			
-			if( ssaoEffect )
-				ssaoEffect.enabled = false;
+		SSAOEffect ssaoEffect = Camera.main.gameObject.GetComponent<SSAOEffect>();
 			
-			//js
-			Vignetting vignetting = Camera.main.GetComponent<Vignetting>();
+		if( ssaoEffect )
+			ssaoEffect.enabled = false;
 			
-			if( vignetting )
-				vignetting.enabled = false;
-		}
+		//js
+		Vignetting vignetting = Camera.main.GetComponent<Vignetting>();
+			
+		if( vignetting )
+			vignetting.enabled = false;
 		
 		RageController rageController = gameObject.GetComponent<RageController>();
 		
@@ -1488,12 +1485,6 @@ public class PlayerController : Photon.MonoBehaviour {
 			if( fastBloom )
 				fastBloom.enabled = true;
 
-			gameObject.AddComponent<NoiseController>();
-
-			ZoomSurvivorController zoomSurvivorController = gameObject.AddComponent<ZoomSurvivorController>();
-
-			zoomSurvivorController.playerController = this;
-
 			ColorCorrectionCurves colorCorrectionCurves = Camera.main.gameObject.GetComponent<ColorCorrectionCurves>();
 			
 			if( colorCorrectionCurves )
@@ -1515,8 +1506,13 @@ public class PlayerController : Photon.MonoBehaviour {
 			
 			if( vignetting )
 				vignetting.enabled = true;
-
 		}
+		
+		ZoomSurvivorController zoomSurvivorController = gameObject.AddComponent<ZoomSurvivorController>();
+		
+		zoomSurvivorController.playerController = this;
+
+		gameObject.AddComponent<NoiseController>();
 
 		GameAgent.ChangeGameState( GameAgent.GameState.Game );
 		PlayerAgent.SetMonster();
@@ -1528,68 +1524,65 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		StopCoroutine( "DoStun" );
 		StopCoroutine( "RageMode" );
-
+		
 		NegativeEffect negativeEffect = Camera.main.gameObject.GetComponent<NegativeEffect>();
 		
 		if( negativeEffect )
 			Destroy( negativeEffect );
-
+		
 		RemoveStunEffect();
-
-		if( photonView.isMine )
-		{
-			FastBloom fastBloom = Camera.main.gameObject.GetComponent<FastBloom>();
-			
-			if( fastBloom )
-				fastBloom.enabled = false;
-
-			ColorCorrectionCurves colorCorrectionCurves = Camera.main.gameObject.GetComponent<ColorCorrectionCurves>();
-			
-			if( colorCorrectionCurves )
-				colorCorrectionCurves.enabled = false;
-			
-			//js
-			DepthOfField34 depthOfField34 = Camera.main.gameObject.GetComponent<DepthOfField34>();
-			
-			if( depthOfField34 )
-				depthOfField34.enabled = false;
-			
-			SSAOEffect ssaoEffect = Camera.main.gameObject.GetComponent<SSAOEffect>();
-			
-			if( ssaoEffect )
-				ssaoEffect.enabled = false;
-			
-			//js
-			Vignetting vignetting = Camera.main.GetComponent<Vignetting>();
-			
-			if( vignetting )
-				vignetting.enabled = false;
-		}
-
+		
+		FastBloom fastBloom = Camera.main.gameObject.GetComponent<FastBloom>();
+		
+		if( fastBloom )
+			fastBloom.enabled = false;
+		
+		ColorCorrectionCurves colorCorrectionCurves = Camera.main.gameObject.GetComponent<ColorCorrectionCurves>();
+		
+		if( colorCorrectionCurves )
+			colorCorrectionCurves.enabled = false;
+		
+		//js
+		DepthOfField34 depthOfField34 = Camera.main.gameObject.GetComponent<DepthOfField34>();
+		
+		if( depthOfField34 )
+			depthOfField34.enabled = false;
+		
+		SSAOEffect ssaoEffect = Camera.main.gameObject.GetComponent<SSAOEffect>();
+		
+		if( ssaoEffect )
+			ssaoEffect.enabled = false;
+		
+		//js
+		Vignetting vignetting = Camera.main.GetComponent<Vignetting>();
+		
+		if( vignetting )
+			vignetting.enabled = false;
+		
 		RageController rageController = gameObject.GetComponent<RageController>();
-
+		
 		if( rageController )
 			Destroy( rageController );
-
+		
 		ZoomSurvivorController zoomSurvivorController = gameObject.GetComponent<ZoomSurvivorController>();
 		
 		if( zoomSurvivorController )
 			Destroy( zoomSurvivorController );
-
+		
 		ZoomKillerController zoomKillerController = gameObject.GetComponent<ZoomKillerController>();
 		
 		if( zoomKillerController )
 			Destroy( zoomKillerController );
-
+		
 		NoiseController noiseController = gameObject.GetComponent<NoiseController>();
-
+		
 		if( noiseController )
 			Destroy( noiseController );
-
+		
 		GameAgent.ChangeGameState( GameAgent.GameState.End );
-
+		
 		messageString = "";
-
+		
 		TurnOffQuads();
 
 		photonView.RPC( "RPCEndGame", PhotonTargets.OthersBuffered );
