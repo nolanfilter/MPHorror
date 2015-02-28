@@ -38,12 +38,12 @@ public class InputController : MonoBehaviour {
 		Invalid = 19,
 	}
 	
-	private string verticalAxisString = "Vertical";
-	private string horizontalAxisString = "Horizontal";
-	private string rVerticalAxisString = "RVertical";
-	private string rHorizontalAxisString = "RHorizontal";
-	private string leftTriggerAxisString = "Left Trigger";
-	private string rightTriggerAxisString = "Right Trigger";
+	private string verticalAxisString;
+	private string horizontalAxisString;
+	private string rVerticalAxisString;
+	private string rHorizontalAxisString;
+	private string leftTriggerAxisString;
+	private string rightTriggerAxisString;
 	
 	private KeyCode[] codes = new KeyCode[ Enum.GetNames( typeof( ButtonType ) ).Length - 1 ];
 	
@@ -113,6 +113,25 @@ public class InputController : MonoBehaviour {
 
 	private void CheckInputType()
 	{
+		if( Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor )
+		{
+			verticalAxisString = "Vertical Mac";
+			horizontalAxisString = "Horizontal Mac";
+			rVerticalAxisString = "RVertical Mac";
+			rHorizontalAxisString = "RHorizontal Mac";
+			leftTriggerAxisString = "Left Trigger Mac";
+			rightTriggerAxisString = "Right Trigger Mac";
+		}
+		else if( Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor )
+		{
+			verticalAxisString = "Vertical PC";
+			horizontalAxisString = "Horizontal PC";
+			rVerticalAxisString = "RVertical PC";
+			rHorizontalAxisString = "RHorizontal PC";
+			leftTriggerAxisString = "Left Trigger PC";
+			rightTriggerAxisString = "Right Trigger PC";
+		}
+
 		if( ( Input.GetJoystickNames().Length > 0 && currentInputType != Input.GetJoystickNames()[0] ) ||
 		   ( Input.GetJoystickNames().Length == 0 && currentInputType != "Keyboard" ) )
 		{
@@ -121,45 +140,69 @@ public class InputController : MonoBehaviour {
 				//hardcoded for PS3 controller, PS4 controller, and PC
 				switch( Input.GetJoystickNames()[0] )
 				{
-					//PS3
+				//PS3
 				case "Sony PLAYSTATION(R)3 Controller":
 				{
 					
 				} break;
 					
-					//PS4
+				//PS4
 				case "Sony Computer Entertainment Wireless Controller":
 				{
 					
 				} break;
 					
-					//SNES
+				//SNES
 				case " 2Axes 11Keys Game  Pad":
 				{
 					
 				} break;
 					
-					//XBOX 360
+				//XBOX 360
 				case "©Microsoft Corporation Controller": case "":
 				{
-					codes[ (int)ButtonType.Up ] = (KeyCode)( (int)KeyCode.Joystick1Button5 );
-					codes[ (int)ButtonType.Down ] = (KeyCode)( (int)KeyCode.Joystick1Button6 );
-					codes[ (int)ButtonType.Left ] = (KeyCode)( (int)KeyCode.Joystick1Button7 );
-					codes[ (int)ButtonType.Right ] = (KeyCode)( (int)KeyCode.Joystick1Button8 );
-					codes[ (int)ButtonType.RUp ] = (KeyCode)( (int)KeyCode.Joystick1Button0 );
-					codes[ (int)ButtonType.RDown ] = (KeyCode)( (int)KeyCode.Joystick1Button0 );
-					codes[ (int)ButtonType.RLeft ] = (KeyCode)( (int)KeyCode.Joystick1Button0 );
-					codes[ (int)ButtonType.RRight ] = (KeyCode)( (int)KeyCode.Joystick1Button0 );
-					codes[ (int)ButtonType.Zoom ] = (KeyCode)( (int)KeyCode.Joystick1Button0 );
-					codes[ (int)ButtonType.Flashlight ] = (KeyCode)( (int)KeyCode.Joystick1Button12 );
-					codes[ (int)ButtonType.Action ] = (KeyCode)( (int)KeyCode.Joystick1Button0 );
-					codes[ (int)ButtonType.LeftShoulder ] = (KeyCode)( (int)KeyCode.Joystick1Button13 );
-					codes[ (int)ButtonType.RightShoulder ] = (KeyCode)( (int)KeyCode.Joystick1Button14 );
+					if( Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor )
+					{
+						codes[ (int)ButtonType.Up ] = (KeyCode)( (int)KeyCode.Joystick1Button5 );
+						codes[ (int)ButtonType.Down ] = (KeyCode)( (int)KeyCode.Joystick1Button6 );
+						codes[ (int)ButtonType.Left ] = (KeyCode)( (int)KeyCode.Joystick1Button7 );
+						codes[ (int)ButtonType.Right ] = (KeyCode)( (int)KeyCode.Joystick1Button8 );
+						codes[ (int)ButtonType.RUp ] = (KeyCode)( (int)KeyCode.Joystick1Button0 );
+						codes[ (int)ButtonType.RDown ] = (KeyCode)( (int)KeyCode.Joystick1Button0 );
+						codes[ (int)ButtonType.RLeft ] = (KeyCode)( (int)KeyCode.Joystick1Button0 );
+						codes[ (int)ButtonType.RRight ] = (KeyCode)( (int)KeyCode.Joystick1Button0 );
+						codes[ (int)ButtonType.Zoom ] = (KeyCode)( (int)KeyCode.Joystick1Button0 );
+						codes[ (int)ButtonType.Flashlight ] = (KeyCode)( (int)KeyCode.Joystick1Button12 );
+						codes[ (int)ButtonType.Action ] = (KeyCode)( (int)KeyCode.Joystick1Button0 );
+						codes[ (int)ButtonType.LeftShoulder ] = (KeyCode)( (int)KeyCode.Joystick1Button13 );
+						codes[ (int)ButtonType.RightShoulder ] = (KeyCode)( (int)KeyCode.Joystick1Button14 );
 
-					codes[ (int)ButtonType.Start ] = (KeyCode)( (int)KeyCode.Joystick1Button9 );
-					codes[ (int)ButtonType.A ] = (KeyCode)( (int)KeyCode.Joystick1Button16 );
-					codes[ (int)ButtonType.B ] = (KeyCode)( (int)KeyCode.Joystick1Button17 );
-					codes[ (int)ButtonType.X ] = (KeyCode)( (int)KeyCode.Joystick1Button18 );
+						codes[ (int)ButtonType.Start ] = (KeyCode)( (int)KeyCode.Joystick1Button9 );
+						codes[ (int)ButtonType.A ] = (KeyCode)( (int)KeyCode.Joystick1Button16 );
+						codes[ (int)ButtonType.B ] = (KeyCode)( (int)KeyCode.Joystick1Button17 );
+						codes[ (int)ButtonType.X ] = (KeyCode)( (int)KeyCode.Joystick1Button18 );
+					}
+					else if( Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor )
+					{
+						codes[ (int)ButtonType.Up ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
+						codes[ (int)ButtonType.Down ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
+						codes[ (int)ButtonType.Left ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
+						codes[ (int)ButtonType.Right ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
+						codes[ (int)ButtonType.RUp ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
+						codes[ (int)ButtonType.RDown ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
+						codes[ (int)ButtonType.RLeft ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
+						codes[ (int)ButtonType.RRight ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
+						codes[ (int)ButtonType.Zoom ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
+						codes[ (int)ButtonType.Flashlight ] = (KeyCode)( (int)KeyCode.Joystick1Button9 );
+						codes[ (int)ButtonType.Action ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
+						codes[ (int)ButtonType.LeftShoulder ] = (KeyCode)( (int)KeyCode.Joystick1Button4 );
+						codes[ (int)ButtonType.RightShoulder ] = (KeyCode)( (int)KeyCode.Joystick1Button5 );
+
+						codes[ (int)ButtonType.Start ] = (KeyCode)( (int)KeyCode.Joystick1Button7 );
+						codes[ (int)ButtonType.A ] = (KeyCode)( (int)KeyCode.Joystick1Button0 );
+						codes[ (int)ButtonType.B ] = (KeyCode)( (int)KeyCode.Joystick1Button1 );
+						codes[ (int)ButtonType.X ] = (KeyCode)( (int)KeyCode.Joystick1Button2 );
+					}
 					
 				} break;
 				}
