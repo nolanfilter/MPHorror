@@ -66,7 +66,7 @@ public class NetworkAgent : MonoBehaviour {
 	{
 		if( networkBackground != null )
 		{
-			networkBackground.renderer.enabled = ( PhotonNetwork.room == null );
+			networkBackground.GetComponent<Renderer>().enabled = ( PhotonNetwork.room == null );
 		}
 
 		if( GameAgent.GetCurrentGameState() == GameAgent.GameState.Waiting )

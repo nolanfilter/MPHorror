@@ -59,7 +59,7 @@ public class GameAgent : MonoBehaviour {
 	{
 		if( !Application.isEditor )
 		{
-			Screen.showCursor = false;
+			Cursor.visible = false;
 			Screen.lockCursor = true;
 		}
 

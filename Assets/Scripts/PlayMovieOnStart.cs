@@ -14,7 +14,7 @@ public class PlayMovieOnStart : MonoBehaviour {
 
 	void Start()
 	{
-		movieTexture = renderer.material.mainTexture as MovieTexture;
+		movieTexture = GetComponent<Renderer>().material.mainTexture as MovieTexture;
 		movieTexture.loop = loop;
 
 		audioSource = gameObject.AddComponent<AudioSource>();
