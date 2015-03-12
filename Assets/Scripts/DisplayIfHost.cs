@@ -5,6 +5,6 @@ public class DisplayIfHost : MonoBehaviour {
 
 	void Start ()
 	{
-		renderer.enabled = NetworkAgent.GetIsHost();
+		GetComponent<Renderer>().enabled = NetworkAgent.GetIsHost();
 	}
 }

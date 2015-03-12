@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
-using System.Collections;
-
 
 [Serializable]
 public class SceneSetting
@@ -14,8 +13,37 @@ public class SceneSetting
 
 public class PunSceneSettings : ScriptableObject
 {
-    [SerializeField]
-    public List<SceneSetting> MinViewIdPerScene = new List<SceneSetting>();
+    [SerializeField] public List<SceneSetting> MinViewIdPerScene = new List<SceneSetting>();
+
+    private const string SceneSettingsFileName = "PunSceneSettingsFile.asset";
+
+    // we use the path to PunSceneSettings.cs as path to create a scene settings file
+    private static string punSceneSettingsCsPath;
+    public static string PunSceneSettingsCsPath
+    {
+        get
+        {
+            if (!string.IsNullOrEmpty(punSceneSettingsCsPath))
+            {
+                return punSceneSettingsCsPath;
+            }
+
+            // Unity 4.3.4 does not yet have AssetDatabase.FindAssets(). Would be easier.
+            var result = Directory.GetFiles(Application.dataPath, "PunSceneSettings.cs", SearchOption.AllDirectories);
+            if (result.Length >= 1)
+            {
+                punSceneSettingsCsPath = Path.GetDirectoryName(result[0]);
+                punSceneSettingsCsPath = punSceneSettingsCsPath.Replace('\\', '/');
+                punSceneSettingsCsPath = punSceneSettingsCsPath.Replace(Application.dataPath, "Assets");
+
+                // AssetDatabase paths have to use '/' and are relative to the project's folder. Always.
+                punSceneSettingsCsPath = punSceneSettingsCsPath + "/" + SceneSettingsFileName;
+            }
+
+            return punSceneSettingsCsPath;
+        }
+    }
+
 
     private static PunSceneSettings instanceField;
     public static PunSceneSettings Instance
@@ -27,20 +55,16 @@ public class PunSceneSettings : ScriptableObject
                 return instanceField;
             }
 
-            instanceField = (PunSceneSettings)AssetDatabase.LoadAssetAtPath(SceneSettingsFilePath, typeof(PunSceneSettings));
+            instanceField = (PunSceneSettings)AssetDatabase.LoadAssetAtPath(PunSceneSettingsCsPath, typeof(PunSceneSettings));
             if (instanceField == null)
             {
-                //Debug.LogWarning("Creating new PunSceneSettings!!");
                 instanceField = ScriptableObject.CreateInstance<PunSceneSettings>();
-                AssetDatabase.CreateAsset(instanceField, SceneSettingsFilePath);
+                AssetDatabase.CreateAsset(instanceField, PunSceneSettingsCsPath);
             }
 
-            //Debug.Log("Instance: " + instanceField);
             return instanceField;
         }
     }
-    
-    public static readonly string SceneSettingsFilePath = "Assets/Photon Unity Networking/Editor/PhotonNetwork/PunSceneSettingsFile.asset";
 
 
     public static int MinViewIdForScene(string scene)

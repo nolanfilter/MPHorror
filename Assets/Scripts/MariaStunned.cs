@@ -125,7 +125,7 @@ public class MariaStunned : Photon.MonoBehaviour {
 
 		//if zooming in
 		if (state){
-			this.camera.fieldOfView = Mathf.Lerp(this.camera.fieldOfView, cameraZoomFoV, Time.deltaTime * smooth);
+			this.GetComponent<Camera>().fieldOfView = Mathf.Lerp(this.GetComponent<Camera>().fieldOfView, cameraZoomFoV, Time.deltaTime * smooth);
 			_tiltShiftHdr.blurArea = Mathf.Lerp (_tiltShiftHdr.blurArea, fromBlurArea, Time.deltaTime * smooth);
 			_vignetting.chromaticAberration = Mathf.Lerp (_vignetting.chromaticAberration, fromChromAberration, Time.deltaTime * smooth);
 
@@ -136,7 +136,7 @@ public class MariaStunned : Photon.MonoBehaviour {
 		}
 		// if zooming out
 		else {
-			this.camera.fieldOfView = Mathf.Lerp(this.camera.fieldOfView, cameraFoV, Time.deltaTime * smooth);
+			this.GetComponent<Camera>().fieldOfView = Mathf.Lerp(this.GetComponent<Camera>().fieldOfView, cameraFoV, Time.deltaTime * smooth);
 			_tiltShiftHdr.blurArea = Mathf.Lerp (_tiltShiftHdr.blurArea, toBlurArea, Time.deltaTime * smooth);
 			_vignetting.chromaticAberration = Mathf.Lerp (_vignetting.chromaticAberration, toChromAberration, Time.deltaTime * smooth);
 		}

@@ -211,25 +211,25 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( flashQuadPrefab )
 		{
 			flashQuad = Instantiate( flashQuadPrefab ) as GameObject;
-			flashQuad.renderer.material.color = whiteClear;
+			flashQuad.GetComponent<Renderer>().material.color = whiteClear;
 		}
 
 		if( screenshotQuadPrefab )
 		{
 			screenshotQuad = Instantiate( screenshotQuadPrefab ) as GameObject;
-			screenshotQuad.renderer.material.color = whiteClear;
+			screenshotQuad.GetComponent<Renderer>().material.color = whiteClear;
 		}
 
 		if( camQuadPrefab )
 		{
 			camQuad = Instantiate( camQuadPrefab ) as GameObject;
-			camQuad.renderer.enabled = false;
+			camQuad.GetComponent<Renderer>().enabled = false;
 		}
 
 		if( rageQuadPrefab )
 		{
 			rageQuad = Instantiate( rageQuadPrefab ) as GameObject;
-			rageQuad.renderer.enabled = false;
+			rageQuad.GetComponent<Renderer>().enabled = false;
 		}
 
 		viewChangeVector = Vector2.zero;
@@ -474,20 +474,20 @@ public class PlayerController : Photon.MonoBehaviour {
 			transform.rotation = Quaternion.LookRotation( zoomOffset.normalized );
 
 			if( rageQuad && currentState == State.Monster )
-				rageQuad.renderer.enabled = true;
+				rageQuad.GetComponent<Renderer>().enabled = true;
 
 			if( camQuad && ( currentState == State.Normal || currentState == State.None ) )
-				camQuad.renderer.enabled = !isWaitingForPhotoFinish && !hasPhoto;
+				camQuad.GetComponent<Renderer>().enabled = !isWaitingForPhotoFinish && !hasPhoto;
 		}
 		else
 		{
 			transform.rotation = Quaternion.LookRotation( moveDirection );
 
 			if( rageQuad )
-				rageQuad.renderer.enabled = false;
+				rageQuad.GetComponent<Renderer>().enabled = false;
 			
 			if( camQuad )
-				camQuad.renderer.enabled = false;
+				camQuad.GetComponent<Renderer>().enabled = false;
 		}
 
 		movementVector = Vector3.zero;
@@ -557,7 +557,7 @@ public class PlayerController : Photon.MonoBehaviour {
 			zoomOffset = Vector3.Lerp( clippingOffset, Quaternion.AngleAxis( cameraTransform.eulerAngles.y, Vector3.up ) * Vector3.forward * 0.75f, zoomProgress );
 			cameraTransform.position += zoomOffset;
 
-			cameraTransform.camera.fieldOfView = Mathf.RoundToInt( Mathf.Lerp( cameraFoV, cameraZoomFoV, zoomProgress ) );
+			cameraTransform.GetComponent<Camera>().fieldOfView = Mathf.RoundToInt( Mathf.Lerp( cameraFoV, cameraZoomFoV, zoomProgress ) );
 
 			if( flashlight != null && currentState != State.Dead )
 			{
@@ -665,8 +665,8 @@ public class PlayerController : Photon.MonoBehaviour {
 			Vector3 relativeOffset = Vector3.forward * distance + Vector3.down * height;
 			cameraTransform.rotation = yRotation * Quaternion.LookRotation(relativeOffset);
 			
-			Ray centerRay = cameraTransform.camera.ViewportPointToRay( new Vector3( 0.5f, 0.5f, 1f ) );
-			Ray topRay = cameraTransform.camera.ViewportPointToRay( new Vector3( 0.5f, clampHeadPositionScreenSpace, 1f ) );
+			Ray centerRay = cameraTransform.GetComponent<Camera>().ViewportPointToRay( new Vector3( 0.5f, 0.5f, 1f ) );
+			Ray topRay = cameraTransform.GetComponent<Camera>().ViewportPointToRay( new Vector3( 0.5f, clampHeadPositionScreenSpace, 1f ) );
 			
 			Vector3 centerRayPos = centerRay.GetPoint( distance );
 			Vector3 topRayPos = topRay.GetPoint( distance );
@@ -840,18 +840,18 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		if( flashQuad )
 		{
-			yield return StartCoroutine( DoColorFade( flashQuad.renderer.material, Color.white, whiteClear, 0.5f ) );
+			yield return StartCoroutine( DoColorFade( flashQuad.GetComponent<Renderer>().material, Color.white, whiteClear, 0.5f ) );
 		}
 
 		SetFlashBulbTo( false );
 
 		if( screenshotQuad )
 		{
-			yield return StartCoroutine( DoColorFade( screenshotQuad.renderer.material, whiteClear, Color.white, 0.25f ) );
+			yield return StartCoroutine( DoColorFade( screenshotQuad.GetComponent<Renderer>().material, whiteClear, Color.white, 0.25f ) );
 
 			yield return new WaitForSeconds( 1.25f );
 
-			yield return StartCoroutine( DoColorFade( screenshotQuad.renderer.material, Color.white, whiteClear, 0.45f ) );
+			yield return StartCoroutine( DoColorFade( screenshotQuad.GetComponent<Renderer>().material, Color.white, whiteClear, 0.45f ) );
 		}
 
 		hasPhoto = false;
@@ -1236,7 +1236,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		ScreenshotAgent.instance.OnPostRenderFinish -= OnScreenshotFinish;
 
 		if( screenshotQuad )
-			screenshotQuad.renderer.material.mainTexture = ScreenshotAgent.GetTexture();
+			screenshotQuad.GetComponent<Renderer>().material.mainTexture = ScreenshotAgent.GetTexture();
 
 		isWaitingForPhotoFinish = false;
 	}
@@ -1403,7 +1403,7 @@ public class PlayerController : Photon.MonoBehaviour {
 			return;
 
 		if( camQuad )
-			camQuad.renderer.enabled = false;
+			camQuad.GetComponent<Renderer>().enabled = false;
 
 		//cameraTransform.gameObject.AddComponent<NegativeEffect>();
 		StopCoroutine( "DoStun" );
@@ -1587,10 +1587,10 @@ public class PlayerController : Photon.MonoBehaviour {
 	public void TurnOffQuads()
 	{
 		if( rageQuad )
-			rageQuad.renderer.enabled = false;
+			rageQuad.GetComponent<Renderer>().enabled = false;
 		
 		if( camQuad )
-			camQuad.renderer.enabled = false;
+			camQuad.GetComponent<Renderer>().enabled = false;
 	}
 
 	public void TeleportTo( Vector3 coordinate )
