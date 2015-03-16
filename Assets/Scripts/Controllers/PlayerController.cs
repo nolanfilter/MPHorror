@@ -9,12 +9,16 @@ public class PlayerController : Photon.MonoBehaviour {
 		Monster = 1,
 		Dead = 2,
 		Voyeur = 3,
-		None = 4,
+		Stunned = 4,
+		Raging = 5,
+		None = 6,
+		Invalid = 7,
 	}
 	private State currentState = State.None;
 
 	private bool isZoomingIn = false;
 	private bool hasPhoto = false;
+	private bool isOpeningDoor = false;
 
 	private float currentFear = 1f;
 	private float currentSanity = 1f;
@@ -53,17 +57,15 @@ public class PlayerController : Photon.MonoBehaviour {
 	private Vector3 movementVector;
 	private Vector2 viewChangeVector;
 	private Vector2 oldViewChangeVector;
-	private float viewChangeRate = 2.5f;
+	private float viewChangeRate = 1.75f;
 	private float timeViewChangeStatic;
 	private float timeViewChangeStaticThreshold = 1f;
 
 	private float height = 0.96f;
 	
  	private Transform cameraTransform;
-	private Vector3 cameraPositionOffset = new Vector3( 0f, 1.5f, -1.75f );
-	private Vector3 cameraPositionZoomOffset = new Vector3( 0f, 1.5f, -1.5f );
-	private float cameraFoV = 60f;
-	private float cameraZoomFoV = 30f;
+	private float cameraFoV = 40f;
+	private float cameraZoomFoV = 20f;
 	private Quaternion cameraRotationOffset = Quaternion.Euler( new Vector3( 0f, 0f, 0f ) );
 	private float cameraRotationRate = 0.025f;
 
@@ -88,13 +90,19 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public GameObject flashQuadPrefab;
 	public GameObject screenshotQuadPrefab;
+	public GameObject camQuadPrefab;
+	public GameObject rageQuadPrefab;
 
 	private Renderer[] modelRenderers = null;
 
 	public Light flashlight;
+	public Light flashBulb;
 
 	private GameObject flashQuad;
 	private GameObject screenshotQuad;
+	private GameObject camQuad;
+	private GameObject rageQuad;
+
 	private Color whiteClear = new Color( 1f, 1f, 1f, 0f );
 
 	private bool isWaitingForPhotoFinish = false;
@@ -117,12 +125,12 @@ public class PlayerController : Photon.MonoBehaviour {
 	private float snapSmoothLag = 0.2f;
 	private float snapMaxSpeed = 720.0f;
 	private float clampHeadPositionScreenSpace = 0.75f;
-	private Vector3 headOffset = Vector3.zero;
-	private Vector3 centerOffset = Vector3.zero;
-	private float shoulderOffset = 0.4f;
+	private Vector3 headOffset = new Vector3( 0f, 0f, 0f );
+	private Vector3 centerOffset = new Vector3( 0f, 0.6125f, 0f );
+	private float shoulderOffset = 0.325f;
 	private float angleVelocity = 0.0f;
 	private bool snap = false;
-	private float distance = 1.25f;
+	private float distance = 0.75f;
 
 	void Awake()
 	{
@@ -153,7 +161,25 @@ public class PlayerController : Photon.MonoBehaviour {
 			modelRenderers = GetComponentsInChildren<Renderer>();
 
 		if( flashlight == null )
-			flashlight = GetComponentInChildren<Light>();
+		{
+			Light[] lights = GetComponentsInChildren<Light>();
+
+			for( int i = 0; i < lights.Length; i++ )
+				if( lights[i].gameObject.name == "Flashlight" )
+					flashlight = lights[i];
+		}
+
+		if( flashBulb == null )
+		{
+			Light[] lights = GetComponentsInChildren<Light>();
+			
+			for( int i = 0; i < lights.Length; i++ )
+				if( lights[i].gameObject.name == "Flash Bulb" )
+					flashBulb = lights[i];
+		}
+
+		if( flashBulb )
+			flashBulb.enabled = false;
 
 		moveDirection = transform.TransformDirection(Vector3.forward);
 
@@ -161,6 +187,16 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		if( photonView.isMine )
 			gameObject.name += "(Client)";
+
+
+
+		if( modelRenderers != null )
+		{
+			Color color = new Color( 1f, 0.9f, 0.9f, 1f );
+			
+			for( int i = 0; i < modelRenderers.Length; i++ )
+				modelRenderers[i].material.color = color;
+		}
 	}
 	
 	void Start()
@@ -168,20 +204,32 @@ public class PlayerController : Photon.MonoBehaviour {
 		messageRect = new Rect( 0f, 0f, Screen.width, Screen.height * 0.1f );
 
 		textStyle = new GUIStyle();
-		textStyle.font = FontAgent.GetFont();
+		textStyle.font = FontAgent.GetNotificationFont();
 		textStyle.normal.textColor = Color.white;
 		textStyle.alignment = TextAnchor.MiddleCenter;
 
 		if( flashQuadPrefab )
 		{
 			flashQuad = Instantiate( flashQuadPrefab ) as GameObject;
-			flashQuad.renderer.material.color = whiteClear;
+			flashQuad.GetComponent<Renderer>().material.color = whiteClear;
 		}
 
 		if( screenshotQuadPrefab )
 		{
 			screenshotQuad = Instantiate( screenshotQuadPrefab ) as GameObject;
-			screenshotQuad.renderer.material.color = whiteClear;
+			screenshotQuad.GetComponent<Renderer>().material.color = whiteClear;
+		}
+
+		if( camQuadPrefab )
+		{
+			camQuad = Instantiate( camQuadPrefab ) as GameObject;
+			camQuad.GetComponent<Renderer>().enabled = false;
+		}
+
+		if( rageQuadPrefab )
+		{
+			rageQuad = Instantiate( rageQuadPrefab ) as GameObject;
+			rageQuad.GetComponent<Renderer>().enabled = false;
 		}
 
 		viewChangeVector = Vector2.zero;
@@ -200,7 +248,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		SnapCamera();
 
-		PlayerAgent.RegisterPlayer( this );
+		PlayerAgent.RegisterPlayer( this, photonView.isMine );
 	}
 	
 	void OnEnable()
@@ -209,8 +257,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		inputController.OnButtonHeld += OnButtonHeld;
 		inputController.OnButtonUp += OnButtonUp;
 
-		centerOffset = Vector3.up * 1.5f;
-		headOffset = centerOffset;
+		//centerOffset = Vector3.up * 0.25f;
+		//headOffset = centerOffset + Vector3.up * 0.25f;
 		//headOffset.y = characterController.bounds.max.y - transform.position.y;
 		
 		
@@ -231,6 +279,9 @@ public class PlayerController : Photon.MonoBehaviour {
 	
 	void Update()
 	{
+		if( GameAgent.GetCurrentGameState() != GameAgent.GameState.Game )
+			return;
+
 		if( photonView.isMine )
 		{
 			InputMovement();
@@ -415,12 +466,29 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		Vector3 movement = moveDirection * moveSpeed * Time.deltaTime;
 
-		characterController.Move( movement );
+		if( currentState != State.Raging )
+			characterController.Move( movement );
 
 		if( zoomProgress == 1f )
+		{
 			transform.rotation = Quaternion.LookRotation( zoomOffset.normalized );
+
+			if( rageQuad && currentState == State.Monster )
+				rageQuad.GetComponent<Renderer>().enabled = true;
+
+			if( camQuad && ( currentState == State.Normal || currentState == State.None ) )
+				camQuad.GetComponent<Renderer>().enabled = !isWaitingForPhotoFinish && !hasPhoto;
+		}
 		else
+		{
 			transform.rotation = Quaternion.LookRotation( moveDirection );
+
+			if( rageQuad )
+				rageQuad.GetComponent<Renderer>().enabled = false;
+			
+			if( camQuad )
+				camQuad.GetComponent<Renderer>().enabled = false;
+		}
 
 		movementVector = Vector3.zero;
 	}
@@ -430,7 +498,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		syncTime += Time.deltaTime;
 		
 		float lerp = syncTime / syncDelay;
-		
+
 		if( Vector3.Distance( syncStartPosition, syncEndPosition ) < 2f )
 		{
 			transform.position = Vector3.Lerp( syncStartPosition, syncEndPosition, lerp );
@@ -456,7 +524,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		if( photonView.isMine )
 		{
-			if( isZoomingIn )
+			if( ( isZoomingIn && currentState != State.Stunned ) || currentState == State.Raging )
 				zoomProgress = Mathf.Clamp01( zoomProgress + Time.deltaTime / zoomDuration );
 			else
 				zoomProgress = Mathf.Clamp01( zoomProgress - Time.deltaTime / zoomDuration );
@@ -486,10 +554,10 @@ public class PlayerController : Photon.MonoBehaviour {
 			
 			clippingOffset = cameraTransform.forward * longestDistance;
 
-			zoomOffset = Vector3.Lerp( clippingOffset, Quaternion.AngleAxis( cameraTransform.eulerAngles.y, Vector3.up ) * Vector3.forward * 1.25f, zoomProgress );
+			zoomOffset = Vector3.Lerp( clippingOffset, Quaternion.AngleAxis( cameraTransform.eulerAngles.y, Vector3.up ) * Vector3.forward * 0.75f, zoomProgress );
 			cameraTransform.position += zoomOffset;
 
-			cameraTransform.camera.fieldOfView = Mathf.RoundToInt( Mathf.Lerp( cameraFoV, cameraZoomFoV, zoomProgress ) );
+			cameraTransform.GetComponent<Camera>().fieldOfView = Mathf.RoundToInt( Mathf.Lerp( cameraFoV, cameraZoomFoV, zoomProgress ) );
 
 			if( flashlight != null && currentState != State.Dead )
 			{
@@ -499,9 +567,12 @@ public class PlayerController : Photon.MonoBehaviour {
 
 				if( Physics.Raycast( cameraTransform.position + cameraTransform.forward * 1.5f, cameraTransform.forward, out hit ) )
 				{
-					Vector3 hitPosition = cameraTransform.position + cameraTransform.forward * ( hit.distance + 1.5f );
+					if( hit.collider.transform != transform )
+					{
+						Vector3 hitPosition = cameraTransform.position + cameraTransform.forward * ( hit.distance + 1.5f );
 
-					newFlashlightRotation = Quaternion.LookRotation( hitPosition - flashlight.transform.position );
+						newFlashlightRotation = Quaternion.LookRotation( hitPosition - flashlight.transform.position );
+					}
 				}
 
 				float percent = Mathf.Clamp01( Quaternion.Angle( flashlight.transform.rotation, newFlashlightRotation ) / 90f );
@@ -545,7 +616,7 @@ public class PlayerController : Photon.MonoBehaviour {
 				currentAngle = Mathf.SmoothDampAngle(currentAngle, targetAngle, ref angleVelocity, angularSmoothLag, angularMaxSpeed);
 			}
 			
-			float currentHeight = transform.position.y + height;
+			float currentHeight = transform.position.y + centerOffset.y;
 			
 			Quaternion currentRotation = Quaternion.Euler(0, currentAngle, 0);
 			
@@ -594,8 +665,8 @@ public class PlayerController : Photon.MonoBehaviour {
 			Vector3 relativeOffset = Vector3.forward * distance + Vector3.down * height;
 			cameraTransform.rotation = yRotation * Quaternion.LookRotation(relativeOffset);
 			
-			Ray centerRay = cameraTransform.camera.ViewportPointToRay( new Vector3( 0.5f, 0.5f, 1f ) );
-			Ray topRay = cameraTransform.camera.ViewportPointToRay( new Vector3( 0.5f, clampHeadPositionScreenSpace, 1f ) );
+			Ray centerRay = cameraTransform.GetComponent<Camera>().ViewportPointToRay( new Vector3( 0.5f, 0.5f, 1f ) );
+			Ray topRay = cameraTransform.GetComponent<Camera>().ViewportPointToRay( new Vector3( 0.5f, clampHeadPositionScreenSpace, 1f ) );
 			
 			Vector3 centerRayPos = centerRay.GetPoint( distance );
 			Vector3 topRayPos = topRay.GetPoint( distance );
@@ -642,16 +713,16 @@ public class PlayerController : Photon.MonoBehaviour {
 				if( xAngleOffset > 40f && xAngleOffset < 180f )
 					xAngleOffset = 40f;
 					
-				if( xAngleOffset > 180f && xAngleOffset < 340f )
-					xAngleOffset = 340f;
+				if( xAngleOffset > 180f && xAngleOffset < 300f )
+					xAngleOffset = 300f;
 			}
 			else
 			{
 				if( xAngleOffset > 60f && xAngleOffset < 180f )
 					xAngleOffset = 60f;
 				
-				if( xAngleOffset > 180f && xAngleOffset < 320f )
-					xAngleOffset = 320f;
+				if( xAngleOffset > 180f && xAngleOffset < 290f )
+					xAngleOffset = 290f;
 			}
 			
 			cameraRotationOffset.eulerAngles = new Vector3( xAngleOffset, cameraRotationOffset.eulerAngles.y, cameraRotationOffset.eulerAngles.z );
@@ -694,6 +765,9 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private void EvaluateViewChange( InputController.ButtonType button )
 	{
+		if( GameAgent.GetCurrentGameState() != GameAgent.GameState.Game )
+			return;
+
 		switch( button )
 		{
 		case InputController.ButtonType.RLeft:
@@ -723,6 +797,14 @@ public class PlayerController : Photon.MonoBehaviour {
 		shoulderOffset = Mathf.Abs( shoulderOffset ) * sign;
 	}
 
+	private void RemoveStunEffect()
+	{
+		StunController stunController = gameObject.GetComponent<StunController>();
+	
+		if( stunController )
+			Destroy( stunController );
+	}
+
 	//coroutines
 	private IEnumerator DoDisplayMessage( string messageToDisplay )
 	{
@@ -738,10 +820,10 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( ( zoomProgress != 1f ) || isWaitingForPhotoFinish || hasPhoto )
 			yield break;
 
+		isWaitingForPhotoFinish = true;
+
 		ScreenshotAgent.instance.OnPostRenderFinish += OnScreenshotFinish;
 		ScreenshotAgent.Enable();
-
-		isWaitingForPhotoFinish = true;
 
 		while( isWaitingForPhotoFinish )
 			yield return null;
@@ -752,36 +834,124 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		hasPhoto = true;
 
+		StartCoroutine( "PlayCameraCooldown" );
+
+		SetFlashBulbTo( true );
+
 		if( flashQuad )
 		{
-			yield return StartCoroutine( DoColorFade( flashQuad.renderer.material, Color.white, whiteClear, 0.5f ) );
+			yield return StartCoroutine( DoColorFade( flashQuad.GetComponent<Renderer>().material, Color.white, whiteClear, 0.5f ) );
 		}
-	
+
+		SetFlashBulbTo( false );
+
 		if( screenshotQuad )
 		{
-			yield return StartCoroutine( DoColorFade( screenshotQuad.renderer.material, whiteClear, Color.white, 0.25f ) );
+			yield return StartCoroutine( DoColorFade( screenshotQuad.GetComponent<Renderer>().material, whiteClear, Color.white, 0.25f ) );
 
 			yield return new WaitForSeconds( 1.25f );
+
+			yield return StartCoroutine( DoColorFade( screenshotQuad.GetComponent<Renderer>().material, Color.white, whiteClear, 0.45f ) );
 		}
 
 		hasPhoto = false;
 
 		SetFlashlightTo( oldFlashlightState );
+	}
 
-		if( screenshotQuad )
+	private IEnumerator RageMode()
+	{
+		if( ( zoomProgress != 1f ) )
+			yield break;
+
+		ChangeState( (int)State.Raging );
+		ChangeColor(  new Quaternion( 0.75f, 0f, 0f, 1f ) );
+
+		RageController rageController = null;
+
+		if( photonView.isMine )
+			rageController = gameObject.AddComponent<RageController>();
+
+		float speed = 12.5f;
+
+		float distance = speed * RageController.RageDuration;
+		float currentDistance = 0f;
+	
+		float deltaDistance;
+
+		Vector3 direction = transform.forward;
+
+		yield return null;
+
+		do
 		{
-			yield return StartCoroutine( DoColorFade( screenshotQuad.renderer.material, Color.white, whiteClear, 0.45f ) );
-		}
+			deltaDistance = speed * Time.deltaTime;
+			currentDistance += speed * Time.deltaTime;
+
+			characterController.Move( direction * speed * Time.deltaTime );
+
+			yield return null;
+
+		} while( currentDistance < distance );
+
+		ChangeState( (int)State.Stunned );
+		//MonsterReveal();
+
+		speed = 0.5f;
+		
+		distance = speed * RageController.RageCooldown;
+		currentDistance = 0f;
+
+		yield return null;
+		
+		do
+		{
+			deltaDistance = speed * Time.deltaTime;
+			currentDistance += speed * Time.deltaTime;
+			
+			characterController.Move( direction * speed * Time.deltaTime );
+			
+			yield return null;
+			
+		} while( currentDistance < distance );
+
+
+		if( rageController )
+			Destroy( rageController );
+
+		ChangeColor( new Quaternion( 1f, 0.9f, 0.9f, 1f ) );
+		ChangeState( (int)State.Monster );
+	}
+
+	private IEnumerator DoStun()
+	{
+		if( currentState == State.Stunned || currentState == State.Dead || currentState == State.Voyeur )
+			yield break;
+
+		State originalState = currentState;
+
+		ChangeState( (int)State.Stunned );
+
+		if( photonView.isMine )
+			gameObject.AddComponent<StunController>();
+
+		yield return new WaitForSeconds( StunController.StunDuration );
+
+		ChangeColor( new Quaternion( 1f, 0.9f, 0.9f, 1f ) );
+
+		RemoveStunEffect();
+
+		ChangeState( (int)originalState );
 	}
 
 	private IEnumerator DoColorFade( Material material, Color fromColor, Color toColor, float duration )
 	{
 		material.color = fromColor;
-
+		
 		float beginTime = Time.time;
 		float currentTime = 0f;
 		float lerp = 0f;
-
+		
 		do
 		{
 			currentTime += Time.deltaTime;
@@ -794,6 +964,39 @@ public class PlayerController : Photon.MonoBehaviour {
 		} while ( currentTime < duration );
 		
 		material.color = toColor;
+	}
+
+	//TODO generalize
+	private IEnumerator PlayCameraCooldown()
+	{
+		if( !photonView.isMine )
+			yield break;
+
+		AudioClip cameraCooldownClip = PlayerAgent.GetCameraCooldownClip();
+			
+		if( cameraCooldownClip )
+		{
+			AudioSource source = Camera.main.gameObject.AddComponent<AudioSource>();
+			source.clip = cameraCooldownClip;
+			source.loop = false;
+			source.volume = 1f;
+			source.Play();
+				
+			float duration = 2.5f;
+			float lerp;
+
+			do
+			{
+				lerp = Mathf.Clamp01( source.time / duration );
+
+				source.volume = Mathf.Lerp( 1f, 0f, lerp );
+
+				yield return null;
+
+			} while( source.time < duration );
+
+			Destroy( source );
+		}
 	}
 	//end coroutines
 
@@ -815,6 +1018,13 @@ public class PlayerController : Photon.MonoBehaviour {
 			for( int i = 0; i < modelRenderers.Length; i++ )
 				modelRenderers[i].material.color = color;
 		}
+	}
+
+	[RPC] 
+	public void RPCChangeFlashBulb( int state )
+	{
+		if( flashBulb )
+			flashBulb.enabled = ( state == 1 );
 	}
 
 	[RPC] 
@@ -842,6 +1052,119 @@ public class PlayerController : Photon.MonoBehaviour {
 		StopCoroutine( "DoDisplayMessage" );
 		StartCoroutine( "DoDisplayMessage", messageToDisplay );
 	}
+
+	[RPC]
+	public void RPCStartGame()
+	{
+		FastBloom fastBloom = Camera.main.gameObject.GetComponent<FastBloom>();
+			
+		if( fastBloom )
+			fastBloom.enabled = true;
+
+		ColorCorrectionCurves colorCorrectionCurves = Camera.main.gameObject.GetComponent<ColorCorrectionCurves>();
+			
+		if( colorCorrectionCurves )
+			colorCorrectionCurves.enabled = true;
+			
+		//js
+		DepthOfField34 depthOfField34 = Camera.main.gameObject.GetComponent<DepthOfField34>();
+			
+		//if( depthOfField34 )
+		//	depthOfField34.enabled = true;
+			
+		SSAOEffect ssaoEffect = Camera.main.gameObject.GetComponent<SSAOEffect>();
+			
+		if( ssaoEffect )
+			ssaoEffect.enabled = true;
+			
+		//js
+		Vignetting vignetting = Camera.main.GetComponent<Vignetting>();
+			
+		if( vignetting )
+			vignetting.enabled = true;
+
+		ZoomSurvivorController zoomSurvivorController = gameObject.AddComponent<ZoomSurvivorController>();
+		
+		zoomSurvivorController.playerController = this;
+
+		gameObject.AddComponent<NoiseController>();
+		
+		GameAgent.ChangeGameState( GameAgent.GameState.Game );
+		PlayerAgent.SetMonster();
+	}
+
+	[RPC]
+	public void RPCEndGame()
+	{
+		StopCoroutine( "DoStun" );
+		StopCoroutine( "RageMode" );
+		
+		NegativeEffect negativeEffect = Camera.main.gameObject.GetComponent<NegativeEffect>();
+		
+		if( negativeEffect )
+			Destroy( negativeEffect );
+		
+		RemoveStunEffect();
+
+		FastBloom fastBloom = Camera.main.gameObject.GetComponent<FastBloom>();
+			
+		if( fastBloom )
+			fastBloom.enabled = false;
+
+		ColorCorrectionCurves colorCorrectionCurves = Camera.main.gameObject.GetComponent<ColorCorrectionCurves>();
+			
+		if( colorCorrectionCurves )
+			colorCorrectionCurves.enabled = false;
+			
+		//js
+		DepthOfField34 depthOfField34 = Camera.main.gameObject.GetComponent<DepthOfField34>();
+			
+		if( depthOfField34 )
+			depthOfField34.enabled = false;
+			
+		SSAOEffect ssaoEffect = Camera.main.gameObject.GetComponent<SSAOEffect>();
+			
+		if( ssaoEffect )
+			ssaoEffect.enabled = false;
+			
+		//js
+		Vignetting vignetting = Camera.main.GetComponent<Vignetting>();
+			
+		if( vignetting )
+			vignetting.enabled = false;
+		
+		RageController rageController = gameObject.GetComponent<RageController>();
+		
+		if( rageController )
+			Destroy( rageController );
+
+		ZoomSurvivorController zoomSurvivorController = gameObject.GetComponent<ZoomSurvivorController>();
+		
+		if( zoomSurvivorController )
+			Destroy( zoomSurvivorController );
+		
+		ZoomKillerController zoomKillerController = gameObject.GetComponent<ZoomKillerController>();
+		
+		if( zoomKillerController )
+			Destroy( zoomKillerController );
+		
+		NoiseController noiseController = gameObject.GetComponent<NoiseController>();
+		
+		if( noiseController )
+			Destroy( noiseController );
+		
+		GameAgent.ChangeGameState( GameAgent.GameState.End );
+		
+		messageString = "";
+		
+		TurnOffQuads();
+	}
+
+	[RPC]
+	public void RPCStun()
+	{
+		StartCoroutine( "DoStun" );
+	}
 	// end server calls
 
 	//event handlers
@@ -861,9 +1184,12 @@ public class PlayerController : Photon.MonoBehaviour {
 			ToggleFlashlight();
 		} break;
 
-		case InputController.ButtonType.Photograph: 
+		case InputController.ButtonType.Action: 
 		{
-			StartCoroutine( "TakePhoto" );
+			if( currentState == State.Normal || currentState == State.None )
+				StartCoroutine( "TakePhoto" );
+			else if( currentState == State.Monster )
+				StartCoroutine( "RageMode" );
 		} break;
 
 		case InputController.ButtonType.LeftShoulder: 
@@ -874,6 +1200,11 @@ public class PlayerController : Photon.MonoBehaviour {
 		case InputController.ButtonType.RightShoulder: 
 		{
 			SetShoulderOffset( 1f );
+		} break;
+		
+		case InputController.ButtonType.A: case InputController.ButtonType.X:
+		{
+			isOpeningDoor = true;
 		} break;
 		}
 	}
@@ -891,6 +1222,11 @@ public class PlayerController : Photon.MonoBehaviour {
 			{
 				ChangeZoom( 0 );
 			} break;
+
+			case InputController.ButtonType.A: case InputController.ButtonType.X:
+			{
+				isOpeningDoor = false;
+			} break;
 		}
 
 	}
@@ -900,7 +1236,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		ScreenshotAgent.instance.OnPostRenderFinish -= OnScreenshotFinish;
 
 		if( screenshotQuad )
-			screenshotQuad.renderer.material.mainTexture = ScreenshotAgent.GetTexture();
+			screenshotQuad.GetComponent<Renderer>().material.mainTexture = ScreenshotAgent.GetTexture();
 
 		isWaitingForPhotoFinish = false;
 	}
@@ -956,6 +1292,14 @@ public class PlayerController : Photon.MonoBehaviour {
 		return wasAlive && ( currentFear <= 0f );
 	}
 
+	public void ChangeFlashBulb( int state )
+	{
+		if( flashBulb )
+			flashBulb.enabled = ( state == 1 );
+		
+		photonView.RPC( "RPCChangeFlashBulb", PhotonTargets.OthersBuffered, state );
+	}
+
 	public void ChangeFlashlight( int state )
 	{
 		if( flashlight )
@@ -997,12 +1341,14 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public void Escape()
 	{
-		if( currentState == State.Monster || currentState == State.Voyeur || currentState == State.Dead )
+		if( currentState == State.Monster || currentState == State.Voyeur || currentState == State.Dead || currentState == State.Raging )
 			return;
 
 		ChangeState( (int)State.Voyeur );
 		ChangeColor( new Quaternion( 0f, 0f, 0f, 0f ) );
 		DisplayMessage( "You escaped!" );
+
+		PlayerAgent.CheckForEnd();
 	}
 
 	public State GetCurrentState()
@@ -1018,7 +1364,9 @@ public class PlayerController : Photon.MonoBehaviour {
 		DisplayMessage( "Your soul was stolen" );
 		ChangeColor( new Quaternion( 0.175f, 0.175f, 0.175f, 0.5f ) );
 		ChangeColider( 0 );
-		
+
+		PlayerAgent.CheckForEnd();
+
 		return true;
 		//return ChangeFear( fearAttack );
 	}
@@ -1036,18 +1384,80 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public bool IsZoomedIn()
 	{
-		return hasPhoto;
+		return hasPhoto || currentState == State.Raging;
+	}
+
+	public float GetZoomProgress()
+	{
+		return zoomProgress;
+	}
+
+	public bool IsOpeningDoor()
+	{
+		return isOpeningDoor;
 	}
 
 	public void Monsterize()
 	{
+		if( !photonView.isMine || GameAgent.GetCurrentGameState() != GameAgent.GameState.Game || currentState == State.Monster || currentState == State.Dead )
+			return;
+
+		if( camQuad )
+			camQuad.GetComponent<Renderer>().enabled = false;
+
+		//cameraTransform.gameObject.AddComponent<NegativeEffect>();
+		StopCoroutine( "DoStun" );
+		RemoveStunEffect();
 		ChangeState( (int)State.Monster );
-		DisplayMessage( "\n(You're the Murderer)\nSteal souls with Photos" );
+		DisplayMessage( "Attack your friends" );
+
+		ZoomSurvivorController zoomSurvivorController = gameObject.GetComponent<ZoomSurvivorController>();
+
+		if( zoomSurvivorController )
+			Destroy( zoomSurvivorController );
+
+		ZoomKillerController zoomKillerController = gameObject.AddComponent<ZoomKillerController>();
+
+		zoomKillerController.playerController = this;
+
+		PlayerAgent.CheckForEnd();
+	}
+
+	public void RageHit()
+	{
+		StopCoroutine( "RageMode" );
+		ChangeState( (int)State.Monster );
+		DisplayMessage( "Killer" );
+		ChangeColor( new Quaternion( 1f, 0.9f, 0.9f, 1f ) );
 	}
 
 	public void MonsterReveal()
 	{
-		ChangeColor( new Quaternion( 0.75f, 0f, 0f, 1f ) );
+		StopCoroutine( "RageMode" );
+
+		RageController rageController = gameObject.GetComponent<RageController>();
+		
+		if( rageController )
+			Destroy( rageController );
+
+		ChangeState( (int)State.Monster );
+
+		ChangeColor( new Quaternion( 1f, 0.5f, 0.75f, 1f ) );
+		Stun();
+	}
+
+	public void SurvivorReveal()
+	{
+		ChangeColor( new Quaternion( 0f, 0.75f, 0f, 1f ) );
+		Stun();
+	}
+
+	public void SetFlashBulbTo( bool on )
+	{
+		if( flashBulb == null )
+			ChangeFlashBulb( 0 );
+		else
+			ChangeFlashBulb( ( on ? 1 : 0 ) );
 	}
 
 	public void SetFlashlightTo( bool on )
@@ -1056,6 +1466,131 @@ public class PlayerController : Photon.MonoBehaviour {
 			ChangeFlashlight( 0 );
 		else
 			ChangeFlashlight( ( on ? 1 : 0 ) );
+	}
+
+	public void StartGame()
+	{
+		FastBloom fastBloom = Camera.main.gameObject.GetComponent<FastBloom>();
+		
+		if( fastBloom )
+			fastBloom.enabled = true;
+		
+		ColorCorrectionCurves colorCorrectionCurves = Camera.main.gameObject.GetComponent<ColorCorrectionCurves>();
+		
+		if( colorCorrectionCurves )
+			colorCorrectionCurves.enabled = true;
+		
+		//js
+		DepthOfField34 depthOfField34 = Camera.main.gameObject.GetComponent<DepthOfField34>();
+		
+		//if( depthOfField34 )
+		//	depthOfField34.enabled = true;
+		
+		SSAOEffect ssaoEffect = Camera.main.gameObject.GetComponent<SSAOEffect>();
+		
+		if( ssaoEffect )
+			ssaoEffect.enabled = true;
+		
+		//js
+		Vignetting vignetting = Camera.main.GetComponent<Vignetting>();
+		
+		if( vignetting )
+			vignetting.enabled = true;
+		
+		ZoomSurvivorController zoomSurvivorController = gameObject.AddComponent<ZoomSurvivorController>();
+		
+		zoomSurvivorController.playerController = this;
+		
+		gameObject.AddComponent<NoiseController>();
+		
+		GameAgent.ChangeGameState( GameAgent.GameState.Game );
+		PlayerAgent.SetMonster();
+
+		photonView.RPC( "RPCStartGame", PhotonTargets.OthersBuffered );
+	}
+
+	public void EndGame()
+	{
+		StopCoroutine( "DoStun" );
+		StopCoroutine( "RageMode" );
+		
+		NegativeEffect negativeEffect = Camera.main.gameObject.GetComponent<NegativeEffect>();
+		
+		if( negativeEffect )
+			Destroy( negativeEffect );
+		
+		RemoveStunEffect();
+		
+		FastBloom fastBloom = Camera.main.gameObject.GetComponent<FastBloom>();
+		
+		if( fastBloom )
+			fastBloom.enabled = false;
+		
+		ColorCorrectionCurves colorCorrectionCurves = Camera.main.gameObject.GetComponent<ColorCorrectionCurves>();
+		
+		if( colorCorrectionCurves )
+			colorCorrectionCurves.enabled = false;
+		
+		//js
+		DepthOfField34 depthOfField34 = Camera.main.gameObject.GetComponent<DepthOfField34>();
+		
+		if( depthOfField34 )
+			depthOfField34.enabled = false;
+		
+		SSAOEffect ssaoEffect = Camera.main.gameObject.GetComponent<SSAOEffect>();
+		
+		if( ssaoEffect )
+			ssaoEffect.enabled = false;
+		
+		//js
+		Vignetting vignetting = Camera.main.GetComponent<Vignetting>();
+		
+		if( vignetting )
+			vignetting.enabled = false;
+		
+		RageController rageController = gameObject.GetComponent<RageController>();
+		
+		if( rageController )
+			Destroy( rageController );
+		
+		ZoomSurvivorController zoomSurvivorController = gameObject.GetComponent<ZoomSurvivorController>();
+		
+		if( zoomSurvivorController )
+			Destroy( zoomSurvivorController );
+		
+		ZoomKillerController zoomKillerController = gameObject.GetComponent<ZoomKillerController>();
+		
+		if( zoomKillerController )
+			Destroy( zoomKillerController );
+		
+		NoiseController noiseController = gameObject.GetComponent<NoiseController>();
+		
+		if( noiseController )
+			Destroy( noiseController );
+		
+		GameAgent.ChangeGameState( GameAgent.GameState.End );
+		
+		messageString = "";
+		
+		TurnOffQuads();
+
+		photonView.RPC( "RPCEndGame", PhotonTargets.OthersBuffered );
+	}
+
+	public void Stun()
+	{
+		photonView.RPC( "RPCStun", PhotonTargets.OthersBuffered );
+
+		StartCoroutine( "DoStun" );
+	}
+
+	public void TurnOffQuads()
+	{
+		if( rageQuad )
+			rageQuad.GetComponent<Renderer>().enabled = false;
+		
+		if( camQuad )
+			camQuad.GetComponent<Renderer>().enabled = false;
 	}
 
 	public void TeleportTo( Vector3 coordinate )

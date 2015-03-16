@@ -3,10 +3,12 @@
 --- !u!78 &1
 TagManager:
   tags:
-  - Door
+  - 
   - Key
   - Ghost
   - Key2
+  - Door
+  - Activatable
   - 
   Builtin Layer 0: Default
   Builtin Layer 1: TransparentFX

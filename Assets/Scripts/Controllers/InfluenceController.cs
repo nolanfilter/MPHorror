@@ -3,9 +3,10 @@ using System.Collections;
 
 public class InfluenceController : MonoBehaviour {
 
-	public float radius = 2f;
-	public float radiusZoom = 0.5f;
-	public float zoomDistance = 2.5f;
+	private float radius = 2f;
+	private float radiusZoom = 0.25f;
+	private float zoomDistance = 3f;
+	private float rageDistance = 0.5f;
 	public bool showDebugRay = false;
 
 	private PlayerController playerController = null;
@@ -25,7 +26,8 @@ public class InfluenceController : MonoBehaviour {
 
 	void FixedUpdate()
 	{
-		RaycastHit[] hits;
+		if( GameAgent.GetCurrentGameState() != GameAgent.GameState.Game )
+			return;
 
 		Ray ray;
 
@@ -33,11 +35,17 @@ public class InfluenceController : MonoBehaviour {
 
 		if( playerController.IsZoomedIn() ) 
 		{
-			distance = radiusZoom + transform.root.localScale.z + zoomDistance;
+			if( playerController.GetCurrentState() == PlayerController.State.Raging )
+				distance = radiusZoom + transform.root.localScale.z + rageDistance;
+			else
+				distance = radiusZoom + transform.root.localScale.z + zoomDistance;
 
 			ray = new Ray( transform.position + transform.forward * distance, transform.forward * -1f );
 
-			hits = Physics.SphereCastAll( ray, radiusZoom, distance );
+			RaycastHit[] hits = Physics.SphereCastAll( ray, radiusZoom, distance );
+
+			foreach( RaycastHit hit in hits )
+				EvaluateCollider( hit.collider );
 		}
 		else
 		{
@@ -45,14 +53,14 @@ public class InfluenceController : MonoBehaviour {
 
 			ray = new Ray( transform.position + Vector3.up * distance, Vector3.up * -1f );
 
-			hits = Physics.SphereCastAll( ray, radius, distance );
+			Collider[] colliders = Physics.OverlapSphere( transform.position, distance );
+
+			foreach( Collider collider in colliders )
+				EvaluateCollider( collider );
 		}
 
 		if( showDebugRay )
-			Debug.DrawRay( ray.origin, ray.direction * distance );
-
-		foreach( RaycastHit hit in hits )
-			EvaluateCollider( hit.collider );
+			Debug.DrawRay( ray.origin, ray.direction * distance, Color.magenta );
 	}
 
 	void OnTriggerEnter( Collider collider )
@@ -76,35 +84,61 @@ public class InfluenceController : MonoBehaviour {
 
 			if( playerController.IsZoomedIn() )
 			{
-				if( playerController.GetCurrentState() == PlayerController.State.Monster && ( otherPlayerController.GetCurrentState() == PlayerController.State.Normal || otherPlayerController.GetCurrentState() == PlayerController.State.None ) )
+				if( playerController.GetCurrentState() == PlayerController.State.Raging && otherPlayerController.GetCurrentState() != PlayerController.State.Dead && otherPlayerController.GetCurrentState() != PlayerController.State.Voyeur )
 				{
+					playerController.RageHit();
 					otherPlayerController.IncreaseFear();
-					playerController.MonsterReveal();
 				}
 
-				if( otherPlayerController.GetCurrentState() == PlayerController.State.Monster && ( playerController.GetCurrentState() == PlayerController.State.Normal || playerController.GetCurrentState() == PlayerController.State.None ) )
+				if( playerController.GetCurrentState() == PlayerController.State.Normal || playerController.GetCurrentState() == PlayerController.State.None )
 				{
-					otherPlayerController.MonsterReveal();
+					if( otherPlayerController.GetCurrentState() == PlayerController.State.Monster  )
+						otherPlayerController.MonsterReveal();
+					else if( otherPlayerController.GetCurrentState() == PlayerController.State.Normal || otherPlayerController.GetCurrentState() == PlayerController.State.None )
+						otherPlayerController.SurvivorReveal();
 				}
 			}
 		}
 		else if( collider.tag == "Key" || collider.tag == "Key2" )
 		{
-			PlayMakerFSM fsm = collider.GetComponent<PlayMakerFSM>();
-
-			if( fsm == null || playerController.GetCurrentState() == PlayerController.State.Monster || !playerController.IsZoomedIn() )
+			if( !playerController.IsZoomedIn() )
 				return;
 
-			fsm.SendEvent( "ObjectSeen" );
+			if( playerController.GetCurrentState() == PlayerController.State.Raging  )
+			{
+				playerController.MonsterReveal();
+				return;
+			}
+
+			PlayMakerFSM fsm = collider.GetComponent<PlayMakerFSM>();
+
+			if( fsm != null )
+				fsm.SendEvent( "ObjectSeen" );
 		}
 		else if( collider.tag == "Activatable" )
 		{
+			if( !playerController.IsZoomedIn() )
+				return;
+
+			if( playerController.GetCurrentState() == PlayerController.State.Raging  )
+			{
+				playerController.MonsterReveal();
+			}
+
+			PlayMakerFSM fsm = collider.GetComponent<PlayMakerFSM>();
+
+			if( fsm != null )
+				fsm.SendEvent( "ObjectSeen" );
+		}
+		else if( collider.tag == "Door" )
+		{
+			if( !playerController.IsOpeningDoor() )
+				return;
+
 			PlayMakerFSM fsm = collider.GetComponent<PlayMakerFSM>();
 			
-			if( fsm == null || !playerController.IsZoomedIn() )
-				return;
-			
-			fsm.SendEvent( "ObjectSeen" );
+			if( fsm != null )
+				fsm.SendEvent( "ObjectSeen" );
 		}
 	}
 }

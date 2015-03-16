@@ -6,9 +6,30 @@ public class PlayerAgent : MonoBehaviour {
 
 	private List<PlayerController> playerControllers;
 
+	public Shader stunShader;
+	public Shader monsterShader;
+	public Shader fastBloomShader;
+	public Shader blurShader;
+	public Shader rgbShader;
+	public Shader yuvShader;
+
+	public Texture grainTexture;
+	public Texture scratchTexture;
+
+	public AudioClip cameraCooldownClip;
+
 	public bool monsterize = true;
+	public bool monsterizeMaster = false;
+	public bool checkForEnd = true;
+
+	private bool isEnding = false;
+
+	private PlayerController client;
 
 	private int monsterID = -1;
+
+	public float waitTime = 25f;
+	public float endBuffer = 8f;
 
 	private static PlayerAgent mInstance = null;
 	public static PlayerAgent instance
@@ -32,13 +53,61 @@ public class PlayerAgent : MonoBehaviour {
 		playerControllers = new List<PlayerController>();
 	}
 
-	public static void RegisterPlayer( PlayerController playerController )
+	void Start()
 	{
-		if( instance )
-			instance.internalRegisterPlayer( playerController );
+		//turn off camera effects to start
+		//js
+		ColorCorrectionCurves colorCorrectionCurves = Camera.main.gameObject.GetComponent<ColorCorrectionCurves>();
+
+		if( colorCorrectionCurves )
+			colorCorrectionCurves.enabled = false;
+
+		//js
+		DepthOfField34 depthOfField34 = Camera.main.gameObject.GetComponent<DepthOfField34>();
+
+		if( depthOfField34 )
+			depthOfField34.enabled = false;
+
+		SSAOEffect ssaoEffect = Camera.main.gameObject.GetComponent<SSAOEffect>();
+	
+		if( ssaoEffect )
+			ssaoEffect.enabled = false;
+
+		//js
+		Vignetting vignetting = Camera.main.GetComponent<Vignetting>();
+
+		if( vignetting )
+			vignetting.enabled = false;
+
+		//add new effects
+		//js
+		FastBloom fastBloom = Camera.main.gameObject.AddComponent<FastBloom>();
+
+		fastBloom.enabled = false;
+		fastBloom.fastBloomShader = fastBloomShader;
+
+		//js
+		Blur blur = Camera.main.gameObject.AddComponent<Blur>();
+
+		blur.enabled = false;
+		blur.blurShader = blurShader;
+
+		NoiseEffect noiseEffect = Camera.main.gameObject.AddComponent<NoiseEffect>();
+
+		noiseEffect.enabled = false;
+		noiseEffect.grainTexture = grainTexture;
+		noiseEffect.scratchTexture = scratchTexture;
+		noiseEffect.shaderRGB = rgbShader;
+		noiseEffect.shaderYUV = yuvShader;
 	}
 
-	private void internalRegisterPlayer( PlayerController playerController )
+	public static void RegisterPlayer( PlayerController playerController, bool isClient )
+	{
+		if( instance )
+			instance.internalRegisterPlayer( playerController, isClient );
+	}
+
+	private void internalRegisterPlayer( PlayerController playerController, bool isClient )
 	{
 		if( !playerControllers.Contains( playerController ) )
 		{
@@ -52,8 +121,8 @@ public class PlayerAgent : MonoBehaviour {
 			playerControllers.Insert( index, playerController );
 		}
 
-		if( playerControllers.Count == 1 )
-			StartCoroutine( "WaitAndMonsterize" );
+		if( isClient )
+			client = playerController;
 	}
 
 	public static void UnregisterPlayer( PlayerController playerController )
@@ -61,11 +130,170 @@ public class PlayerAgent : MonoBehaviour {
 		if( instance )
 			instance.internalUnregisterPlayer( playerController );
 	}
-	
+
 	private void internalUnregisterPlayer( PlayerController playerController )
 	{
 		if( playerControllers.Contains( playerController ) )
 			playerControllers.Remove( playerController );
+
+		if( client == playerController )
+			client = null;
+
+		if( playerControllers.Count == 0 )
+			monsterID = -1;
+	}
+
+	public static void CheckForEnd()
+	{
+		if( instance )
+			instance.internalCheckForEnd();
+	}
+
+	private void internalCheckForEnd()
+	{
+		if( !checkForEnd )
+			return;
+
+		bool isOver = true;
+
+		PlayerController.State state;
+
+		for( int i = 0; i < playerControllers.Count; i++ )
+		{
+			state = playerControllers[i].GetCurrentState();
+
+			if( i != monsterID && state != PlayerController.State.Dead && state != PlayerController.State.Voyeur )
+				isOver = false;
+		}
+
+		if( isOver )
+			StartCoroutine( "WaitAndEnd" );
+	}
+
+	public static PlayerController.State GetClientState()
+	{
+		if( instance )
+			return instance.internalGetClientState();
+
+		return PlayerController.State.Invalid;
+	}
+
+	private PlayerController.State internalGetClientState()
+	{
+		if( client != null )
+		{
+			if( client == playerControllers[ monsterID ] )
+				return PlayerController.State.Monster;
+
+			return client.GetCurrentState();
+		}
+
+		return PlayerController.State.Invalid;
+	}
+
+	public static Shader GetMonsterShader()
+	{
+		if( instance )
+			return instance.monsterShader;
+
+		return null;
+	}
+
+	public static Shader GetStunShader()
+	{
+		if( instance )
+			return instance.stunShader;
+
+		return null;
+	}
+
+	//TODO move to AudioAgent
+	public static AudioClip GetCameraCooldownClip()
+	{
+		if( instance )
+			return instance.cameraCooldownClip;
+
+		return null;
+	}
+
+	public static void StartGame()
+	{
+		if( instance )
+			instance.internalStartGame();
+	}
+
+	private void internalStartGame()
+	{
+		if( playerControllers.Count > 0 )
+			playerControllers[ 0 ].StartGame();
+	}
+	
+	public static void EndGame()
+	{
+		if( instance )
+			instance.internalEndGame();
+	}
+
+	private void internalEndGame()
+	{
+		if( playerControllers.Count > 0 )
+			playerControllers[ 0 ].EndGame();
+	}
+
+	public static void TurnOffAllQuads()
+	{
+		if( instance )
+			instance.internalTurnOffAllQuads();
+	}
+
+	private void internalTurnOffAllQuads()
+	{
+		for( int i = 0; i < playerControllers.Count; i++ )
+			playerControllers[i].TurnOffQuads();
+	}
+
+	public static void SetMonster()
+	{
+		if( instance )
+			instance.internalSetMonster();
+	}
+
+	private void internalSetMonster()
+	{
+		if( monsterize )
+		{
+			if( monsterizeMaster )
+				StartCoroutine( "WaitAndMonsterizeMaster" );
+			else
+				StartCoroutine( "WaitAndMonsterizeRandom" );
+		}
+	}
+
+	public static float GetClosestPlayerPosition( Vector3 currentPosition )
+	{
+		if( instance )
+			return instance.internalGetClosestPlayerPosition( currentPosition );
+
+		return Mathf.Infinity;
+	}
+
+	private float internalGetClosestPlayerPosition( Vector3 currentPosition )
+	{
+		float distance;
+		float closestDistance = Mathf.Infinity;
+
+		for( int i = 0; i < playerControllers.Count; i++ )
+		{
+			if( playerControllers[i].transform.position != currentPosition && playerControllers[i].GetCurrentState() != PlayerController.State.Dead )
+			{
+				distance = Vector3.Distance( playerControllers[i].transform.position, currentPosition );
+
+				if( distance < closestDistance )
+					closestDistance = distance;
+			}
+		}
+
+		return closestDistance;
 	}
 
 	public void SetAllFlashlightsTo( bool on )
@@ -95,19 +323,41 @@ public class PlayerAgent : MonoBehaviour {
 				playerControllers[i].DisplayMessage( messageToDisplay );
 	}
 
-	private IEnumerator WaitAndMonsterize()
+	private IEnumerator WaitAndMonsterizeMaster()
 	{
-		if( !monsterize || playerControllers.Count == 0 )
+		monsterID = 0;
+		
+		yield return new WaitForSeconds( waitTime );
+
+		if( monsterID < playerControllers.Count )
+			playerControllers[ monsterID ].Monsterize();
+	}
+
+	private IEnumerator WaitAndMonsterizeRandom()
+	{
+		int seed = Utilities.HexToInt( PhotonNetwork.room.name[ PhotonNetwork.room.name.Length - 1 ] );
+		
+		Random.seed = seed;
+		
+		monsterID = Mathf.FloorToInt( Random.value * playerControllers.Count );
+
+		yield return new WaitForSeconds( waitTime );
+	
+		if( monsterID < playerControllers.Count )
+			playerControllers[ monsterID ].Monsterize();
+	}
+
+	private IEnumerator WaitAndEnd()
+	{
+		if( isEnding )
 			yield break;
 
-		yield return new WaitForSeconds( 25f );
+		isEnding = true;
 
-		int seed = Utilities.HexToInt( PhotonNetwork.room.name[ PhotonNetwork.room.name.Length - 1 ] );
+		yield return new WaitForSeconds( endBuffer );
 
-		Random.seed = seed;
+		EndGame();
 
-		monsterID = Mathf.FloorToInt( Random.value * playerControllers.Count );
-	
-		playerControllers[ monsterID ].Monsterize();
+		isEnding = false;
 	}
 }

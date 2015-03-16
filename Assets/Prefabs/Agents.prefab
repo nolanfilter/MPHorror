@@ -14,6 +14,7 @@ GameObject:
   - 114: {fileID: 11400006}
   - 114: {fileID: 11400008}
   - 114: {fileID: 11400010}
+  - 114: {fileID: 11429286}
   m_Layer: 0
   m_Name: Agents
   m_TagString: Untagged
@@ -60,10 +61,12 @@ MonoBehaviour:
   - {fileID: 100000, guid: 5eac146a239f94e6eb501b44506159d7, type: 2}
   - {fileID: 100000, guid: 603bf4564b4354f71a28c3127ceb2be8, type: 2}
   - {fileID: 0}
+  - {fileID: 100006, guid: 46f9a1e3b37dd49849b289812d5554ef, type: 2}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 100006, guid: 6729b56c082ca4604b1b732f4cf736cc, type: 2}
+  - {fileID: 100000, guid: d4836a03e6f864770818ec0fcd21f554, type: 2}
   menuControllerPrefab: {fileID: 100000, guid: e61fad5d754d44d9292f8ffb7199bf53, type: 2}
   darkQuadPrefab: {fileID: 0}
 --- !u!114 &11400004
@@ -77,18 +80,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2162a4370b1a64be1b680839b0dbfb1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selectionCursor: {fileID: 2800000, guid: 8d06bfa830515497d8c31288e04ecb65, type: 3}
   numPlayers: 4
   playerPrefab: {fileID: 100000, guid: afb5c7e6a90424178a67485185db9d18, type: 2}
   networkBackgroundPrefab: {fileID: 100000, guid: 31af3ae2df7ba4ae8b37d917edabeec6,
     type: 2}
   playerStartPositions:
-  - {x: 0, y: 0, z: 0}
-  - {x: -5, y: 0, z: 0}
-  - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: 0}
+  - {x: 3, y: 0, z: 2.79999995}
+  - {x: -8, y: 0, z: 7}
+  - {x: -1, y: 0, z: 22}
+  - {x: 7, y: 0, z: 21}
   playerStartRotations:
   - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: -90, z: 0}
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: 0}
 --- !u!114 &11400006
@@ -102,7 +106,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20a1718319e9744139e518ca9048dc41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  font: {fileID: 12800000, guid: 1811da8f98ed6472f82d52cac474a90f, type: 3}
+  notificationFont: {fileID: 12800000, guid: 1811da8f98ed6472f82d52cac474a90f, type: 3}
+  uIFont: {fileID: 12800000, guid: 4309e43381048469ca5e630099fd92f4, type: 3}
 --- !u!114 &11400008
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -114,7 +119,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f2d5e5aa453d454ca0318ff6185ebc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  stunShader: {fileID: 4800000, guid: 1c28e7fcf60ea438297ec9c18cbd0fa7, type: 3}
+  monsterShader: {fileID: 4800000, guid: a75f0ab14b53949168c63946615d7cad, type: 3}
+  fastBloomShader: {fileID: 4800000, guid: 68a00c837b82e4c6d92e7da765dc5f1d, type: 3}
+  blurShader: {fileID: 4800000, guid: f9d5fa183cd6b45eeb1491f74863cd91, type: 3}
+  rgbShader: {fileID: 4800000, guid: 5d7f4c401ae8946bcb0d6ff68a9e7466, type: 3}
+  yuvShader: {fileID: 4800000, guid: 0e447868506ba49f0a73235b8a8b647a, type: 3}
+  grainTexture: {fileID: 2800000, guid: ffa9c02760c2b4e8eb9814ec06c4b05b, type: 3}
+  scratchTexture: {fileID: 2800000, guid: 6205c27cc031f4e66b8ea90d1bfaa158, type: 3}
+  cameraCooldownClip: {fileID: 8300000, guid: 9a28f07e49fe741c0bc2741588021257, type: 3}
   monsterize: 1
+  monsterizeMaster: 0
+  checkForEnd: 0
+  waitTime: 2
+  endBuffer: 8
 --- !u!114 &11400010
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -124,6 +142,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 56c329b7de9824cc280c49f470e6ea99, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &11429286
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8dfd86cbe1633460f8f49c2b34b8181a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &100100000

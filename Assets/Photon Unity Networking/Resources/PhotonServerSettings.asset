@@ -22,24 +22,22 @@ MonoBehaviour:
   - Chat
   - DestroyRpc
   - InstantiateRpc
-  - Marco
   - OnAwakeRPC
   - PickupItemInit
-  - Polo
   - PunPickup
   - PunPickupSimple
   - PunRespawn
   - RequestForPickupTimes
-  - SetPosition
-  - TaggedPlayer
-  - ChangeColor
-  - ChangeState
-  - ChangeZoom
-  - ChangeFlashlight
-  - RPCChangeState
+  - rpc
+  - rpc_s
+  - RPCChangeColider
   - RPCChangeColor
+  - RPCChangeFlashBulb
   - RPCChangeFlashlight
+  - RPCChangeState
   - RPCChangeZoom
   - RPCDisplayMessage
-  - RPCChangeColider
+  - RPCEndGame
+  - RPCStartGame
+  - RPCStun
   DisableAutoOpenWizard: 0

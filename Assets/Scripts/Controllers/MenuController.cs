@@ -4,6 +4,8 @@ using System.Collections;
 public class MenuController : MonoBehaviour {
 
 	private InputController inputController;
+	private float buttonBuffer = 0.1f;
+	private float lastButtonTime;
 
 	void Awake()
 	{
@@ -14,6 +16,11 @@ public class MenuController : MonoBehaviour {
 			Debug.LogError( "No input controller on " + gameObject.name );
 			enabled = false;
 		}
+	}
+
+	void Start()
+	{
+		lastButtonTime = buttonBuffer * -1f;
 	}
 
 	void OnEnable()
@@ -32,14 +39,27 @@ public class MenuController : MonoBehaviour {
 
 	private void EvaluateButton( InputController.ButtonType button )
 	{
+		if( Time.time - lastButtonTime < buttonBuffer )
+			return;
+
 		switch( GameAgent.GetCurrentGameState() )
 		{
+			case GameAgent.GameState.Intro:
+			{
+				if( button == InputController.ButtonType.Start || button == InputController.ButtonType.A )
+				{
+					GameAgent.ChangeGameState( GameAgent.GameState.Start );
+					lastButtonTime = Time.time;
+				}
+			} break;
+
 			case GameAgent.GameState.Start:
 			{
 				if( button == InputController.ButtonType.Start || button == InputController.ButtonType.A )
 				{
 					NetworkAgent.SetSelectionIndex( 0 );
 					GameAgent.ChangeGameState( GameAgent.GameState.Lobby );
+					lastButtonTime = Time.time;
 				}
 			} break;
 
@@ -48,25 +68,64 @@ public class MenuController : MonoBehaviour {
 				if( button == InputController.ButtonType.Start || button == InputController.ButtonType.A )
 				{
 					NetworkAgent.ActivateSelected();
+					lastButtonTime = Time.time;
 				}
-				else if( button == InputController.ButtonType.Left )
+				else if( button == InputController.ButtonType.Left || button == InputController.ButtonType.RLeft )
 				{
-					NetworkAgent.SetSelectionIndex( 0 );
+					if( NetworkAgent.GetSelectionIndex() != 0 )
+					{
+						NetworkAgent.SetSelectionIndex( 0 );
+						lastButtonTime = Time.time;
+					}
 				}
-				else if( button == InputController.ButtonType.Right )
+				else if( button == InputController.ButtonType.Right || button == InputController.ButtonType.RRight )
 				{
 					if( NetworkAgent.GetSelectionIndex() == 0 )
+					{
 						NetworkAgent.SetSelectionIndex( 1 );
+						lastButtonTime = Time.time;
+					}
 				}
-				else if( button == InputController.ButtonType.Up )
+				else if( button == InputController.ButtonType.Up || button == InputController.ButtonType.RUp )
 				{
 					if( NetworkAgent.GetSelectionIndex() > 1 )
+					{
 						NetworkAgent.SetSelectionIndex( NetworkAgent.GetSelectionIndex() - 1 );
+						lastButtonTime = Time.time;
+					}
 				}
-				else if( button == InputController.ButtonType.Down )
+				else if( button == InputController.ButtonType.Down || button == InputController.ButtonType.RDown )
 				{
 					if( NetworkAgent.GetSelectionIndex() > 0 )
+					{
 						NetworkAgent.SetSelectionIndex( NetworkAgent.GetSelectionIndex() + 1 );
+						lastButtonTime = Time.time;
+					}
+				}
+			} break;
+
+			case GameAgent.GameState.Room:
+			{
+				if( button == InputController.ButtonType.Start || button == InputController.ButtonType.A )
+				{
+					if( NetworkAgent.GetIsHost() )
+					{
+						PlayerAgent.StartGame();
+						lastButtonTime = Time.time;
+					}
+				} else if( button == InputController.ButtonType.B )
+				{
+					NetworkAgent.LeaveRoom();
+					lastButtonTime = Time.time;
+				}
+			} break;
+
+			case GameAgent.GameState.End:
+			{
+				if( button == InputController.ButtonType.Start || button == InputController.ButtonType.A )
+				{
+					NetworkAgent.LeaveRoom();
+					lastButtonTime = Time.time;
 				}
 			} break;
 		}

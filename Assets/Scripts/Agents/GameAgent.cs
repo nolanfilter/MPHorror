@@ -15,7 +15,9 @@ public class GameAgent : MonoBehaviour {
 		Settings = 5,
 		Credits = 6,
 		Options = 7,
-		Invalid = 8,
+		Room = 8,
+		Intro = 9,
+		Invalid = 10,
 	}
 	private List<GameState> gameStateStack = new List<GameState>();
 
@@ -29,6 +31,9 @@ public class GameAgent : MonoBehaviour {
 	private GameObject darkQuad = null;
 
 	private bool isPendingChange = false;
+
+	private float resetTime;
+	private float resetDuration = 2f;
 
 	private static GameAgent mInstance = null;
 	public static GameAgent instance
@@ -52,8 +57,11 @@ public class GameAgent : MonoBehaviour {
 
 	void Start()
 	{
-		Screen.showCursor = false;
-		Screen.lockCursor = true;
+		if( !Application.isEditor )
+		{
+			Cursor.visible = false;
+			Screen.lockCursor = true;
+		}
 
 		Camera.main.gameObject.AddComponent<ScreenshotAgent>();
 
@@ -66,13 +74,46 @@ public class GameAgent : MonoBehaviour {
 		if( darkQuadPrefab )
 			darkQuad = Instantiate( darkQuadPrefab ) as GameObject; 
 
-		PushGameState( GameState.Start );
+		PushGameState( GameState.Intro );
 	}
 
 	void Update()
 	{
 		if( Input.GetKeyDown( KeyCode.Escape ) )
 			Application.Quit();
+
+		if( GetCurrentGameState() == GameState.Game )
+		{
+			if( Input.GetKeyDown( KeyCode.R ) )
+				resetTime = 0f;
+
+			if( Input.GetKey( KeyCode.R ) )
+				resetTime += Time.deltaTime;
+
+			if( resetTime > resetDuration )
+			{
+				resetTime = 0f;
+
+				NegativeEffect negativeEffect = Camera.main.gameObject.GetComponent<NegativeEffect>();
+				
+				if( negativeEffect )
+					Destroy( negativeEffect );
+				
+				StunController stunController = gameObject.GetComponent<StunController>();
+				
+				if( stunController )
+					Destroy( stunController );
+				
+				MotionBlur motionBlur = Camera.main.gameObject.GetComponent<MotionBlur>();
+				
+				if( motionBlur )
+					motionBlur.enabled = false;
+
+				PlayerAgent.TurnOffAllQuads();
+
+				NetworkAgent.LeaveRoom();
+			}
+		}
 	}
 
 	public static GameState GetCurrentGameState()
@@ -148,8 +189,11 @@ public class GameAgent : MonoBehaviour {
 
 		gameStateStack.RemoveAt( 0 ) ;
 
-		Destroy( gameStateObjectStack[0] );
-		gameStateObjectStack.RemoveAt( 0 );
+		if( gameStateObjectStack.Count > 0 )
+		{
+			Destroy( gameStateObjectStack[0] );
+			gameStateObjectStack.RemoveAt( 0 );
+		}
 
 		if( !isPendingChange )
 		{

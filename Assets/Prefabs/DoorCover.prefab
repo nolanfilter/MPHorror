@@ -12,6 +12,7 @@ GameObject:
   - 65: {fileID: 6500000}
   - 23: {fileID: 2300000}
   - 114: {fileID: 11400000}
+  - 82: {fileID: 8234050}
   m_Layer: 0
   m_Name: DoorCover
   m_TagString: Untagged
@@ -43,9 +44,9 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100000}
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: -1.62920685e-07}
-  m_LocalPosition: {x: -19.9993286, y: 1.01466966, z: 9.1852417}
-  m_LocalScale: {x: .310361743, y: 2.0384407, z: .0974808708}
+  m_LocalRotation: {x: 0, y: -1, z: 0, w: 0}
+  m_LocalPosition: {x: 14.4300003, y: .379999995, z: -1.34000003}
+  m_LocalScale: {x: .310362011, y: 3.10853004, z: .0877680033}
   m_Children:
   - {fileID: 400002}
   m_Father: {fileID: 0}
@@ -140,6 +141,64 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!82 &8234050
+AudioSource:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -154,252 +213,44 @@ MonoBehaviour:
   fsm:
     usedInTemplate: {fileID: 0}
     name: FSM
-    startState: Collision
+    startState: isOpen
     states:
-    - name: Collision
+    - name: DoorOpenFront
       description: 
       colorIndex: 0
       position:
         serializedVersion: 2
-        x: 66
-        y: 100
-        width: 100
+        x: 352.1875
+        y: 106.835938
+        width: 117
         height: 32
       isBreakpoint: 0
       isSequence: 0
       hideUnused: 0
       transitions:
       - fsmEvent:
-          name: collide
-          isSystemEvent: 0
+          name: FINISHED
+          isSystemEvent: 1
           isGlobal: 0
-        toState: KeyWait
+        toState: DoorCloseFront
         linkStyle: 0
         linkConstraint: 0
         colorIndex: 0
       actionData:
         actionNames:
-        - HutongGames.PlayMaker.Actions.SetBoolValue
-        - HutongGames.PlayMaker.Actions.TriggerEvent
-        customNames:
-        - 
-        - 
-        actionEnabled: 0101
-        actionIsOpen: 0001
-        actionStartIndex: 0000000003000000
-        actionHashCodes: 29b4727be0558823
-        unityObjectParams: []
-        fsmGameObjectParams:
-        - useVariable: 1
-          name: 
-          tooltip: 
-          showInInspector: 0
-          networkSync: 0
-          value: {fileID: 0}
-        fsmOwnerDefaultParams: []
-        animationCurveParams: []
-        functionCallParams: []
-        fsmTemplateControlParams: []
-        fsmEventTargetParams: []
-        fsmPropertyParams: []
-        layoutOptionParams: []
-        fsmStringParams:
-        - useVariable: 0
-          name: 
-          tooltip: 
-          showInInspector: 0
-          networkSync: 0
-          value: Player
-        fsmObjectParams: []
-        fsmVarParams: []
-        byteData: 000169734e65617200000000000000636f6c6c696465
-        arrayParamSizes: 
-        arrayParamTypes: []
-        customTypeSizes: 
-        customTypeNames: []
-        paramDataType: 11000000110000000100000007000000120000001700000013000000
-        paramName:
-        - boolVariable
-        - boolValue
-        - everyFrame
-        - trigger
-        - collideTag
-        - sendEvent
-        - storeCollider
-        paramDataPos: 00000000080000000a0000000b000000000000000f00000000000000
-        paramByteDataSize: 08000000020000000100000004000000000000000700000000000000
-    - name: KeyWait
-      description: 
-      colorIndex: 0
-      position:
-        serializedVersion: 2
-        x: 65
-        y: 150
-        width: 100
-        height: 48
-      isBreakpoint: 0
-      isSequence: 0
-      hideUnused: 0
-      transitions:
-      - fsmEvent:
-          name: pressKey
-          isSystemEvent: 0
-          isGlobal: 0
-        toState: isNear
-        linkStyle: 0
-        linkConstraint: 0
-        colorIndex: 0
-      - fsmEvent:
-          name: exit
-          isSystemEvent: 0
-          isGlobal: 0
-        toState: Collision
-        linkStyle: 0
-        linkConstraint: 0
-        colorIndex: 0
-      actionData:
-        actionNames:
-        - HutongGames.PlayMaker.Actions.SetBoolValue
-        - HutongGames.PlayMaker.Actions.TriggerEvent
-        - HutongGames.PlayMaker.Actions.GetKeyDown
-        customNames:
-        - 
-        - 
-        - 
-        actionEnabled: 010101
-        actionIsOpen: 010001
-        actionStartIndex: 000000000300000007000000
-        actionHashCodes: 29b4727be0558823437581ed
-        unityObjectParams: []
-        fsmGameObjectParams:
-        - useVariable: 1
-          name: 
-          tooltip: 
-          showInInspector: 0
-          networkSync: 0
-          value: {fileID: 0}
-        fsmOwnerDefaultParams: []
-        animationCurveParams: []
-        functionCallParams: []
-        fsmTemplateControlParams: []
-        fsmEventTargetParams: []
-        fsmPropertyParams: []
-        layoutOptionParams: []
-        fsmStringParams:
-        - useVariable: 0
-          name: 
-          tooltip: 
-          showInInspector: 0
-          networkSync: 0
-          value: Player
-        fsmObjectParams: []
-        fsmVarParams: []
-        byteData: 000169734e65617201000002000000657869746500000070726573734b65790001
-        arrayParamSizes: 
-        arrayParamTypes: []
-        customTypeSizes: 
-        customTypeNames: []
-        paramDataType: 11000000110000000100000007000000120000001700000013000000070000001700000011000000
-        paramName:
-        - boolVariable
-        - boolValue
-        - everyFrame
-        - trigger
-        - collideTag
-        - sendEvent
-        - storeCollider
-        - key
-        - sendEvent
-        - storeResult
-        paramDataPos: 00000000080000000a0000000b000000000000000f0000000000000013000000170000001f000000
-        paramByteDataSize: 08000000020000000100000004000000000000000400000000000000040000000800000002000000
-    - name: isNear
-      description: 
-      colorIndex: 0
-      position:
-        serializedVersion: 2
-        x: 61.9921875
-        y: 215
-        width: 100
-        height: 32
-      isBreakpoint: 0
-      isSequence: 0
-      hideUnused: 0
-      transitions:
-      - fsmEvent:
-          name: near
-          isSystemEvent: 0
-          isGlobal: 0
-        toState: isOpen
-        linkStyle: 0
-        linkConstraint: 0
-        colorIndex: 0
-      actionData:
-        actionNames:
-        - HutongGames.PlayMaker.Actions.BoolTest
-        customNames:
-        - 
-        actionEnabled: 01
-        actionIsOpen: 01
-        actionStartIndex: 00000000
-        actionHashCodes: 3334d172
-        unityObjectParams: []
-        fsmGameObjectParams: []
-        fsmOwnerDefaultParams: []
-        animationCurveParams: []
-        functionCallParams: []
-        fsmTemplateControlParams: []
-        fsmEventTargetParams: []
-        fsmPropertyParams: []
-        layoutOptionParams: []
-        fsmStringParams: []
-        fsmObjectParams: []
-        fsmVarParams: []
-        byteData: 000169734e6561726e65617200
-        arrayParamSizes: 
-        arrayParamTypes: []
-        customTypeSizes: 
-        customTypeNames: []
-        paramDataType: 11000000170000001700000001000000
-        paramName:
-        - boolVariable
-        - isTrue
-        - isFalse
-        - everyFrame
-        paramDataPos: 00000000080000000c0000000c000000
-        paramByteDataSize: 08000000040000000000000001000000
-    - name: DoorOpen
-      description: 
-      colorIndex: 0
-      position:
-        serializedVersion: 2
-        x: 259.1875
-        y: 116.835938
-        width: 100
-        height: 32
-      isBreakpoint: 0
-      isSequence: 0
-      hideUnused: 0
-      transitions:
-      - fsmEvent:
-          name: wait
-          isSystemEvent: 0
-          isGlobal: 0
-        toState: Collision
-        linkStyle: 0
-        linkConstraint: 0
-        colorIndex: 0
-      actionData:
-        actionNames:
+        - HutongGames.PlayMaker.Actions.iTweenRotateBy
         - HutongGames.PlayMaker.Actions.iTweenRotateTo
-        - HutongGames.PlayMaker.Actions.SetBoolValue
+        - HutongGames.PlayMaker.Actions.AudioPlay
+        - HutongGames.PlayMaker.Actions.Wait
         customNames:
         - 
         - 
-        actionEnabled: 0101
-        actionIsOpen: 0101
-        actionStartIndex: 000000000f000000
-        actionHashCodes: 8f30575729b4727b
+        - 
+        - 
+        actionEnabled: 01000101
+        actionIsOpen: 00000101
+        actionStartIndex: 000000000e0000001d00000021000000
+        actionHashCodes: 50f3a9a58f305757ef9258de3708ec1a
         unityObjectParams: []
         fsmGameObjectParams:
         - useVariable: 1
@@ -409,6 +260,22 @@ MonoBehaviour:
           networkSync: 0
           value: {fileID: 0}
         fsmOwnerDefaultParams:
+        - ownerOption: 0
+          gameObject:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: {fileID: 0}
+        - ownerOption: 0
+          gameObject:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: {fileID: 0}
         - ownerOption: 0
           gameObject:
             useVariable: 0
@@ -430,15 +297,42 @@ MonoBehaviour:
           showInInspector: 0
           networkSync: 0
           value: 
-        fsmObjectParams: []
+        - useVariable: 1
+          name: 
+          tooltip: 
+          showInInspector: 0
+          networkSync: 0
+          value: 
+        fsmObjectParams:
+        - useVariable: 0
+          name: 
+          tooltip: 
+          showInInspector: 0
+          networkSync: 0
+          typeName: UnityEngine.AudioClip
+          value: {fileID: 8300000, guid: 4fa9ad8743c19434f985e969c8ba73d7, type: 3}
         fsmVarParams: []
-        byteData: 000000000000074300000000000000a04000000000000000000000010e000000000000000100000077616974000001000100000169734f70656e010000
+        byteData: 00000000000080be00000000000000404000000000000000000000010e0000000000000000000000000001000100000000000000b4c200000000000000404000000000000000000000010e00000000000000010000000000010001009a99193f000000a0400046494e495348454401
         arrayParamSizes: 
         arrayParamTypes: []
         customTypeSizes: 
         customTypeNames: []
-        paramDataType: 1400000012000000130000001c0000000f0000000f0000000f0000000700000007000000070000001700000017000000110000001100000011000000110000001100000001000000
+        paramDataType: 14000000120000001c0000000f0000000f0000000f00000007000000070000000700000017000000170000001100000011000000110000001400000012000000130000001c0000000f0000000f0000000f0000000700000007000000070000001700000017000000110000001100000011000000140000000f00000018000000170000000f0000001700000001000000
         paramName:
+        - gameObject
+        - id
+        - vector
+        - time
+        - delay
+        - speed
+        - easeType
+        - loopType
+        - space
+        - startEvent
+        - finishEvent
+        - realTime
+        - stopOnExit
+        - loopDontFinish
         - gameObject
         - id
         - transformRotation
@@ -454,20 +348,24 @@ MonoBehaviour:
         - realTime
         - stopOnExit
         - loopDontFinish
-        - boolVariable
-        - boolValue
-        - everyFrame
-        paramDataPos: 000000000000000000000000000000000d00000012000000170000001c000000200000002400000028000000280000002c0000002e00000030000000320000003a0000003c000000
-        paramByteDataSize: 0000000000000000000000000d0000000500000005000000050000000400000004000000040000000000000004000000020000000200000002000000080000000200000001000000
+        - gameObject
+        - volume
+        - oneShotClip
+        - finishedEvent
+        - time
+        - finishEvent
+        - realTime
+        paramDataPos: 0000000000000000000000000d00000012000000170000001c00000020000000240000002800000028000000280000002a0000002c0000000100000001000000000000002e0000003b00000040000000450000004a0000004e00000052000000560000005600000056000000580000005a000000020000005c000000000000006100000061000000660000006e000000
+        paramByteDataSize: 00000000000000000d00000005000000050000000500000004000000040000000400000000000000000000000200000002000000020000000000000000000000000000000d000000050000000500000005000000040000000400000004000000000000000000000002000000020000000200000000000000050000000000000000000000050000000800000001000000
     - name: isOpen
       description: 
       colorIndex: 0
       position:
         serializedVersion: 2
-        x: 60
-        y: 261
+        x: 53
+        y: 167
         width: 100
-        height: 48
+        height: 32
       isBreakpoint: 0
       isSequence: 0
       hideUnused: 0
@@ -476,15 +374,7 @@ MonoBehaviour:
           name: doorOpen
           isSystemEvent: 0
           isGlobal: 0
-        toState: DoorOpen
-        linkStyle: 0
-        linkConstraint: 0
-        colorIndex: 0
-      - fsmEvent:
-          name: doorClose
-          isSystemEvent: 0
-          isGlobal: 0
-        toState: DoorClose
+        toState: Check sides
         linkStyle: 0
         linkConstraint: 0
         colorIndex: 0
@@ -509,7 +399,7 @@ MonoBehaviour:
         fsmStringParams: []
         fsmObjectParams: []
         fsmVarParams: []
-        byteData: 000169734f70656e646f6f72436c6f7365646f6f724f70656e00
+        byteData: 000169734f70656e5f446f6f7231646f6f724f70656e01
         arrayParamSizes: 
         arrayParamTypes: []
         customTypeSizes: 
@@ -520,40 +410,46 @@ MonoBehaviour:
         - isTrue
         - isFalse
         - everyFrame
-        paramDataPos: 00000000080000001100000019000000
-        paramByteDataSize: 08000000090000000800000001000000
-    - name: DoorClose
+        paramDataPos: 000000000e0000001600000016000000
+        paramByteDataSize: 0e000000080000000000000001000000
+    - name: DoorCloseFront
       description: 
       colorIndex: 0
       position:
         serializedVersion: 2
-        x: 257.117188
-        y: 170.023438
-        width: 100
+        x: 350.117188
+        y: 168.023438
+        width: 119
         height: 32
       isBreakpoint: 0
       isSequence: 0
       hideUnused: 0
       transitions:
       - fsmEvent:
-          name: wait
-          isSystemEvent: 0
+          name: FINISHED
+          isSystemEvent: 1
           isGlobal: 0
-        toState: Collision
+        toState: isOpen
         linkStyle: 0
         linkConstraint: 0
         colorIndex: 0
       actionData:
         actionNames:
         - HutongGames.PlayMaker.Actions.iTweenRotateTo
+        - HutongGames.PlayMaker.Actions.iTweenRotateBy
         - HutongGames.PlayMaker.Actions.SetBoolValue
+        - HutongGames.PlayMaker.Actions.AudioPlay
+        - HutongGames.PlayMaker.Actions.ActivateGameObject
         customNames:
         - 
         - 
-        actionEnabled: 0101
-        actionIsOpen: 0101
-        actionStartIndex: 000000000f000000
-        actionHashCodes: 8f30575729b4727b
+        - 
+        - 
+        - 
+        actionEnabled: 0001010100
+        actionIsOpen: 0001010101
+        actionStartIndex: 000000000f0000001d0000002000000024000000
+        actionHashCodes: 8f30575750f3a9a529b4727bef9258deb4797e4a
         unityObjectParams: []
         fsmGameObjectParams:
         - useVariable: 1
@@ -563,6 +459,397 @@ MonoBehaviour:
           networkSync: 0
           value: {fileID: 0}
         fsmOwnerDefaultParams:
+        - ownerOption: 0
+          gameObject:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: {fileID: 0}
+        - ownerOption: 0
+          gameObject:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: {fileID: 0}
+        - ownerOption: 0
+          gameObject:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: {fileID: 0}
+        - ownerOption: 1
+          gameObject:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: {fileID: 0}
+        animationCurveParams: []
+        functionCallParams: []
+        fsmTemplateControlParams: []
+        fsmEventTargetParams: []
+        fsmPropertyParams: []
+        layoutOptionParams: []
+        fsmStringParams:
+        - useVariable: 1
+          name: 
+          tooltip: 
+          showInInspector: 0
+          networkSync: 0
+          value: 
+        - useVariable: 1
+          name: 
+          tooltip: 
+          showInInspector: 0
+          networkSync: 0
+          value: 
+        fsmObjectParams:
+        - useVariable: 0
+          name: 
+          tooltip: 
+          showInInspector: 0
+          networkSync: 0
+          typeName: UnityEngine.AudioClip
+          value: {fileID: 8300000, guid: 05727a02ead6a440591d1cefb3d0a509, type: 3}
+        fsmVarParams: []
+        byteData: 000000000000344300000000000000803f00000000000000000000010e000000000000000100000046494e4953484544000001000100000000000000803e00000000000000003f00000000000000000000010e0000000000000000000000000001000100000169734f70656e5f446f6f72310000000000404000010001000000
+        arrayParamSizes: 
+        arrayParamTypes: []
+        customTypeSizes: 
+        customTypeNames: []
+        paramDataType: 1400000012000000130000001c0000000f0000000f0000000f000000070000000700000007000000170000001700000011000000110000001100000014000000120000001c0000000f0000000f0000000f0000000700000007000000070000001700000017000000110000001100000011000000110000001100000001000000140000000f00000018000000170000001400000011000000110000000100000001000000
+        paramName:
+        - gameObject
+        - id
+        - transformRotation
+        - vectorRotation
+        - time
+        - delay
+        - speed
+        - easeType
+        - loopType
+        - space
+        - startEvent
+        - finishEvent
+        - realTime
+        - stopOnExit
+        - loopDontFinish
+        - gameObject
+        - id
+        - vector
+        - time
+        - delay
+        - speed
+        - easeType
+        - loopType
+        - space
+        - startEvent
+        - finishEvent
+        - realTime
+        - stopOnExit
+        - loopDontFinish
+        - boolVariable
+        - boolValue
+        - everyFrame
+        - gameObject
+        - volume
+        - oneShotClip
+        - finishedEvent
+        - gameObject
+        - activate
+        - recursive
+        - resetOnExit
+        - everyFrame
+        paramDataPos: 000000000000000000000000000000000d00000012000000170000001c0000002000000024000000280000002800000030000000320000003400000001000000010000003600000043000000480000004d00000052000000560000005a0000005e0000005e0000005e00000060000000620000006400000072000000740000000200000075000000000000007a000000030000007a0000007c0000007e0000007f000000
+        paramByteDataSize: 0000000000000000000000000d000000050000000500000005000000040000000400000004000000000000000800000002000000020000000200000000000000000000000d00000005000000050000000500000004000000040000000400000000000000000000000200000002000000020000000e0000000200000001000000000000000500000000000000000000000000000002000000020000000100000001000000
+    - name: Check sides
+      description: 
+      colorIndex: 0
+      position:
+        serializedVersion: 2
+        x: 193
+        y: 151.992188
+        width: 100
+        height: 48
+      isBreakpoint: 0
+      isSequence: 0
+      hideUnused: 0
+      transitions:
+      - fsmEvent:
+          name: front
+          isSystemEvent: 0
+          isGlobal: 0
+        toState: DoorOpenFront
+        linkStyle: 0
+        linkConstraint: 0
+        colorIndex: 0
+      - fsmEvent:
+          name: back
+          isSystemEvent: 0
+          isGlobal: 0
+        toState: DoorOpenBack
+        linkStyle: 0
+        linkConstraint: 0
+        colorIndex: 0
+      actionData:
+        actionNames:
+        - HutongGames.PlayMaker.Actions.BoolTest
+        customNames:
+        - 
+        actionEnabled: 01
+        actionIsOpen: 01
+        actionStartIndex: 00000000
+        actionHashCodes: 3334d172
+        unityObjectParams: []
+        fsmGameObjectParams: []
+        fsmOwnerDefaultParams: []
+        animationCurveParams: []
+        functionCallParams: []
+        fsmTemplateControlParams: []
+        fsmEventTargetParams: []
+        fsmPropertyParams: []
+        layoutOptionParams: []
+        fsmStringParams: []
+        fsmObjectParams: []
+        fsmVarParams: []
+        byteData: 0001446f6f72315f617446726f6e7466726f6e746261636b01
+        arrayParamSizes: 
+        arrayParamTypes: []
+        customTypeSizes: 
+        customTypeNames: []
+        paramDataType: 11000000170000001700000001000000
+        paramName:
+        - boolVariable
+        - isTrue
+        - isFalse
+        - everyFrame
+        paramDataPos: 000000000f0000001400000018000000
+        paramByteDataSize: 0f000000050000000400000001000000
+    - name: DoorCloseBack
+      description: 
+      colorIndex: 0
+      position:
+        serializedVersion: 2
+        x: 348
+        y: 293.6875
+        width: 115
+        height: 32
+      isBreakpoint: 0
+      isSequence: 0
+      hideUnused: 0
+      transitions:
+      - fsmEvent:
+          name: FINISHED
+          isSystemEvent: 1
+          isGlobal: 0
+        toState: isOpen
+        linkStyle: 0
+        linkConstraint: 0
+        colorIndex: 0
+      actionData:
+        actionNames:
+        - HutongGames.PlayMaker.Actions.iTweenRotateTo
+        - HutongGames.PlayMaker.Actions.iTweenRotateBy
+        - HutongGames.PlayMaker.Actions.SetBoolValue
+        - HutongGames.PlayMaker.Actions.AudioPlay
+        - HutongGames.PlayMaker.Actions.ActivateGameObject
+        customNames:
+        - 
+        - 
+        - 
+        - 
+        - 
+        actionEnabled: 0001010100
+        actionIsOpen: 0001010101
+        actionStartIndex: 000000000f0000001d0000002000000024000000
+        actionHashCodes: 8f30575750f3a9a529b4727bef9258deb4797e4a
+        unityObjectParams: []
+        fsmGameObjectParams:
+        - useVariable: 1
+          name: 
+          tooltip: 
+          showInInspector: 0
+          networkSync: 0
+          value: {fileID: 0}
+        fsmOwnerDefaultParams:
+        - ownerOption: 0
+          gameObject:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: {fileID: 0}
+        - ownerOption: 0
+          gameObject:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: {fileID: 0}
+        - ownerOption: 0
+          gameObject:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: {fileID: 0}
+        - ownerOption: 1
+          gameObject:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: {fileID: 0}
+        animationCurveParams: []
+        functionCallParams: []
+        fsmTemplateControlParams: []
+        fsmEventTargetParams: []
+        fsmPropertyParams: []
+        layoutOptionParams: []
+        fsmStringParams:
+        - useVariable: 1
+          name: 
+          tooltip: 
+          showInInspector: 0
+          networkSync: 0
+          value: 
+        - useVariable: 1
+          name: 
+          tooltip: 
+          showInInspector: 0
+          networkSync: 0
+          value: 
+        fsmObjectParams:
+        - useVariable: 0
+          name: 
+          tooltip: 
+          showInInspector: 0
+          networkSync: 0
+          typeName: UnityEngine.AudioClip
+          value: {fileID: 8300000, guid: 05727a02ead6a440591d1cefb3d0a509, type: 3}
+        fsmVarParams: []
+        byteData: 000000000000344300000000000000803f00000000000000000000010e000000000000000100000046494e495348454400000100010000000000000080be00000000000000003f00000000000000000000010e0000000000000000000000000001000100000169734f70656e5f446f6f72310000000000404000010001000000
+        arrayParamSizes: 
+        arrayParamTypes: []
+        customTypeSizes: 
+        customTypeNames: []
+        paramDataType: 1400000012000000130000001c0000000f0000000f0000000f000000070000000700000007000000170000001700000011000000110000001100000014000000120000001c0000000f0000000f0000000f0000000700000007000000070000001700000017000000110000001100000011000000110000001100000001000000140000000f00000018000000170000001400000011000000110000000100000001000000
+        paramName:
+        - gameObject
+        - id
+        - transformRotation
+        - vectorRotation
+        - time
+        - delay
+        - speed
+        - easeType
+        - loopType
+        - space
+        - startEvent
+        - finishEvent
+        - realTime
+        - stopOnExit
+        - loopDontFinish
+        - gameObject
+        - id
+        - vector
+        - time
+        - delay
+        - speed
+        - easeType
+        - loopType
+        - space
+        - startEvent
+        - finishEvent
+        - realTime
+        - stopOnExit
+        - loopDontFinish
+        - boolVariable
+        - boolValue
+        - everyFrame
+        - gameObject
+        - volume
+        - oneShotClip
+        - finishedEvent
+        - gameObject
+        - activate
+        - recursive
+        - resetOnExit
+        - everyFrame
+        paramDataPos: 000000000000000000000000000000000d00000012000000170000001c0000002000000024000000280000002800000030000000320000003400000001000000010000003600000043000000480000004d00000052000000560000005a0000005e0000005e0000005e00000060000000620000006400000072000000740000000200000075000000000000007a000000030000007a0000007c0000007e0000007f000000
+        paramByteDataSize: 0000000000000000000000000d000000050000000500000005000000040000000400000004000000000000000800000002000000020000000200000000000000000000000d00000005000000050000000500000004000000040000000400000000000000000000000200000002000000020000000e0000000200000001000000000000000500000000000000000000000000000002000000020000000100000001000000
+    - name: DoorOpenBack
+      description: 
+      colorIndex: 0
+      position:
+        serializedVersion: 2
+        x: 350.070312
+        y: 232.5
+        width: 113
+        height: 32
+      isBreakpoint: 0
+      isSequence: 0
+      hideUnused: 0
+      transitions:
+      - fsmEvent:
+          name: FINISHED
+          isSystemEvent: 1
+          isGlobal: 0
+        toState: DoorCloseBack
+        linkStyle: 0
+        linkConstraint: 0
+        colorIndex: 0
+      actionData:
+        actionNames:
+        - HutongGames.PlayMaker.Actions.iTweenRotateBy
+        - HutongGames.PlayMaker.Actions.iTweenRotateTo
+        - HutongGames.PlayMaker.Actions.AudioPlay
+        - HutongGames.PlayMaker.Actions.Wait
+        customNames:
+        - 
+        - 
+        - 
+        - 
+        actionEnabled: 01000101
+        actionIsOpen: 01000101
+        actionStartIndex: 000000000e0000001d00000021000000
+        actionHashCodes: 50f3a9a58f305757ef9258de3708ec1a
+        unityObjectParams: []
+        fsmGameObjectParams:
+        - useVariable: 1
+          name: 
+          tooltip: 
+          showInInspector: 0
+          networkSync: 0
+          value: {fileID: 0}
+        fsmOwnerDefaultParams:
+        - ownerOption: 0
+          gameObject:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: {fileID: 0}
+        - ownerOption: 0
+          gameObject:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: {fileID: 0}
         - ownerOption: 0
           gameObject:
             useVariable: 0
@@ -584,15 +871,42 @@ MonoBehaviour:
           showInInspector: 0
           networkSync: 0
           value: 
-        fsmObjectParams: []
+        - useVariable: 1
+          name: 
+          tooltip: 
+          showInInspector: 0
+          networkSync: 0
+          value: 
+        fsmObjectParams:
+        - useVariable: 0
+          name: 
+          tooltip: 
+          showInInspector: 0
+          networkSync: 0
+          typeName: UnityEngine.AudioClip
+          value: {fileID: 8300000, guid: 4fa9ad8743c19434f985e969c8ba73d7, type: 3}
         fsmVarParams: []
-        byteData: 000000000000000000000000000000803f00000000000000000000010e000000000000000100000077616974000001000100000169734f70656e000000
+        byteData: 000000000000803e00000000000000404000000000000000000000010e0000000000000000000000000001000100000000000000b4c200000000000000404000000000000000000000010e00000000000000010000000000010001009a99193f000000a0400046494e495348454401
         arrayParamSizes: 
         arrayParamTypes: []
         customTypeSizes: 
         customTypeNames: []
-        paramDataType: 1400000012000000130000001c0000000f0000000f0000000f0000000700000007000000070000001700000017000000110000001100000011000000110000001100000001000000
+        paramDataType: 14000000120000001c0000000f0000000f0000000f00000007000000070000000700000017000000170000001100000011000000110000001400000012000000130000001c0000000f0000000f0000000f0000000700000007000000070000001700000017000000110000001100000011000000140000000f00000018000000170000000f0000001700000001000000
         paramName:
+        - gameObject
+        - id
+        - vector
+        - time
+        - delay
+        - speed
+        - easeType
+        - loopType
+        - space
+        - startEvent
+        - finishEvent
+        - realTime
+        - stopOnExit
+        - loopDontFinish
         - gameObject
         - id
         - transformRotation
@@ -608,13 +922,32 @@ MonoBehaviour:
         - realTime
         - stopOnExit
         - loopDontFinish
-        - boolVariable
-        - boolValue
-        - everyFrame
-        paramDataPos: 000000000000000000000000000000000d00000012000000170000001c000000200000002400000028000000280000002c0000002e00000030000000320000003a0000003c000000
-        paramByteDataSize: 0000000000000000000000000d0000000500000005000000050000000400000004000000040000000000000004000000020000000200000002000000080000000200000001000000
+        - gameObject
+        - volume
+        - oneShotClip
+        - finishedEvent
+        - time
+        - finishEvent
+        - realTime
+        paramDataPos: 0000000000000000000000000d00000012000000170000001c00000020000000240000002800000028000000280000002a0000002c0000000100000001000000000000002e0000003b00000040000000450000004a0000004e00000052000000560000005600000056000000580000005a000000020000005c000000000000006100000061000000660000006e000000
+        paramByteDataSize: 00000000000000000d00000005000000050000000500000004000000040000000400000000000000000000000200000002000000020000000000000000000000000000000d000000050000000500000005000000040000000400000004000000000000000000000002000000020000000200000000000000050000000000000000000000050000000800000001000000
     events:
+    - name: FINISHED
+      isSystemEvent: 1
+      isGlobal: 0
+    - name: ObjectSeen
+      isSystemEvent: 0
+      isGlobal: 0
+    - name: back
+      isSystemEvent: 0
+      isGlobal: 0
     - name: collide
+      isSystemEvent: 0
+      isGlobal: 0
+    - name: doHaveKey
+      isSystemEvent: 0
+      isGlobal: 0
+    - name: dontHaveKey
       isSystemEvent: 0
       isGlobal: 0
     - name: doorClose
@@ -624,6 +957,9 @@ MonoBehaviour:
       isSystemEvent: 0
       isGlobal: 0
     - name: exit
+      isSystemEvent: 0
+      isGlobal: 0
+    - name: front
       isSystemEvent: 0
       isGlobal: 0
     - name: near

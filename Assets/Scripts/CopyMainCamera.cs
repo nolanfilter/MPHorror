@@ -5,7 +5,7 @@ public class CopyMainCamera : MonoBehaviour {
 
 	void Awake()
 	{
-		if( camera == null )
+		if( GetComponent<Camera>() == null )
 			enabled = false;
 	}
 
@@ -15,6 +15,6 @@ public class CopyMainCamera : MonoBehaviour {
 		transform.position = Camera.main.transform.position;
 		transform.rotation = Camera.main.transform.rotation;
 
-		camera.fieldOfView = Camera.main.fieldOfView;
+		GetComponent<Camera>().fieldOfView = Camera.main.fieldOfView;
 	}
 }
