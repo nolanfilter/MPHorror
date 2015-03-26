@@ -1,5 +1,6 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class PlayerController : Photon.MonoBehaviour {
 
@@ -130,8 +131,27 @@ public class PlayerController : Photon.MonoBehaviour {
 	private float shoulderOffset = 0.325f;
 	private float angleVelocity = 0.0f;
 	private bool snap = false;
-	private float distance = 0.75f;
+	private float distance = 1f;
 
+	private struct JoystickValue
+	{
+		public Vector2 xy { get; private set; }
+		public float timeStamp { get; private set; }
+
+		public JoystickValue( Vector2 newXY, float newTimeStamp )
+		{
+			xy = newXY;
+			timeStamp = newTimeStamp;
+		}
+	}
+
+	private List<JoystickValue> joystickValues;
+	private float flickThreshold = 0.75f;
+	private float flickMinDelta = 0.5f;
+	private float flickWindow = 0.1f;
+
+	private float jumpDistance = 2f;
+	
 	void Awake()
 	{
 		inputController = GetComponent<InputController>();
@@ -197,6 +217,8 @@ public class PlayerController : Photon.MonoBehaviour {
 			for( int i = 0; i < modelRenderers.Length; i++ )
 				modelRenderers[i].material.color = color;
 		}
+
+		joystickValues = new List<JoystickValue>();
 	}
 	
 	void Start()
@@ -424,7 +446,44 @@ public class PlayerController : Photon.MonoBehaviour {
 		Vector3 right = new Vector3( forward.z, 0, -forward.x );
 
 		if( photonView.isMine )
-			movementVector = inputController.getRawAxes();
+		{
+			//movementVector = inputController.getRawAxes();
+
+			joystickValues.Insert( 0, new JoystickValue( inputController.getRawAxes(), Time.time ) );
+			
+			float timeDifference;
+			int index = joystickValues.Count - 1;
+			
+			do
+			{
+				timeDifference = joystickValues[0].timeStamp - joystickValues[ index ].timeStamp;
+				
+				//Debug.Log( timeDifference );
+				
+				if( timeDifference > flickWindow )
+					joystickValues.RemoveAt( index );
+				
+				index--;
+				
+			} while( index > 0 && timeDifference > flickWindow );
+			
+			if( joystickValues.Count > 0 && joystickValues[0].xy.magnitude > flickThreshold && ( joystickValues[0].xy.magnitude - joystickValues[ joystickValues.Count - 1 ].xy.magnitude > flickMinDelta ) )
+			{
+				movementVector = joystickValues[0].xy;
+				joystickValues.Clear();
+			}
+			else
+			{
+				movementVector = Vector3.zero;
+			}
+
+			/*
+			Debug.Log( "Joystick Values" );
+
+			for( int i = 0; i < joystickValues.Count; i++ )
+				Debug.Log( joystickValues[i].timeStamp );
+			*/
+		}
 
 		movingBack = ( movementVector.y < -0.2f );
 		
@@ -437,20 +496,21 @@ public class PlayerController : Photon.MonoBehaviour {
 		if (isMoving != wasMoving )
 			lockCameraTimer = 0.0f;
 
-		if( targetDirection != Vector3.zero )
-		{
-			if( moveSpeed < walkSpeed * 0.9f )
-			{
+		//if( targetDirection != Vector3.zero )
+		//{
+			//if( moveSpeed < walkSpeed * 0.9f )
+			//{
 				moveDirection = targetDirection.normalized;
-			}
-			else
-			{
-				moveDirection = Vector3.RotateTowards(moveDirection, targetDirection, rotateSpeed * Mathf.Deg2Rad * Time.deltaTime, 1000);
+			//}
+			//else
+			//{
+				//moveDirection = Vector3.RotateTowards(moveDirection, targetDirection, rotateSpeed * Mathf.Deg2Rad * Time.deltaTime, 1000);
 				
-				moveDirection = moveDirection.normalized;
-			}
-		}
+				//moveDirection = moveDirection.normalized;
+			//}
+		//}
 
+		/*
 		float curSmooth = speedSmoothing * Time.deltaTime;
 		float targetSpeed = Mathf.Min( targetDirection.magnitude, 1.0f );
 
@@ -463,8 +523,10 @@ public class PlayerController : Photon.MonoBehaviour {
 		
 		if( moveSpeed < walkSpeed * 0.3f )
 			walkTimeStart = Time.time;
+		*/
 
-		Vector3 movement = moveDirection * moveSpeed * Time.deltaTime;
+		//Vector3 movement = moveDirection * moveSpeed * Time.deltaTime;
+		Vector3 movement = moveDirection * jumpDistance;
 
 		if( currentState != State.Raging )
 			characterController.Move( movement );
@@ -481,7 +543,12 @@ public class PlayerController : Photon.MonoBehaviour {
 		}
 		else
 		{
-			transform.rotation = Quaternion.LookRotation( moveDirection );
+			Vector3 axes = inputController.getRawAxes();
+
+			axes = axes.x * right + axes.y * forward;
+
+			if( axes != Vector3.zero )
+				transform.rotation = Quaternion.LookRotation( axes );
 
 			if( rageQuad )
 				rageQuad.GetComponent<Renderer>().enabled = false;
@@ -495,6 +562,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	
 	private void SyncedMovement()
 	{
+		/*
 		syncTime += Time.deltaTime;
 		
 		float lerp = syncTime / syncDelay;
@@ -518,6 +586,10 @@ public class PlayerController : Photon.MonoBehaviour {
 			transform.rotation = syncEndRotation;
 			syncStartRotation = transform.rotation;
 		}
+		*/
+
+		transform.position = syncEndPosition;
+		transform.rotation = syncEndRotation;
 	}
 
 	private void SnapCamera()
@@ -619,7 +691,9 @@ public class PlayerController : Photon.MonoBehaviour {
 			float currentHeight = transform.position.y + centerOffset.y;
 			
 			Quaternion currentRotation = Quaternion.Euler(0, currentAngle, 0);
-			
+
+			Vector3 oldCameraPosition = cameraTransform.position;
+
 			cameraTransform.position = targetCenter;
 			cameraTransform.position += currentRotation * Vector3.back * distance;
 			
@@ -628,7 +702,9 @@ public class PlayerController : Photon.MonoBehaviour {
 			Vector3 shoulderOffsetVector = cameraTransform.right * shoulderOffset;
 
 			cameraTransform.position += shoulderOffsetVector;
-			
+
+			//cameraTransform.position = Vector3.MoveTowards( oldCameraPosition, cameraTransform.position, 0.25f );
+
 			SnapCamera();
 			
 			SetUpRotation(targetCenter + shoulderOffsetVector, targetHead + shoulderOffsetVector);
