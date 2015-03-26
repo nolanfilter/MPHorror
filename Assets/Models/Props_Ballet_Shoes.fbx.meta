@@ -1,7 +1,7 @@
 fileFormatVersion: 2
-guid: a38594f934740445fa0f97476401e51b
+guid: 048e1194d8aaf498181215a983bbc0d7
 ModelImporter:
-  serializedVersion: 16
+  serializedVersion: 15
   fileIDToRecycleName:
     100000: Ballet_Shoes_Left
     100002: Ballet_Shoes_Right
@@ -24,7 +24,6 @@ ModelImporter:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
     optimizeGameObjects: 0
-    motionNodeName: 
     animationCompression: 1
     animationRotationError: .5
     animationPositionError: .5
@@ -68,5 +67,4 @@ ModelImporter:
     rootMotionBoneName: 
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   animationType: 2
-  additionalBone: 0
   userData: 
