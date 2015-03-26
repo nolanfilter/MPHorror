@@ -1,7 +1,7 @@
 fileFormatVersion: 2
-guid: 809c986bf1675466b92359b1d2df029a
+guid: df47523cd996349f985500b9b36b2402
 ModelImporter:
-  serializedVersion: 16
+  serializedVersion: 15
   fileIDToRecycleName:
     100000: pCube3
     100002: pCube4
@@ -59,7 +59,6 @@ ModelImporter:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
     optimizeGameObjects: 0
-    motionNodeName: 
     animationCompression: 1
     animationRotationError: .5
     animationPositionError: .5
@@ -103,5 +102,4 @@ ModelImporter:
     rootMotionBoneName: 
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   animationType: 2
-  additionalBone: 0
   userData: 
