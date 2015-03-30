@@ -1,0 +1,133 @@
+fileFormatVersion: 2
+guid: 2cedba2b30536475ba5a302a715b8045
+timeCreated: 1427666343
+licenseType: Pro
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: Drawer
+    100002: pCube18
+    100004: pCube19
+    100006: pCube3
+    100008: Props_KidsRoom_Bed:KidsRoom_Bed
+    100010: Props_KidsRoom_Bed:pCone2
+    100012: Props_KidsRoom_Bed:pCube18
+    100014: Props_KidsRoom_Bed:pCube19
+    100016: Props_KidsRoom_Bed:pCube20
+    100018: Props_KidsRoom_Bed:pCube21
+    100020: Props_KidsRoom_Bed:pCube22
+    100022: Props_KidsRoom_Bed:pCube23
+    100024: Props_KidsRoom_Bed:pCube3
+    100026: Props_KidsRoom_Bed:Props_KidsRoom_Bed:pCube3
+    100028: Props_KidsRoom_Bed:Props_KidsRoom_Bed:transform1
+    100030: Props_KidsRoom_Bed:Props_KidsRoom_Bed:transform2
+    100032: //RootNode
+    400000: Drawer
+    400002: pCube18
+    400004: pCube19
+    400006: pCube3
+    400008: Props_KidsRoom_Bed:KidsRoom_Bed
+    400010: Props_KidsRoom_Bed:pCone2
+    400012: Props_KidsRoom_Bed:pCube18
+    400014: Props_KidsRoom_Bed:pCube19
+    400016: Props_KidsRoom_Bed:pCube20
+    400018: Props_KidsRoom_Bed:pCube21
+    400020: Props_KidsRoom_Bed:pCube22
+    400022: Props_KidsRoom_Bed:pCube23
+    400024: Props_KidsRoom_Bed:pCube3
+    400026: Props_KidsRoom_Bed:Props_KidsRoom_Bed:pCube3
+    400028: Props_KidsRoom_Bed:Props_KidsRoom_Bed:transform1
+    400030: Props_KidsRoom_Bed:Props_KidsRoom_Bed:transform2
+    400032: //RootNode
+    2300000: Drawer
+    2300002: pCube18
+    2300004: pCube19
+    2300006: Props_KidsRoom_Bed:pCone2
+    2300008: Props_KidsRoom_Bed:pCube18
+    2300010: Props_KidsRoom_Bed:pCube19
+    2300012: Props_KidsRoom_Bed:pCube20
+    2300014: Props_KidsRoom_Bed:pCube21
+    2300016: Props_KidsRoom_Bed:pCube22
+    2300018: Props_KidsRoom_Bed:pCube23
+    2300020: Props_KidsRoom_Bed:Props_KidsRoom_Bed:pCube3
+    3300000: Drawer
+    3300002: pCube18
+    3300004: pCube19
+    3300006: Props_KidsRoom_Bed:pCone2
+    3300008: Props_KidsRoom_Bed:pCube18
+    3300010: Props_KidsRoom_Bed:pCube19
+    3300012: Props_KidsRoom_Bed:pCube20
+    3300014: Props_KidsRoom_Bed:pCube21
+    3300016: Props_KidsRoom_Bed:pCube22
+    3300018: Props_KidsRoom_Bed:pCube23
+    3300020: Props_KidsRoom_Bed:Props_KidsRoom_Bed:pCube3
+    4300000: Props_KidsRoom_Bed:Props_KidsRoom_Bed:pCube3
+    4300002: Props_KidsRoom_Bed:pCone2
+    4300004: Props_KidsRoom_Bed:pCube18
+    4300006: Props_KidsRoom_Bed:pCube19
+    4300008: Props_KidsRoom_Bed:pCube20
+    4300010: Props_KidsRoom_Bed:pCube21
+    4300012: Props_KidsRoom_Bed:pCube22
+    4300014: Props_KidsRoom_Bed:pCube23
+    4300016: pCube18
+    4300018: pCube19
+    4300020: Drawer
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
