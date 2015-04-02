@@ -1251,6 +1251,12 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		StartCoroutine( "DoFreeze" );
 	}
+
+	[RPC]
+	public void RPCStopFreeze()
+	{
+		StopCoroutine( "DoFreeze" );
+	}
 	// end server calls
 
 	//event handlers
@@ -1532,7 +1538,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		if( currentState == State.Frozen )
 		{
-			StopCoroutine( "DoFreeze" );
+			StopFreeze();
 			ChangeState( (int)State.Voyeur );
 			DisplayMessage( "Your friend destroyed you" );
 			ChangeColor( new Quaternion( 0f, 0f, 0f, 0f ) );
@@ -1683,6 +1689,13 @@ public class PlayerController : Photon.MonoBehaviour {
 		photonView.RPC( "RPCFreeze", PhotonTargets.OthersBuffered );
 		
 		StartCoroutine( "DoFreeze" );
+	}
+
+	public void StopFreeze()
+	{
+		photonView.RPC( "RPCStopFreeze", PhotonTargets.OthersBuffered );
+		
+		StopCoroutine( "DoFreeze" );
 	}
 
 	public void TurnOffQuads()
