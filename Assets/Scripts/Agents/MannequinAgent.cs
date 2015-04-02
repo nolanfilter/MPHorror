@@ -5,6 +5,8 @@ using System.Collections.Generic;
 public class MannequinAgent : MonoBehaviour {
 
 	private List<GameObject> mannequins;
+
+	private int monsterMannequinNumber = 2;
 	
 	private static MannequinAgent mInstance = null;
 	public static MannequinAgent instance
@@ -60,6 +62,8 @@ public class MannequinAgent : MonoBehaviour {
 
 	private void internalSetKeys()
 	{
+		return;
+
 		if( mannequins.Count == 0 )
 			return;
 
@@ -84,5 +88,50 @@ public class MannequinAgent : MonoBehaviour {
 		
 		if( mannequins.Count > 1 )
 			mannequins[ key2Index ].tag = "Key2";
+	}
+
+
+	public static bool GetAllMannequinsDisabled()
+	{
+		if( instance )
+			return instance.internalGetAllMannequinsDisabled();
+
+		return false;
+	}
+
+	private bool internalGetAllMannequinsDisabled()
+	{
+		if( mannequins.Count == 0 )
+			return true;
+
+		int numActiveMannequins = 0;
+
+		for( int i = 0; i < mannequins.Count; i++ )
+			if( mannequins[i].activeSelf )
+				numActiveMannequins++;
+
+		return ( numActiveMannequins == 0 );
+	}
+
+	public static bool GetShouldMonsterize()
+	{
+		if( instance )
+			return instance.internalGetShouldMonsterize();
+		
+		return false;
+	}
+
+	private bool internalGetShouldMonsterize()
+	{
+		if( mannequins.Count == 0 )
+			return true;
+		
+		int numActiveMannequins = 0;
+		
+		for( int i = 0; i < mannequins.Count; i++ )
+			if( mannequins[i].activeSelf )
+				numActiveMannequins++;
+
+		return ( mannequins.Count - numActiveMannequins == monsterMannequinNumber );
 	}
 }
