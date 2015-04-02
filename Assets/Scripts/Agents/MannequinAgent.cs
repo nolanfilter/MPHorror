@@ -5,8 +5,6 @@ using System.Collections.Generic;
 public class MannequinAgent : MonoBehaviour {
 
 	private List<GameObject> mannequins;
-
-	private int monsterMannequinNumber = 2;
 	
 	private static MannequinAgent mInstance = null;
 	public static MannequinAgent instance
@@ -132,6 +130,6 @@ public class MannequinAgent : MonoBehaviour {
 			if( mannequins[i].activeSelf )
 				numActiveMannequins++;
 
-		return ( mannequins.Count - numActiveMannequins == monsterMannequinNumber );
+		return ( mannequins.Count - numActiveMannequins == PlayerAgent.GetMonsterizingMannequinNumber() );
 	}
 }
