@@ -10,7 +10,7 @@ public class MannequinController : MonoBehaviour {
 
 	void OnDisable()
 	{
-		if( MannequinAgent.GetShouldMonsterize() )
+		if( !PlayerAgent.GetIsMonsterSet() && MannequinAgent.GetShouldMonsterize() )
 			PlayerAgent.MonsterizeNearestPlayer( transform.position );
 
 		PlayerAgent.CheckForEnd();

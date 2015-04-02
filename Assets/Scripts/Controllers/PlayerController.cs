@@ -1508,7 +1508,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		StopCoroutine( "RageMode" );
 		ChangeState( (int)State.Monster );
-		DisplayMessage( "Killer" );
+		DisplayMessage( "Trapped your friend" );
 		ChangeColor( new Quaternion( 1f, 0.9f, 0.9f, 1f ) );
 	}
 
@@ -1531,6 +1531,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		if( currentState == State.Frozen )
 		{
+			StopCoroutine( "DoFreeze" );
 			ChangeState( (int)State.Voyeur );
 			DisplayMessage( "Your friend destroyed you" );
 			ChangeColor( new Quaternion( 0f, 0f, 0f, 0f ) );
