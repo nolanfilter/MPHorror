@@ -166,6 +166,9 @@ public class PlayerAgent : MonoBehaviour {
 				isOver = false;
 		}
 
+		if( !isOver )
+			isOver = MannequinAgent.GetAllMannequinsDisabled();
+
 		if( isOver )
 			StartCoroutine( "WaitAndEnd" );
 	}
@@ -180,7 +183,7 @@ public class PlayerAgent : MonoBehaviour {
 
 	private PlayerController.State internalGetClientState()
 	{
-		if( client != null )
+		if( client != null && monsterID >= 0 && monsterID < playerControllers.Count )
 		{
 			if( client == playerControllers[ monsterID ] )
 				return PlayerController.State.Monster;
@@ -252,6 +255,38 @@ public class PlayerAgent : MonoBehaviour {
 			playerControllers[i].TurnOffQuads();
 	}
 
+	public static void MonsterizeNearestPlayer( Vector3 position )
+	{
+		if( instance )
+			instance.internalMonsterizeNearestPlayer( position );
+	}
+
+	private void internalMonsterizeNearestPlayer( Vector3 position )
+	{
+		if( !monsterize )
+			return;
+
+		float closestDistance = Mathf.Infinity;
+		float distance;
+		int closestPlayerID = -1;
+
+		for( int i = 0; i < playerControllers.Count; i++ )
+		{
+			distance = Vector3.Distance( playerControllers[i].transform.position, position );
+				
+			if( distance < closestDistance )
+			{
+				closestDistance = distance;
+				closestPlayerID = i;
+			}
+		}
+
+		monsterID = closestPlayerID;
+
+		if( monsterID >= 0 && monsterID < playerControllers.Count )
+			playerControllers[ monsterID ].Monsterize();
+	}
+
 	public static void SetMonster()
 	{
 		if( instance )
@@ -260,6 +295,8 @@ public class PlayerAgent : MonoBehaviour {
 
 	private void internalSetMonster()
 	{
+		return;
+
 		if( monsterize )
 		{
 			if( monsterizeMaster )
@@ -353,6 +390,11 @@ public class PlayerAgent : MonoBehaviour {
 			yield break;
 
 		isEnding = true;
+
+		if( MannequinAgent.GetAllMannequinsDisabled() )
+			GlobalMessageDisplay( "The healing is complete" );
+		else
+			GlobalMessageDisplay( "There are no heroes left" );
 
 		yield return new WaitForSeconds( endBuffer );
 

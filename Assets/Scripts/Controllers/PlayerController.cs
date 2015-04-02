@@ -703,7 +703,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 			cameraTransform.position += shoulderOffsetVector;
 
-			//cameraTransform.position = Vector3.MoveTowards( oldCameraPosition, cameraTransform.position, 0.25f );
+			//cameraTransform.position = Vector3.MoveTowards( oldCameraPosition, cameraTransform.position, 0.05f );
 
 			SnapCamera();
 			
@@ -973,6 +973,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		ChangeState( (int)State.Stunned );
 		//MonsterReveal();
 
+		/*
 		speed = 0.5f;
 		
 		distance = speed * RageController.RageCooldown;
@@ -990,7 +991,7 @@ public class PlayerController : Photon.MonoBehaviour {
 			yield return null;
 			
 		} while( currentDistance < distance );
-
+		*/
 
 		if( rageController )
 			Destroy( rageController );
@@ -1436,8 +1437,8 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		//TODO tie into mechanic
 		
-		ChangeState( (int)State.Dead );
-		DisplayMessage( "Your soul was stolen" );
+		ChangeState( (int)State.Voyeur );
+		DisplayMessage( "Your friend destroyed you" );
 		ChangeColor( new Quaternion( 0.175f, 0.175f, 0.175f, 0.5f ) );
 		ChangeColider( 0 );
 
@@ -1460,7 +1461,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public bool IsZoomedIn()
 	{
-		return hasPhoto || currentState == State.Raging;
+		return flashBulb.enabled || currentState == State.Raging;
 	}
 
 	public float GetZoomProgress()

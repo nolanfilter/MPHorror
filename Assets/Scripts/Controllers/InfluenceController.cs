@@ -3,10 +3,11 @@ using System.Collections;
 
 public class InfluenceController : MonoBehaviour {
 
-	private float radius = 2f;
-	private float radiusZoom = 0.25f;
-	private float zoomDistance = 3f;
-	private float rageDistance = 0.5f;
+	private float sphereRadius = 2f;
+	private float zoomRadius = 0.5f;
+	private float rageRadius = 0.25f;
+	private float zoomDistance = 2f;
+	private float rageDistance = 1f;
 	public bool showDebugRay = false;
 
 	private PlayerController playerController = null;
@@ -32,24 +33,31 @@ public class InfluenceController : MonoBehaviour {
 		Ray ray;
 
 		float distance;
+		float radius;
 
 		if( playerController.IsZoomedIn() ) 
 		{
 			if( playerController.GetCurrentState() == PlayerController.State.Raging )
-				distance = radiusZoom + transform.root.localScale.z + rageDistance;
+			{
+				distance = rageDistance;
+				radius = rageRadius;
+			}
 			else
-				distance = radiusZoom + transform.root.localScale.z + zoomDistance;
+			{
+				distance = zoomDistance;
+				radius = zoomRadius;
+			}
 
 			ray = new Ray( transform.position + transform.forward * distance, transform.forward * -1f );
 
-			RaycastHit[] hits = Physics.SphereCastAll( ray, radiusZoom, distance );
+			RaycastHit[] hits = Physics.SphereCastAll( ray, radius, distance );
 
 			foreach( RaycastHit hit in hits )
 				EvaluateCollider( hit.collider );
 		}
 		else
 		{
-			distance = radius + transform.root.localScale.y;
+			distance = sphereRadius + transform.root.localScale.y;
 
 			ray = new Ray( transform.position + Vector3.up * distance, Vector3.up * -1f );
 
@@ -123,6 +131,7 @@ public class InfluenceController : MonoBehaviour {
 			if( playerController.GetCurrentState() == PlayerController.State.Raging  )
 			{
 				playerController.MonsterReveal();
+				return;
 			}
 
 			PlayMakerFSM fsm = collider.GetComponent<PlayMakerFSM>();
