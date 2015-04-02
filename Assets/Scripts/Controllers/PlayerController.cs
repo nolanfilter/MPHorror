@@ -1020,7 +1020,8 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		DisplayMessage( "" );
 
-		ChangeState( (int)State.None );
+		if( currentState == State.Frozen )
+			ChangeState( (int)State.None );
 	}
 
 	private IEnumerator DoColorFade( Material material, Color fromColor, Color toColor, float duration )
