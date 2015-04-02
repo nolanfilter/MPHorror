@@ -130,6 +130,6 @@ public class MannequinAgent : MonoBehaviour {
 			if( mannequins[i].activeSelf )
 				numActiveMannequins++;
 
-		return ( mannequins.Count - numActiveMannequins == PlayerAgent.GetMonsterizingMannequinNumber() );
+		return ( mannequins.Count - numActiveMannequins >= PlayerAgent.GetMonsterizingMannequinNumber() );
 	}
 }

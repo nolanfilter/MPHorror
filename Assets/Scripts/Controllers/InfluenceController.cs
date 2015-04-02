@@ -109,7 +109,7 @@ public class InfluenceController : MonoBehaviour {
 				{
 					if( otherPlayerController.GetCurrentState() == PlayerController.State.Monster  )
 						otherPlayerController.MonsterReveal();
-					else if( otherPlayerController.GetCurrentState() == PlayerController.State.Normal || otherPlayerController.GetCurrentState() == PlayerController.State.None )
+					else if( otherPlayerController.GetCurrentState() == PlayerController.State.Normal || otherPlayerController.GetCurrentState() == PlayerController.State.None || otherPlayerController.GetCurrentState() == PlayerController.State.Frozen )
 						otherPlayerController.SurvivorReveal();
 				}
 			}

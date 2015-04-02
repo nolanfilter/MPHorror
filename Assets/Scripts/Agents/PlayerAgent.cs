@@ -152,6 +152,14 @@ public class PlayerAgent : MonoBehaviour {
 		return -1;
 	}
 
+	public static bool GetIsMonsterSet()
+	{
+		if( instance )
+			return instance.monsterID != -1;
+
+		return false;
+	}
+
 	public static void CheckForEnd()
 	{
 		if( instance )
@@ -272,7 +280,7 @@ public class PlayerAgent : MonoBehaviour {
 
 	private void internalMonsterizeNearestPlayer( Vector3 position )
 	{
-		if( !monsterize )
+		if( !monsterize || monsterID != -1 )
 			return;
 
 		float closestDistance = Mathf.Infinity;
