@@ -13,7 +13,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		Stunned = 4,
 		Raging = 5,
 		None = 6,
-		Invalid = 7,
+		Frozen = 7,
+		Invalid = 8,
 	}
 	private State currentState = State.None;
 
@@ -133,6 +134,8 @@ public class PlayerController : Photon.MonoBehaviour {
 	private bool snap = false;
 	private float distance = 1f;
 
+	private float maxRotationSpeed = 5f;
+
 	private struct JoystickValue
 	{
 		public Vector2 xy { get; private set; }
@@ -151,6 +154,8 @@ public class PlayerController : Photon.MonoBehaviour {
 	private float flickWindow = 0.1f;
 
 	private float jumpDistance = 2f;
+
+	private float freezeDuration = 10f;
 	
 	void Awake()
 	{
@@ -313,52 +318,8 @@ public class PlayerController : Photon.MonoBehaviour {
 			SyncedMovement();
 		}
 
-		if (transform.position.y != height)
+		if( transform.position.y != height )
 			transform.position = new Vector3( transform.position.x, height, transform.position.z );
-
-		/*
-		if( currentState == State.Normal )
-		{
-			currentSanity -= sanityDecreaseRate * Time.deltaTime;
-
-			if( currentSanity < 0.25f && !hasReRandomized )
-			{
-				DoorAgent.RandomizeDoorConnections();
-				hasReRandomized = true;
-			}
-
-			if( currentSanity < 0f )
-				currentSanity = 0f;
-
-			if( currentSanity == 0f )
-			{
-				ChangeState( (int)State.Monster );
-				DisplayMessage( "Kill players to get points!" );
-				ChangeColor( new Vector3( 1f, 0f, 0f ) );
-				currentFear = 1.25f;
-			}
-
-			float deltaFear = fearIncreaseRate * Time.deltaTime;
-
-			if( currentFear < fearThreshold - deltaFear )
-				ChangeFear( deltaFear * -1f );
-			else if( currentFear < fearThreshold )
-				currentFear = fearThreshold;
-			
-			if( currentFear < 0f )
-			{
-				ChangeState( (int)State.Dead );
-				DisplayMessage( "You're paralyzed with fear!" );
-				ChangeColor( new Vector3( 0.5f, 0.5f, 0.5f ) );
-				currentFear = 0f;
-			}
-		}
-
-		currentTimeLived += Time.deltaTime;
-
-		//if( currentTimeLived > lifeLength )
-		//	Destroy( gameObject );
-		*/
 	}
 
 	void LateUpdate()
@@ -447,42 +408,47 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		if( photonView.isMine )
 		{
-			//movementVector = inputController.getRawAxes();
-
-			joystickValues.Insert( 0, new JoystickValue( inputController.getRawAxes(), Time.time ) );
-			
-			float timeDifference;
-			int index = joystickValues.Count - 1;
-			
-			do
+			if( currentState == State.Voyeur )
 			{
-				timeDifference = joystickValues[0].timeStamp - joystickValues[ index ].timeStamp;
-				
-				//Debug.Log( timeDifference );
-				
-				if( timeDifference > flickWindow )
-					joystickValues.RemoveAt( index );
-				
-				index--;
-				
-			} while( index > 0 && timeDifference > flickWindow );
-			
-			if( joystickValues.Count > 0 && joystickValues[0].xy.magnitude > flickThreshold && ( joystickValues[0].xy.magnitude - joystickValues[ joystickValues.Count - 1 ].xy.magnitude > flickMinDelta ) )
-			{
-				movementVector = joystickValues[0].xy;
-				joystickValues.Clear();
+				movementVector = inputController.getRawAxes();
 			}
-			else
+			else if( currentState != State.Frozen )
 			{
-				movementVector = Vector3.zero;
+				joystickValues.Insert( 0, new JoystickValue( inputController.getRawAxes(), Time.time ) );
+				
+				float timeDifference;
+				int index = joystickValues.Count - 1;
+				
+				do
+				{
+					timeDifference = joystickValues[0].timeStamp - joystickValues[ index ].timeStamp;
+					
+					//Debug.Log( timeDifference );
+					
+					if( timeDifference > flickWindow )
+						joystickValues.RemoveAt( index );
+					
+					index--;
+					
+				} while( index > 0 && timeDifference > flickWindow );
+				
+				if( joystickValues.Count > 0 && joystickValues[0].xy.magnitude > flickThreshold && ( joystickValues[0].xy.magnitude - joystickValues[ joystickValues.Count - 1 ].xy.magnitude > flickMinDelta ) )
+				{
+					movementVector = joystickValues[0].xy;
+					joystickValues.Clear();
+				}
+				else
+				{
+					movementVector = Vector3.zero;
+				}
+
+				/*
+				Debug.Log( "Joystick Values" );
+
+				for( int i = 0; i < joystickValues.Count; i++ )
+					Debug.Log( joystickValues[i].timeStamp );
+				*/
 			}
-
-			/*
-			Debug.Log( "Joystick Values" );
-
-			for( int i = 0; i < joystickValues.Count; i++ )
-				Debug.Log( joystickValues[i].timeStamp );
-			*/
 		}
 
 		movingBack = ( movementVector.y < -0.2f );
@@ -496,37 +462,44 @@ public class PlayerController : Photon.MonoBehaviour {
 		if (isMoving != wasMoving )
 			lockCameraTimer = 0.0f;
 
-		//if( targetDirection != Vector3.zero )
-		//{
-			//if( moveSpeed < walkSpeed * 0.9f )
-			//{
-				moveDirection = targetDirection.normalized;
-			//}
-			//else
-			//{
-				//moveDirection = Vector3.RotateTowards(moveDirection, targetDirection, rotateSpeed * Mathf.Deg2Rad * Time.deltaTime, 1000);
+		Vector3 movement = Vector3.zero;
+
+		if (currentState == State.Voyeur)
+		{
+			if( targetDirection != Vector3.zero )
+			{
+				if( moveSpeed < walkSpeed * 0.9f )
+				{
+					moveDirection = targetDirection.normalized;
+				}
+				else
+				{
+					moveDirection = Vector3.RotateTowards(moveDirection, targetDirection, rotateSpeed * Mathf.Deg2Rad * Time.deltaTime, 1000);
 				
-				//moveDirection = moveDirection.normalized;
-			//}
-		//}
+					moveDirection = moveDirection.normalized;
+				}
+			}
 
-		/*
-		float curSmooth = speedSmoothing * Time.deltaTime;
-		float targetSpeed = Mathf.Min( targetDirection.magnitude, 1.0f );
+			float curSmooth = speedSmoothing * Time.deltaTime;
+			float targetSpeed = Mathf.Min( targetDirection.magnitude, 1.0f );
 
-		if( Time.time - trotAfterSeconds > walkTimeStart )
-			targetSpeed *= trotSpeed;
+			if( Time.time - trotAfterSeconds > walkTimeStart )
+				targetSpeed *= trotSpeed;
+			else
+				targetSpeed *= walkSpeed;
+
+			moveSpeed = Mathf.Lerp( moveSpeed, targetSpeed, curSmooth );
+			
+			if( moveSpeed < walkSpeed * 0.3f )
+				walkTimeStart = Time.time;
+
+			movement = moveDirection * moveSpeed * Time.deltaTime;
+		}
 		else
-			targetSpeed *= walkSpeed;
-
-		moveSpeed = Mathf.Lerp( moveSpeed, targetSpeed, curSmooth );
-		
-		if( moveSpeed < walkSpeed * 0.3f )
-			walkTimeStart = Time.time;
-		*/
-
-		//Vector3 movement = moveDirection * moveSpeed * Time.deltaTime;
-		Vector3 movement = moveDirection * jumpDistance;
+		{
+			moveDirection = targetDirection.normalized;
+			movement = moveDirection * jumpDistance;
+		}
 
 		if( currentState != State.Raging )
 			characterController.Move( movement );
@@ -548,7 +521,12 @@ public class PlayerController : Photon.MonoBehaviour {
 			axes = axes.x * right + axes.y * forward;
 
 			if( axes != Vector3.zero )
-				transform.rotation = Quaternion.LookRotation( axes );
+			{
+				if( joystickValues.Count == 0 )
+					transform.rotation = Quaternion.LookRotation( axes );
+				else
+					transform.rotation = Quaternion.RotateTowards( transform.rotation, Quaternion.LookRotation( axes ), maxRotationSpeed );
+			}
 
 			if( rageQuad )
 				rageQuad.GetComponent<Renderer>().enabled = false;
@@ -1021,6 +999,30 @@ public class PlayerController : Photon.MonoBehaviour {
 		ChangeState( (int)originalState );
 	}
 
+	private IEnumerator DoFreeze()
+	{
+		float beginTime = Time.time;
+
+		DisplayMessage( "You've been frozen in place" );
+
+		yield return new WaitForSeconds( messageDisplayDuration );
+
+		int timeLeft;
+
+		while( Time.time - beginTime < freezeDuration )
+		{
+			timeLeft = Mathf.RoundToInt( freezeDuration - ( Time.time - beginTime ) );
+
+			DisplayMessage( "" + timeLeft );
+
+			yield return new WaitForSeconds( 1f );
+		}
+
+		DisplayMessage( "" );
+
+		ChangeState( (int)State.None );
+	}
+
 	private IEnumerator DoColorFade( Material material, Color fromColor, Color toColor, float duration )
 	{
 		material.color = fromColor;
@@ -1242,6 +1244,12 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		StartCoroutine( "DoStun" );
 	}
+
+	[RPC]
+	public void RPCFreeze()
+	{
+		StartCoroutine( "DoFreeze" );
+	}
 	// end server calls
 
 	//event handlers
@@ -1437,15 +1445,11 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		//TODO tie into mechanic
 		
-		ChangeState( (int)State.Voyeur );
-		DisplayMessage( "Your friend destroyed you" );
-		ChangeColor( new Quaternion( 0.175f, 0.175f, 0.175f, 0.5f ) );
-		ChangeColider( 0 );
-
+		ChangeState( (int)State.Frozen );
 		PlayerAgent.CheckForEnd();
+		Freeze();
 
 		return true;
-		//return ChangeFear( fearAttack );
 	}
 	
 	public void IncreaseSanity()
@@ -1525,8 +1529,19 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public void SurvivorReveal()
 	{
-		ChangeColor( new Quaternion( 0f, 0.75f, 0f, 1f ) );
-		Stun();
+		if( currentState == State.Frozen )
+		{
+			ChangeState( (int)State.Voyeur );
+			DisplayMessage( "Your friend destroyed you" );
+			ChangeColor( new Quaternion( 0f, 0f, 0f, 0f ) );
+			
+			PlayerAgent.CheckForEnd();
+		}
+		else
+		{
+			ChangeColor( new Quaternion( 0f, 0.75f, 0f, 1f ) );
+			Stun();
+		}
 	}
 
 	public void SetFlashBulbTo( bool on )
@@ -1659,6 +1674,13 @@ public class PlayerController : Photon.MonoBehaviour {
 		photonView.RPC( "RPCStun", PhotonTargets.OthersBuffered );
 
 		StartCoroutine( "DoStun" );
+	}
+
+	public void Freeze()
+	{
+		photonView.RPC( "RPCFreeze", PhotonTargets.OthersBuffered );
+		
+		StartCoroutine( "DoFreeze" );
 	}
 
 	public void TurnOffQuads()

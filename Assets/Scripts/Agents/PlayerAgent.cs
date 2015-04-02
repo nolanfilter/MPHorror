@@ -30,6 +30,7 @@ public class PlayerAgent : MonoBehaviour {
 
 	public float waitTime = 25f;
 	public float endBuffer = 8f;
+	public int monsterizingMannequinNumber = 13;
 
 	private static PlayerAgent mInstance = null;
 	public static PlayerAgent instance
@@ -143,6 +144,14 @@ public class PlayerAgent : MonoBehaviour {
 			monsterID = -1;
 	}
 
+	public static int GetMonsterizingMannequinNumber()
+	{
+		if( instance )
+			return instance.monsterizingMannequinNumber;
+
+		return -1;
+	}
+
 	public static void CheckForEnd()
 	{
 		if( instance )
@@ -162,7 +171,7 @@ public class PlayerAgent : MonoBehaviour {
 		{
 			state = playerControllers[i].GetCurrentState();
 
-			if( i != monsterID && state != PlayerController.State.Dead && state != PlayerController.State.Voyeur )
+			if( i != monsterID && state != PlayerController.State.Dead && state != PlayerController.State.Voyeur && state != PlayerController.State.Frozen )
 				isOver = false;
 		}
 

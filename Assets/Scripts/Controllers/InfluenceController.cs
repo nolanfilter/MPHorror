@@ -92,10 +92,17 @@ public class InfluenceController : MonoBehaviour {
 
 			if( playerController.IsZoomedIn() )
 			{
-				if( playerController.GetCurrentState() == PlayerController.State.Raging && otherPlayerController.GetCurrentState() != PlayerController.State.Dead && otherPlayerController.GetCurrentState() != PlayerController.State.Voyeur )
+				if( playerController.GetCurrentState() == PlayerController.State.Raging )
 				{
-					playerController.RageHit();
-					otherPlayerController.IncreaseFear();
+					if( otherPlayerController.GetCurrentState() == PlayerController.State.Frozen )
+					{
+						playerController.MonsterReveal();
+					}
+					else if( otherPlayerController.GetCurrentState() != PlayerController.State.Dead && otherPlayerController.GetCurrentState() != PlayerController.State.Voyeur )
+					{
+						playerController.RageHit();
+						otherPlayerController.IncreaseFear();
+					}
 				}
 
 				if( playerController.GetCurrentState() == PlayerController.State.Normal || playerController.GetCurrentState() == PlayerController.State.None )
