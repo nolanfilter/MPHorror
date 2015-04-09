@@ -281,4 +281,21 @@ public class NetworkAgent : MonoBehaviour {
 
 		GameAgent.ChangeGameState( GameAgent.GameState.Waiting );
 	}
+
+	public static void LockRoom()
+	{
+		if( instance )
+			instance.internalLockRoom();
+	}
+
+	private void internalLockRoom()
+	{
+		Room room = PhotonNetwork.room;
+
+		if( room != null )
+		{
+			room.open = false;
+			room.visible = false;
+		}
+	}
 }
