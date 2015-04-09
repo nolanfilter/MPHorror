@@ -4,7 +4,16 @@ using System.Collections.Generic;
 
 public class MannequinAgent : MonoBehaviour {
 
+	public GameObject mannequinPrefab;
+
+	public int numMannequinsToGenerate;
+	public float mannequinHeight = 0.96f;
+	public float minMannequinDistance = 1f;
+	public Transform mannequinAreaRoot;
+
 	private List<GameObject> mannequins;
+	private List<GameObject> randomMannequins;
+	private List<Rect> mannequinAreas;
 	
 	private static MannequinAgent mInstance = null;
 	public static MannequinAgent instance
@@ -26,6 +35,19 @@ public class MannequinAgent : MonoBehaviour {
 		mInstance = this;
 		
 		mannequins = new List<GameObject>();
+		randomMannequins = new List<GameObject>();
+
+		mannequinAreas = new List<Rect>();
+
+		if( mannequinAreaRoot )
+		{
+			mannequinAreaRoot.gameObject.SetActive( true );
+
+			foreach( Transform childTransform in mannequinAreaRoot )
+				mannequinAreas.Add( new Rect( childTransform.transform.position.x - childTransform.transform.localScale.x * 0.5f, childTransform.transform.position.z - childTransform.transform.localScale.y * 0.5f, childTransform.transform.localScale.x, childTransform.transform.localScale.y ) );
+		
+			mannequinAreaRoot.gameObject.SetActive( false );
+		}
 	}
 
 	public static void RegisterMannequin( GameObject mannequin )
@@ -52,42 +74,70 @@ public class MannequinAgent : MonoBehaviour {
 			mannequins.Remove( mannequin );
 	}
 
-	public static void SetKeys()
+	public static void Reset()
 	{
 		if( instance )
-			instance.internalSetKeys();
+			instance.internalReset();
 	}
 
-	private void internalSetKeys()
+	private void internalReset()
 	{
-		return;
-
-		if( mannequins.Count == 0 )
-			return;
-
-		for (int i = 0; i < mannequins.Count; i++)
+		if( randomMannequins.Count > 0 )
 		{
-			mannequins[i].SetActive( true );
-			mannequins[i].tag = "Activatable";
+			for( int i = 0; i < randomMannequins.Count; i++ )
+			{
+				mannequins.Remove( randomMannequins[i] );
+				Destroy( randomMannequins[i] );
+			}
+
+			randomMannequins.Clear();
 		}
+
+		if( mannequins.Count > 0 )
+		{
+			for( int i = 0; i < mannequins.Count; i++ )
+			{
+				mannequins[i].SetActive( true );
+				//mannequins[i].tag = "Activatable";
+			}
+		}
+
+		if( mannequinPrefab == null )
+			return;
 
 		int seed = Utilities.HexToInt( PhotonNetwork.room.name[ PhotonNetwork.room.name.Length - 2 ] );
 		
 		Random.seed = seed;
 
-		int keyIndex = Random.Range( 0, mannequins.Count );
-		int key2Index = Random.Range( 0, mannequins.Count );
-		
-		if( key2Index == keyIndex )
-			key2Index = ( key2Index + 1 )%mannequins.Count;
-		
-		if( mannequins.Count > 0 )
-			mannequins[ keyIndex ].tag = "Key";
-		
-		if( mannequins.Count > 1 )
-			mannequins[ key2Index ].tag = "Key2";
-	}
+		int attempts = 0;
+		int maxAttempts = numMannequinsToGenerate * 3;
+		int randomAreaIndex;
+		Vector3 randomPosition;
+		Collider[] colliders;
+		bool isViablePosition;
 
+		while( attempts < maxAttempts && randomMannequins.Count < numMannequinsToGenerate )
+		{
+			attempts++;
+
+			randomAreaIndex = Random.Range( 0, mannequinAreas.Count );
+
+			randomPosition = new Vector3( Random.Range( mannequinAreas[randomAreaIndex].xMin, mannequinAreas[randomAreaIndex].xMax ), mannequinHeight, Random.Range( mannequinAreas[randomAreaIndex].yMin, mannequinAreas[randomAreaIndex].yMax ) );
+
+			colliders = Physics.OverlapSphere( randomPosition, minMannequinDistance );
+
+			isViablePosition = true;
+
+			for( int i = 0; i < colliders.Length; i++ )
+				if( colliders[i].GetComponent<MannequinController>() )
+					isViablePosition = false;
+
+			if( isViablePosition )
+			{
+				randomMannequins.Add( Instantiate( mannequinPrefab, randomPosition, Quaternion.AngleAxis( Random.Range( 0, 360f ), Vector3.up ) ) as GameObject );
+			}
+		}
+	}
 
 	public static bool GetAllMannequinsDisabled()
 	{

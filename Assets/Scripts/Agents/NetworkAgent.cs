@@ -186,7 +186,7 @@ public class NetworkAgent : MonoBehaviour {
 			int playerNumber = PhotonNetwork.otherPlayers.Length;
 
 			PhotonNetwork.Instantiate( playerPrefab.name, playerStartPositions[ playerNumber%playerStartPositions.Length ], Quaternion.Euler( playerStartRotations[ playerNumber%playerStartRotations.Length ] ), 0 );
-			MannequinAgent.SetKeys();
+			MannequinAgent.Reset();
 			FSMAgent.Reset();
 		}
 	}
@@ -280,5 +280,22 @@ public class NetworkAgent : MonoBehaviour {
 		}
 
 		GameAgent.ChangeGameState( GameAgent.GameState.Waiting );
+	}
+
+	public static void LockRoom()
+	{
+		if( instance )
+			instance.internalLockRoom();
+	}
+
+	private void internalLockRoom()
+	{
+		Room room = PhotonNetwork.room;
+
+		if( room != null )
+		{
+			room.open = false;
+			room.visible = false;
+		}
 	}
 }

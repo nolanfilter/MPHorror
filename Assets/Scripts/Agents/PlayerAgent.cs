@@ -12,6 +12,7 @@ public class PlayerAgent : MonoBehaviour {
 	public Shader blurShader;
 	public Shader rgbShader;
 	public Shader yuvShader;
+	public Shader brushEffectShader;
 
 	public Texture grainTexture;
 	public Texture scratchTexture;
@@ -92,6 +93,11 @@ public class PlayerAgent : MonoBehaviour {
 
 		blur.enabled = false;
 		blur.blurShader = blurShader;
+
+		BrushEffect brushEffect = Camera.main.gameObject.AddComponent<BrushEffect>();
+
+		brushEffect.enabled = false;
+		brushEffect.BrushEffectShader = brushEffectShader;
 
 		NoiseEffect noiseEffect = Camera.main.gameObject.AddComponent<NoiseEffect>();
 
@@ -244,6 +250,8 @@ public class PlayerAgent : MonoBehaviour {
 
 	private void internalStartGame()
 	{
+		NetworkAgent.LockRoom();
+
 		if( playerControllers.Count > 0 )
 			playerControllers[ 0 ].StartGame();
 	}
