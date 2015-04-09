@@ -57,11 +57,20 @@ public class GameAgent : MonoBehaviour {
 
 	void Start()
 	{
+		//Cursor.visible does nothing, this is a unity bug
+		//TODO activate when unity gets its shit together
+		/*
 		if( !Application.isEditor )
 		{
+			Cursor.lockState = CursorLockMode.Locked;
 			Cursor.visible = false;
-			Screen.lockCursor = true;
 		}
+		else
+		{
+			Cursor.lockState = CursorLockMode.None;
+			Cursor.visible = true;
+		}
+		*/
 
 		Camera.main.gameObject.AddComponent<ScreenshotAgent>();
 
