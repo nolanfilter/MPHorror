@@ -186,7 +186,7 @@ public class NetworkAgent : MonoBehaviour {
 			int playerNumber = PhotonNetwork.otherPlayers.Length;
 
 			PhotonNetwork.Instantiate( playerPrefab.name, playerStartPositions[ playerNumber%playerStartPositions.Length ], Quaternion.Euler( playerStartRotations[ playerNumber%playerStartRotations.Length ] ), 0 );
-			MannequinAgent.SetKeys();
+			MannequinAgent.Reset();
 			FSMAgent.Reset();
 		}
 	}
