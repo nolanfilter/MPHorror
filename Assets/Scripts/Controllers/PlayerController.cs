@@ -135,6 +135,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	private float distance = 1f;
 
 	private float maxRotationSpeed = 5f;
+	private bool invertY = false;
 
 	private struct JoystickValue
 	{
@@ -155,7 +156,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private float jumpDistance = 2f;
 
-	private float freezeDuration = 10f;
+	private float freezeDuration = 20f;
 	
 	void Awake()
 	{
@@ -836,12 +837,12 @@ public class PlayerController : Photon.MonoBehaviour {
 			
 		case InputController.ButtonType.RUp: 
 		{
-			viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y + viewChangeRate * Time.deltaTime, -1f, 1f ) );
+			viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y + viewChangeRate * Time.deltaTime * ( invertY ? -1f : 1f ), -1f, 1f ) );
 		} break;
 			
 		case InputController.ButtonType.RDown: 
 		{
-			viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y - viewChangeRate * Time.deltaTime, -1f, 1f ) );
+			viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y - viewChangeRate * Time.deltaTime * ( invertY ? -1f : 1f ), -1f, 1f ) );
 		} break;
 		}
 	}
@@ -1011,7 +1012,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		while( Time.time - beginTime < freezeDuration )
 		{
-			timeLeft = Mathf.RoundToInt( freezeDuration - ( Time.time - beginTime ) );
+			timeLeft = Mathf.RoundToInt( freezeDuration - ( Time.time - beginTime ) ) + 1;
 
 			DisplayMessage( "" + timeLeft );
 
@@ -1253,9 +1254,10 @@ public class PlayerController : Photon.MonoBehaviour {
 	}
 
 	[RPC]
-	public void RPCStopFreeze()
+	public void RPCStopStatuses()
 	{
 		StopCoroutine( "DoFreeze" );
+		StopCoroutine( "DoStun" );
 	}
 	// end server calls
 
@@ -1297,6 +1299,11 @@ public class PlayerController : Photon.MonoBehaviour {
 		case InputController.ButtonType.A: case InputController.ButtonType.X:
 		{
 			isOpeningDoor = true;
+		} break;
+
+		case InputController.ButtonType.Y:
+		{
+			invertY = !invertY;
 		} break;
 		}
 	}
@@ -1538,7 +1545,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		if( currentState == State.Frozen )
 		{
-			StopFreeze();
+			StopStatuses();
 			ChangeState( (int)State.Voyeur );
 			DisplayMessage( "Your friend destroyed you" );
 			ChangeColor( new Quaternion( 0f, 0f, 0f, 0f ) );
@@ -1691,11 +1698,12 @@ public class PlayerController : Photon.MonoBehaviour {
 		StartCoroutine( "DoFreeze" );
 	}
 
-	public void StopFreeze()
+	public void StopStatuses()
 	{
-		photonView.RPC( "RPCStopFreeze", PhotonTargets.OthersBuffered );
+		photonView.RPC( "RPCStopStatuses", PhotonTargets.OthersBuffered );
 		
 		StopCoroutine( "DoFreeze" );
+		StopCoroutine( "DoStun" );
 	}
 
 	public void TurnOffQuads()

@@ -125,28 +125,28 @@ public class InputController : MonoBehaviour {
 
 	private void CheckInputType()
 	{
-		if( Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor )
-		{
-			verticalAxisString = "Vertical Mac";
-			horizontalAxisString = "Horizontal Mac";
-			rVerticalAxisString = "RVertical Mac";
-			rHorizontalAxisString = "RHorizontal Mac";
-			leftTriggerAxisString = "Left Trigger Mac";
-			rightTriggerAxisString = "Right Trigger Mac";
-		}
-		else if( Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor )
-		{
-			verticalAxisString = "Vertical PC";
-			horizontalAxisString = "Horizontal PC";
-			rVerticalAxisString = "RVertical PC";
-			rHorizontalAxisString = "RHorizontal PC";
-			leftTriggerAxisString = "Left Trigger PC";
-			rightTriggerAxisString = "Right Trigger PC";
-		}
-
 		if( ( Input.GetJoystickNames().Length > 0 && currentInputType != Input.GetJoystickNames()[0] ) ||
 		   ( Input.GetJoystickNames().Length == 0 && currentInputType != "Keyboard" ) )
 		{
+			if( Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor )
+			{
+				verticalAxisString = "Vertical Mac";
+				horizontalAxisString = "Horizontal Mac";
+				rVerticalAxisString = "RVertical Mac";
+				rHorizontalAxisString = "RHorizontal Mac";
+				leftTriggerAxisString = "Left Trigger Mac";
+				rightTriggerAxisString = "Right Trigger Mac";
+			}
+			else if( Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor )
+			{
+				verticalAxisString = "Vertical PC";
+				horizontalAxisString = "Horizontal PC";
+				rVerticalAxisString = "RVertical PC";
+				rHorizontalAxisString = "RHorizontal PC";
+				leftTriggerAxisString = "Left Trigger PC";
+				rightTriggerAxisString = "Right Trigger PC";
+			}
+
 			if( Input.GetJoystickNames().Length > 0 && Input.GetJoystickNames()[0] != "" )
 			{
 				//hardcoded for PS3 controller, PS4 controller, and PC
@@ -186,11 +186,12 @@ public class InputController : MonoBehaviour {
 					codes[ (int)ButtonType.Action ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
 					codes[ (int)ButtonType.LeftShoulder ] = (KeyCode)( (int)KeyCode.Joystick1Button4 );
 					codes[ (int)ButtonType.RightShoulder ] = (KeyCode)( (int)KeyCode.Joystick1Button5 );
-					
+
 					codes[ (int)ButtonType.Start ] = (KeyCode)( (int)KeyCode.Joystick1Button7 );
 					codes[ (int)ButtonType.A ] = (KeyCode)( (int)KeyCode.Joystick1Button0 );
 					codes[ (int)ButtonType.B ] = (KeyCode)( (int)KeyCode.Joystick1Button1 );
 					codes[ (int)ButtonType.X ] = (KeyCode)( (int)KeyCode.Joystick1Button2 );
+					codes[ (int)ButtonType.Y ] = (KeyCode)( (int)KeyCode.Joystick1Button3 );
 				} break;
 
 				//XBOX 360 on OSX
@@ -214,6 +215,7 @@ public class InputController : MonoBehaviour {
 					codes[ (int)ButtonType.A ] = (KeyCode)( (int)KeyCode.Joystick1Button16 );
 					codes[ (int)ButtonType.B ] = (KeyCode)( (int)KeyCode.Joystick1Button17 );
 					codes[ (int)ButtonType.X ] = (KeyCode)( (int)KeyCode.Joystick1Button18 );
+					codes[ (int)ButtonType.Y ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
 				} break;
 				}
 				
@@ -239,6 +241,7 @@ public class InputController : MonoBehaviour {
 				codes[ (int)ButtonType.A ] = KeyCode.RightCommand;
 				codes[ (int)ButtonType.B ] = KeyCode.Backspace;
 				codes[ (int)ButtonType.X ] = KeyCode.LeftCommand;
+				codes[ (int)ButtonType.Y ] = KeyCode.Y;
 				
 				currentInputType = "Keyboard";
 			}
