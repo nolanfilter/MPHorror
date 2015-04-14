@@ -149,9 +149,9 @@ public class NetworkAgent : MonoBehaviour {
 
 			switch( PlayerAgent.GetClientState() )
 			{
-				case PlayerController.State.Dead: endStatusString = "Trapped forever"; break;
-				case PlayerController.State.Voyeur: endStatusString = "Sweet freedom"; break;
-				case PlayerController.State.Monster: endStatusString = "Betrayal suits you"; break;
+				case PlayerController.State.Voyeur: case PlayerController.State.Frozen: endStatusString = "Trapped forever"; break;
+				case PlayerController.State.Monster: case PlayerController.State.Raging: endStatusString = "Betrayal suits you"; break;
+				default: endStatusString = "Everything is awesome"; break;
 			}
 
 			GUI.Label( new Rect( Screen.width * 0.3f + 3, 225, Screen.width * 0.4f, 100 ), endStatusString, shadowStyle );

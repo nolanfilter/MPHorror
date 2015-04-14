@@ -160,7 +160,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	
 	void Awake()
 	{
-		inputController = GetComponent<InputController>();
+		inputController = GetComponent<InputController>(); 
 		
 		if( inputController == null )
 		{
@@ -1177,8 +1177,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	[RPC]
 	public void RPCEndGame()
 	{
-		StopCoroutine( "DoStun" );
-		StopCoroutine( "RageMode" );
+		StopStatuses();
 		
 		NegativeEffect negativeEffect = Camera.main.gameObject.GetComponent<NegativeEffect>();
 		
@@ -1258,6 +1257,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		StopCoroutine( "DoFreeze" );
 		StopCoroutine( "DoStun" );
+		StopCoroutine( "RageMode" );
 	}
 	// end server calls
 
@@ -1618,8 +1618,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public void EndGame()
 	{
-		StopCoroutine( "DoStun" );
-		StopCoroutine( "RageMode" );
+		StopStatuses();
 		
 		NegativeEffect negativeEffect = Camera.main.gameObject.GetComponent<NegativeEffect>();
 		
@@ -1704,6 +1703,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		
 		StopCoroutine( "DoFreeze" );
 		StopCoroutine( "DoStun" );
+		StopCoroutine( "RageMode" );
 	}
 
 	public void TurnOffQuads()
