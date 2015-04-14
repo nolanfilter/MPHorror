@@ -107,7 +107,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 161654}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 237a7a10492cc4ae6a3adcc6419f4961, type: 3}
   m_Name: 
@@ -115,14 +115,14 @@ MonoBehaviour:
   quality: 1
   resolution: 4
   simpleTweakMode: 1
-  focalPoint: 1
-  smoothness: .5
+  focalPoint: 2
+  smoothness: 2
   focalZDistance: 0
   focalZStartCurve: 1
   focalZEndCurve: 1
   objectFocus: {fileID: 0}
-  focalSize: 0
-  bluriness: 2
+  focalSize: 1
+  bluriness: 1
   maxBlurSpread: 1.75
   foregroundBlurExtrude: 1.14999998
   dofBlurShader: {fileID: 4800000, guid: bb4af680337344a4abad65a4e8873c50, type: 3}
