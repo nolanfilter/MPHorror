@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: 4b97dc4df8a574670b2fa035fb0de759
 ModelImporter:
-  serializedVersion: 15
+  serializedVersion: 18
   fileIDToRecycleName:
     100000: pCone1
     100002: pCone2
@@ -24,6 +24,7 @@ ModelImporter:
     4300000: pCube2
     4300002: pCone1
     4300004: pCone2
+    4300006: polySurface1
     9500000: //RootNode
   materials:
     importMaterials: 1
@@ -33,6 +34,7 @@ ModelImporter:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
     optimizeGameObjects: 0
+    motionNodeName: 
     animationCompression: 1
     animationRotationError: .5
     animationPositionError: .5
@@ -51,11 +53,13 @@ ModelImporter:
     generateSecondaryUV: 0
     useFileUnits: 1
     optimizeMeshForGPU: 1
+    keepQuads: 0
     weldVertices: 1
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
     secondaryUVPackMargin: 4
+    useFileScale: 0
   tangentSpace:
     normalSmoothAngle: 60
     splitTangentsAcrossUV: 1
@@ -76,4 +80,7 @@ ModelImporter:
     rootMotionBoneName: 
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   animationType: 2
+  additionalBone: 0
   userData: 
+  assetBundleName: 
+  assetBundleVariant: 
