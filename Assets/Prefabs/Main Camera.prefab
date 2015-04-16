@@ -29,9 +29,9 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 161654}
-  m_LocalRotation: {x: -.0632176027, y: .731566131, z: -.0684776902, w: -.675370514}
-  m_LocalPosition: {x: -21.4500008, y: 1.51999998, z: 13.46}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0, y: .707106829, z: 0, w: .707106709}
+  m_LocalPosition: {x: -7.30999994, y: 1.40999997, z: 6.75}
+  m_LocalScale: {x: .99999994, y: 1, z: .99999994}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -107,7 +107,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 161654}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 237a7a10492cc4ae6a3adcc6419f4961, type: 3}
   m_Name: 
@@ -115,15 +115,15 @@ MonoBehaviour:
   quality: 1
   resolution: 4
   simpleTweakMode: 1
-  focalPoint: 2
-  smoothness: 2
-  focalZDistance: 0
+  focalPoint: 5
+  smoothness: .100000001
+  focalZDistance: .300000012
   focalZStartCurve: 1
   focalZEndCurve: 1
   objectFocus: {fileID: 0}
-  focalSize: 1
-  bluriness: 1
-  maxBlurSpread: 1.75
+  focalSize: 0
+  bluriness: 4
+  maxBlurSpread: 5
   foregroundBlurExtrude: 1.14999998
   dofBlurShader: {fileID: 4800000, guid: bb4af680337344a4abad65a4e8873c50, type: 3}
   dofShader: {fileID: 4800000, guid: 987fb0677d01f43ce8a9dbf12271e668, type: 3}

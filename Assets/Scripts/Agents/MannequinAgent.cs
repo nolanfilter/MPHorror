@@ -50,6 +50,7 @@ public class MannequinAgent : MonoBehaviour {
 		}
 	}
 
+	/*
 	void OnGUI()
 	{
 		if( GameAgent.GetCurrentGameState() != GameAgent.GameState.Game )
@@ -63,6 +64,7 @@ public class MannequinAgent : MonoBehaviour {
 
 		GUI.Label( new Rect( 10f, 10f, 1000f, 1000f ), "" + numActiveMannequins + "/" + mannequins.Count );
 	}
+	*/
 
 	public static void RegisterMannequin( GameObject mannequin )
 	{
@@ -116,7 +118,7 @@ public class MannequinAgent : MonoBehaviour {
 			}
 		}
 
-		if( mannequinPrefab == null )
+		if( mannequinPrefab == null || mannequinAreaRoot == null )
 			return;
 
 		int seed = Utilities.HexToInt( PhotonNetwork.room.name[ PhotonNetwork.room.name.Length - 2 ] );
