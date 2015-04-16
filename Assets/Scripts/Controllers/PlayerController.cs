@@ -94,16 +94,18 @@ public class PlayerController : Photon.MonoBehaviour {
 	public GameObject screenshotQuadPrefab;
 	public GameObject camQuadPrefab;
 	public GameObject rageQuadPrefab;
-
-	private Renderer[] modelRenderers = null;
-
-	public Light flashlight;
-	public Light flashBulb;
+	public GameObject compassQuadPrefab;
 
 	private GameObject flashQuad;
 	private GameObject screenshotQuad;
 	private GameObject camQuad;
 	private GameObject rageQuad;
+	private GameObject compassQuad;
+
+	private Renderer[] modelRenderers = null;
+
+	public Light flashlight;
+	public Light flashBulb;
 
 	private Color whiteClear = new Color( 1f, 1f, 1f, 0f );
 
@@ -260,6 +262,12 @@ public class PlayerController : Photon.MonoBehaviour {
 			rageQuad.GetComponent<Renderer>().enabled = false;
 		}
 
+		if( compassQuadPrefab )
+		{
+			compassQuad = Instantiate( compassQuadPrefab ) as GameObject;
+			compassQuad.GetComponent<Renderer>().enabled = false;
+		}
+
 		viewChangeVector = Vector2.zero;
 		oldViewChangeVector = viewChangeVector;
 
@@ -321,6 +329,8 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		if( transform.position.y != height )
 			transform.position = new Vector3( transform.position.x, height, transform.position.z );
+
+		UpdateCompass();
 	}
 
 	void LateUpdate()
@@ -569,6 +579,25 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		transform.position = syncEndPosition;
 		transform.rotation = syncEndRotation;
+	}
+
+	private void UpdateCompass()
+	{
+		if( !photonView.isMine || compassQuad == null || MannequinAgent.GetNumActiveMannequins() > 13 )
+			return;
+
+		Vector3 closestMannequinVector = MannequinAgent.GetClosestMannequin( transform.position ) - transform.position;
+
+		float angle = Mathf.DeltaAngle( Mathf.Atan2( cameraTransform.forward.x, cameraTransform.forward.z ) * Mathf.Rad2Deg,
+		                               Mathf.Atan2( closestMannequinVector.x, closestMannequinVector.z ) * Mathf.Rad2Deg );
+
+		if( compassQuad )
+		{
+			if( !compassQuad.GetComponent<Renderer>().enabled )
+				compassQuad.GetComponent<Renderer>().enabled = true;
+
+			compassQuad.transform.localRotation = Quaternion.AngleAxis( angle, Vector3.back );
+		}
 	}
 
 	private void SnapCamera()
@@ -1713,6 +1742,9 @@ public class PlayerController : Photon.MonoBehaviour {
 		
 		if( camQuad )
 			camQuad.GetComponent<Renderer>().enabled = false;
+
+		if( compassQuad )
+			compassQuad.GetComponent<Renderer>().enabled = false;
 	}
 
 	public void TeleportTo( Vector3 coordinate )

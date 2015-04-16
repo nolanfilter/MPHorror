@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class PlayerAgent : MonoBehaviour {
 
 	private List<PlayerController> playerControllers;
-
+	
 	public Shader stunShader;
 	public Shader monsterShader;
 	public Shader fastBloomShader;

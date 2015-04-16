@@ -50,6 +50,20 @@ public class MannequinAgent : MonoBehaviour {
 		}
 	}
 
+	void OnGUI()
+	{
+		if( GameAgent.GetCurrentGameState() != GameAgent.GameState.Game )
+			return;
+
+		int numActiveMannequins = 0;
+		
+		for( int i = 0; i < mannequins.Count; i++ )
+			if( mannequins[i].activeSelf )
+				numActiveMannequins++;
+
+		GUI.Label( new Rect( 10f, 10f, 1000f, 1000f ), "" + numActiveMannequins + "/" + mannequins.Count );
+	}
+
 	public static void RegisterMannequin( GameObject mannequin )
 	{
 		if( instance )
@@ -159,6 +173,59 @@ public class MannequinAgent : MonoBehaviour {
 				numActiveMannequins++;
 
 		return ( numActiveMannequins == 0 );
+	}
+
+	public static Vector3 GetClosestMannequin( Vector3 position )
+	{
+		if( instance )
+			return instance.internalGetClosestMannequin( position );
+
+		return Vector3.zero;
+	}
+
+	private Vector3 internalGetClosestMannequin( Vector3 position )
+	{
+		float closestDistance = Mathf.Infinity;
+		Vector3 closestPosition = Vector3.zero;
+		float distance;
+		Vector3 adjustedPosition;
+
+		for( int i = 0; i < mannequins.Count; i++ )
+		{
+			if( mannequins[i].activeSelf )
+			{
+				adjustedPosition = new Vector3( mannequins[i].transform.position.x, position.y, mannequins[i].transform.position.z );
+
+				distance = Vector3.Distance( position, adjustedPosition );
+
+				if( distance < closestDistance )
+				{
+					closestDistance = distance;
+					closestPosition = adjustedPosition;
+				}
+			}
+		}
+
+		return closestPosition;
+	}
+
+	public static int GetNumActiveMannequins()
+	{
+		if( instance )
+			return instance.internalGetNumActiveMannequins();
+
+		return -1;
+	}
+
+	private int internalGetNumActiveMannequins()
+	{
+		int numActiveMannequins = 0;
+		
+		for( int i = 0; i < mannequins.Count; i++ )
+			if( mannequins[i].activeSelf )
+				numActiveMannequins++;
+
+		return numActiveMannequins;
 	}
 
 	public static bool GetShouldMonsterize()
