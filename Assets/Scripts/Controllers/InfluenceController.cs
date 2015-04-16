@@ -6,7 +6,7 @@ public class InfluenceController : MonoBehaviour {
 	private float sphereRadius = 2f;
 	private float zoomRadius = 0.5f;
 	private float rageRadius = 0.25f;
-	private float zoomDistance = 3f;
+	private float zoomDistance = 5f;
 	private float rageDistance = 1f;
 	public bool showDebugRay = false;
 

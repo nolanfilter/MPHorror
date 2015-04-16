@@ -583,7 +583,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private void UpdateCompass()
 	{
-		if( !photonView.isMine || compassQuad == null || MannequinAgent.GetNumActiveMannequins() > PlayerAgent.GetCompassActivationNumber() )
+		if( !photonView.isMine || GameAgent.GetCurrentGameState() != GameAgent.GameState.Game || compassQuad == null || MannequinAgent.GetNumActiveMannequins() > PlayerAgent.GetCompassActivationNumber() )
 			return;
 
 		Vector3 closestMannequinVector = MannequinAgent.GetClosestMannequin( transform.position ) - transform.position;
@@ -616,10 +616,12 @@ public class PlayerController : Photon.MonoBehaviour {
 			if( zoomProgress == 1f )
 			{
 				timeZoomedIn += Time.deltaTime;
+				Camera.main.gameObject.GetComponent<DepthOfField34>().enabled = ( currentState != State.Monster );
 			}
 			else
 			{
 				timeZoomedIn = 0f;
+				Camera.main.gameObject.GetComponent<DepthOfField34>().enabled = false;
 			}
 
 			if( zoomProgress != 0f )

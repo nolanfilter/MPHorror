@@ -183,7 +183,7 @@ public class PlayerAgent : MonoBehaviour {
 
 	private void internalCheckForEnd()
 	{
-		if( !checkForEnd )
+		if( !checkForEnd || GameAgent.GetCurrentGameState() != GameAgent.GameState.Game )
 			return;
 
 		bool isOver = true;
