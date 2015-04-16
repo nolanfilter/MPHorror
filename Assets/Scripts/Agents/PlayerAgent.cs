@@ -32,6 +32,7 @@ public class PlayerAgent : MonoBehaviour {
 	public float waitTime = 25f;
 	public float endBuffer = 8f;
 	public int monsterizingMannequinNumber = 13;
+	public int compassActivationNumber = 25;
 
 	private static PlayerAgent mInstance = null;
 	public static PlayerAgent instance
@@ -155,6 +156,14 @@ public class PlayerAgent : MonoBehaviour {
 		if( instance )
 			return instance.monsterizingMannequinNumber;
 
+		return -1;
+	}
+
+	public static int GetCompassActivationNumber()
+	{
+		if( instance )
+			return instance.compassActivationNumber;
+		
 		return -1;
 	}
 
