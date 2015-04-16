@@ -583,7 +583,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private void UpdateCompass()
 	{
-		if( !photonView.isMine || compassQuad == null || MannequinAgent.GetNumActiveMannequins() > 13 )
+		if( !photonView.isMine || compassQuad == null || MannequinAgent.GetNumActiveMannequins() > PlayerAgent.GetCompassActivationNumber() )
 			return;
 
 		Vector3 closestMannequinVector = MannequinAgent.GetClosestMannequin( transform.position ) - transform.position;
@@ -611,7 +611,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 			//check for jumps
 			if( Mathf.Abs( oldZoomProgress - zoomProgress ) > 0.5f )
-				zoomProgress = oldZoomProgress + 0.1f * Mathf.Sign( oldZoomProgress - zoomProgress );
+				zoomProgress = Mathf.Clamp01( oldZoomProgress + 0.1f * Mathf.Sign( oldZoomProgress - zoomProgress ) );
 
 			if( zoomProgress == 1f )
 			{
