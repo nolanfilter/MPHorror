@@ -6,6 +6,9 @@ public class ScreenshotAgent : MonoBehaviour {
 	public delegate void PostRenderFinish();
 	public event PostRenderFinish OnPostRenderFinish;
 
+	private int adjustedWidth;
+	private int adjustedX;
+
 	private Texture2D texture;
 
 	private static ScreenshotAgent mInstance = null;
@@ -27,13 +30,16 @@ public class ScreenshotAgent : MonoBehaviour {
 		
 		mInstance = this;
 
-		texture = new Texture2D( Screen.width, Screen.height, TextureFormat.RGB24, false );
+		adjustedWidth = Mathf.RoundToInt( Screen.height / 3f * 4f );
+		adjustedX = Mathf.RoundToInt( ( Screen.width - adjustedWidth ) / 2f );
+
+		texture = new Texture2D( adjustedWidth, Screen.height, TextureFormat.RGB24, false );
 		Disable();
 	}
 
 	void OnPostRender()
 	{
-		texture.ReadPixels( new Rect( 0,0,Screen.width, Screen.height ), 0, 0 );
+		texture.ReadPixels( new Rect( adjustedX, 0, adjustedWidth, Screen.height ), 0, 0 );
 		texture.Apply();
 		Disable();
 		
