@@ -53,6 +53,8 @@ public class GameAgent : MonoBehaviour {
 		}
 		
 		mInstance = this;
+
+		//Application.targetFrameRate = 1;
 	}
 
 	void Start()
@@ -118,12 +120,17 @@ public class GameAgent : MonoBehaviour {
 				if( motionBlur )
 					motionBlur.enabled = false;
 
-				PlayerAgent.TurnOffAllQuads();
-
 				NetworkAgent.LeaveRoom();
 			}
 		}
 	}
+
+	/*
+	void OnGUI()
+	{
+		GUI.Label( new Rect( 10f, 10f, 1000f, 1000f ), "" + GetCurrentGameState() );
+	}
+	*/
 
 	public static GameState GetCurrentGameState()
 	{
@@ -170,9 +177,6 @@ public class GameAgent : MonoBehaviour {
 
 	private void internalPushGameState( GameState newGameState )
 	{
-		if( GetCurrentGameState() == newGameState )
-			return;
-
 		if( gameStateObjectStack.Count > 0 && gameStateObjectStack[0] != null )
 			gameStateObjectStack[0].SetActive( false );
 

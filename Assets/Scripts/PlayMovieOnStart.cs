@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class PlayMovieOnStart : MonoBehaviour {
@@ -14,7 +15,19 @@ public class PlayMovieOnStart : MonoBehaviour {
 
 	void Start()
 	{
-		movieTexture = GetComponent<Renderer>().material.mainTexture as MovieTexture;
+		Renderer renderer = GetComponent<Renderer>();
+
+		if( renderer )
+			movieTexture = renderer.material.mainTexture as MovieTexture;
+
+		if( movieTexture == null )
+		{
+			RawImage rawImage = GetComponent<RawImage>();
+
+			if( rawImage )
+				movieTexture = rawImage.texture as MovieTexture;
+		}
+
 		movieTexture.loop = loop;
 
 		audioSource = gameObject.AddComponent<AudioSource>();

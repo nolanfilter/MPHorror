@@ -277,18 +277,6 @@ public class PlayerAgent : MonoBehaviour {
 			playerControllers[ 0 ].EndGame();
 	}
 
-	public static void TurnOffAllQuads()
-	{
-		if( instance )
-			instance.internalTurnOffAllQuads();
-	}
-
-	private void internalTurnOffAllQuads()
-	{
-		for( int i = 0; i < playerControllers.Count; i++ )
-			playerControllers[i].TurnOffQuads();
-	}
-
 	public static void MonsterizeNearestPlayer( Vector3 position )
 	{
 		if( instance )

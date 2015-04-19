@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -90,17 +91,13 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private NetworkView networkView;
 
-	public GameObject flashQuadPrefab;
-	public GameObject screenshotQuadPrefab;
-	public GameObject camQuadPrefab;
-	public GameObject rageQuadPrefab;
-	public GameObject compassQuadPrefab;
-
-	private GameObject flashQuad;
-	private GameObject screenshotQuad;
-	private GameObject camQuad;
-	private GameObject rageQuad;
-	private GameObject compassQuad;
+	public GameObject UIRootObject;
+	public RawImage flashUI;
+	public RawImage screenshotUI;
+	public RawImage photoFrameUI;
+	public RawImage camUI;
+	public RawImage rageUI;
+	public RawImage compassUI;
 
 	private Renderer[] modelRenderers = null;
 
@@ -238,35 +235,13 @@ public class PlayerController : Photon.MonoBehaviour {
 		textStyle.normal.textColor = Color.white;
 		textStyle.alignment = TextAnchor.MiddleCenter;
 
-		if( flashQuadPrefab )
+		if( UIRootObject )
 		{
-			flashQuad = Instantiate( flashQuadPrefab ) as GameObject;
-			flashQuad.GetComponent<Renderer>().material.color = whiteClear;
+			UIRootObject.SetActive( false );
+			UIRootObject.transform.SetParent( null, false );
 		}
 
-		if( screenshotQuadPrefab )
-		{
-			screenshotQuad = Instantiate( screenshotQuadPrefab ) as GameObject;
-			screenshotQuad.GetComponent<Renderer>().material.color = whiteClear;
-		}
-
-		if( camQuadPrefab )
-		{
-			camQuad = Instantiate( camQuadPrefab ) as GameObject;
-			camQuad.GetComponent<Renderer>().enabled = false;
-		}
-
-		if( rageQuadPrefab )
-		{
-			rageQuad = Instantiate( rageQuadPrefab ) as GameObject;
-			rageQuad.GetComponent<Renderer>().enabled = false;
-		}
-
-		if( compassQuadPrefab )
-		{
-			compassQuad = Instantiate( compassQuadPrefab ) as GameObject;
-			compassQuad.GetComponent<Renderer>().enabled = false;
-		}
+		DisableUI();
 
 		viewChangeVector = Vector2.zero;
 		oldViewChangeVector = viewChangeVector;
@@ -311,6 +286,8 @@ public class PlayerController : Photon.MonoBehaviour {
 	void OnDestroy()
 	{
 		PlayerAgent.UnregisterPlayer( this );
+
+		Destroy( UIRootObject );
 	}
 	
 	void Update()
@@ -519,11 +496,11 @@ public class PlayerController : Photon.MonoBehaviour {
 		{
 			transform.rotation = Quaternion.LookRotation( zoomOffset.normalized );
 
-			if( rageQuad && currentState == State.Monster )
-				rageQuad.GetComponent<Renderer>().enabled = true;
+			if( rageUI && currentState == State.Monster )
+				rageUI.enabled = true;
 
-			if( camQuad && ( currentState == State.Normal || currentState == State.None ) )
-				camQuad.GetComponent<Renderer>().enabled = !isWaitingForPhotoFinish && !hasPhoto;
+			if( camUI && ( currentState == State.Normal || currentState == State.None ) )
+				camUI.enabled = ( !isWaitingForPhotoFinish && !hasPhoto );
 		}
 		else
 		{
@@ -539,11 +516,11 @@ public class PlayerController : Photon.MonoBehaviour {
 					transform.rotation = Quaternion.RotateTowards( transform.rotation, Quaternion.LookRotation( axes ), maxRotationSpeed );
 			}
 
-			if( rageQuad )
-				rageQuad.GetComponent<Renderer>().enabled = false;
+			if( rageUI )
+				rageUI.enabled = false;
 			
-			if( camQuad )
-				camQuad.GetComponent<Renderer>().enabled = false;
+			if( camUI )
+				camUI.enabled = false;
 		}
 
 		movementVector = Vector3.zero;
@@ -583,7 +560,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private void UpdateCompass()
 	{
-		if( !photonView.isMine || GameAgent.GetCurrentGameState() != GameAgent.GameState.Game || compassQuad == null || MannequinAgent.GetNumActiveMannequins() > PlayerAgent.GetCompassActivationNumber() )
+		if( !photonView.isMine || GameAgent.GetCurrentGameState() != GameAgent.GameState.Game || compassUI == null || MannequinAgent.GetNumActiveMannequins() > PlayerAgent.GetCompassActivationNumber() )
 			return;
 
 		Vector3 closestMannequinVector = MannequinAgent.GetClosestMannequin( transform.position ) - transform.position;
@@ -591,13 +568,10 @@ public class PlayerController : Photon.MonoBehaviour {
 		float angle = Mathf.DeltaAngle( Mathf.Atan2( cameraTransform.forward.x, cameraTransform.forward.z ) * Mathf.Rad2Deg,
 		                               Mathf.Atan2( closestMannequinVector.x, closestMannequinVector.z ) * Mathf.Rad2Deg );
 
-		if( compassQuad )
-		{
-			if( !compassQuad.GetComponent<Renderer>().enabled )
-				compassQuad.GetComponent<Renderer>().enabled = true;
+		if( !compassUI.enabled )
+			compassUI.enabled = true;
 
-			compassQuad.transform.localRotation = Quaternion.AngleAxis( angle, Vector3.back );
-		}
+		compassUI.rectTransform.localRotation = Quaternion.AngleAxis( angle, Vector3.back );
 	}
 
 	private void SnapCamera()
@@ -891,6 +865,40 @@ public class PlayerController : Photon.MonoBehaviour {
 			Destroy( stunController );
 	}
 
+	private void DisableUI()
+	{
+		if( flashUI )
+		{
+			flashUI.enabled = false;
+			flashUI.color = whiteClear;
+		}
+		if( screenshotUI )
+		{
+			screenshotUI.enabled = false;
+			screenshotUI.color = whiteClear;
+		}
+
+		if( photoFrameUI )
+		{
+			photoFrameUI.enabled = false;
+		}
+		
+		if( camUI )
+		{
+			camUI.enabled = false;
+		}
+		
+		if( rageUI )
+		{
+			rageUI.enabled = false;
+		}
+		
+		if( compassUI )
+		{
+			compassUI.enabled = false;
+		}
+	}
+
 	//coroutines
 	private IEnumerator DoDisplayMessage( string messageToDisplay )
 	{
@@ -924,23 +932,45 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		SetFlashBulbTo( true );
 
-		if( flashQuad )
+		if( flashUI )
 		{
-			yield return StartCoroutine( DoColorFade( flashQuad.GetComponent<Renderer>().material, Color.white, whiteClear, 0.5f ) );
+			flashUI.enabled = true;
+
+			yield return StartCoroutine( DoColorFade( flashUI, Color.white, whiteClear, 0.5f ) );
+
+			flashUI.enabled = false;
 		}
 
 		SetFlashBulbTo( false );
 
-		if( screenshotQuad )
+		if( photoFrameUI )
 		{
-			yield return StartCoroutine( DoColorFade( screenshotQuad.GetComponent<Renderer>().material, whiteClear, Color.white, 0.25f ) );
+			photoFrameUI.color = Color.white;
+			photoFrameUI.enabled = true;
+		}
 
-			yield return new WaitForSeconds( 1.25f );
+		if( screenshotUI )
+		{
+			screenshotUI.enabled = true;
 
-			yield return StartCoroutine( DoColorFade( screenshotQuad.GetComponent<Renderer>().material, Color.white, whiteClear, 0.45f ) );
+			yield return StartCoroutine( DoColorFade( screenshotUI, Color.black, Color.white, 1.75f ) );
 		}
 
 		hasPhoto = false;
+
+		if( photoFrameUI )
+			StartCoroutine( DoColorFade( photoFrameUI, Color.white, whiteClear, 0.5f ) );
+
+		if( screenshotUI )
+			StartCoroutine( DoColorFade( screenshotUI, Color.white, whiteClear, 0.5f ) );
+
+		yield return new WaitForSeconds( 0.5f );
+
+		if( photoFrameUI )
+			photoFrameUI.enabled = false;
+
+		if (screenshotUI)
+			screenshotUI.enabled = false;
 
 		SetFlashlightTo( oldFlashlightState );
 	}
@@ -1056,9 +1086,9 @@ public class PlayerController : Photon.MonoBehaviour {
 			ChangeState( (int)State.None );
 	}
 
-	private IEnumerator DoColorFade( Material material, Color fromColor, Color toColor, float duration )
+	private IEnumerator DoColorFade( RawImage rawImage, Color fromColor, Color toColor, float duration )
 	{
-		material.color = fromColor;
+		rawImage.color = fromColor;
 		
 		float beginTime = Time.time;
 		float currentTime = 0f;
@@ -1069,13 +1099,13 @@ public class PlayerController : Photon.MonoBehaviour {
 			currentTime += Time.deltaTime;
 			lerp = currentTime / duration;
 			
-			material.color = Color.Lerp( fromColor, toColor, lerp );
+			rawImage.color = Color.Lerp( fromColor, toColor, lerp );
 			
 			yield return null;
 			
 		} while ( currentTime < duration );
 		
-		material.color = toColor;
+		rawImage.color = toColor;
 	}
 
 	//TODO generalize
@@ -1168,6 +1198,11 @@ public class PlayerController : Photon.MonoBehaviour {
 	[RPC]
 	public void RPCStartGame()
 	{
+		DisableUI();
+
+		if( UIRootObject )
+			UIRootObject.SetActive( true );
+
 		FastBloom fastBloom = Camera.main.gameObject.GetComponent<FastBloom>();
 			
 		if( fastBloom )
@@ -1200,7 +1235,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		zoomSurvivorController.playerController = this;
 
 		gameObject.AddComponent<NoiseController>();
-		
+
 		GameAgent.ChangeGameState( GameAgent.GameState.Game );
 		PlayerAgent.SetMonster();
 	}
@@ -1268,7 +1303,10 @@ public class PlayerController : Photon.MonoBehaviour {
 		
 		messageString = "";
 		
-		TurnOffQuads();
+		DisableUI();
+		
+		if( UIRootObject )
+			UIRootObject.SetActive( false );
 	}
 
 	[RPC]
@@ -1365,8 +1403,8 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		ScreenshotAgent.instance.OnPostRenderFinish -= OnScreenshotFinish;
 
-		if( screenshotQuad )
-			screenshotQuad.GetComponent<Renderer>().material.mainTexture = ScreenshotAgent.GetTexture();
+		if( screenshotUI )
+			screenshotUI.texture = ScreenshotAgent.GetTexture();
 
 		isWaitingForPhotoFinish = false;
 	}
@@ -1528,8 +1566,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( !photonView.isMine || GameAgent.GetCurrentGameState() != GameAgent.GameState.Game || currentState == State.Monster || currentState == State.Dead )
 			return;
 
-		if( camQuad )
-			camQuad.GetComponent<Renderer>().enabled = false;
+		if( camUI )
+			camUI.enabled = false;
 
 		//cameraTransform.gameObject.AddComponent<NegativeEffect>();
 		StopCoroutine( "DoStun" );
@@ -1608,6 +1646,11 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public void StartGame()
 	{
+		DisableUI();
+		
+		if( UIRootObject )
+			UIRootObject.SetActive( photonView.isMine );
+
 		FastBloom fastBloom = Camera.main.gameObject.GetComponent<FastBloom>();
 		
 		if( fastBloom )
@@ -1709,7 +1752,10 @@ public class PlayerController : Photon.MonoBehaviour {
 		
 		messageString = "";
 		
-		TurnOffQuads();
+		DisableUI();
+		
+		if( UIRootObject )
+			UIRootObject.SetActive( false );
 
 		photonView.RPC( "RPCEndGame", PhotonTargets.OthersBuffered );
 	}
@@ -1735,18 +1781,6 @@ public class PlayerController : Photon.MonoBehaviour {
 		StopCoroutine( "DoFreeze" );
 		StopCoroutine( "DoStun" );
 		StopCoroutine( "RageMode" );
-	}
-
-	public void TurnOffQuads()
-	{
-		if( rageQuad )
-			rageQuad.GetComponent<Renderer>().enabled = false;
-		
-		if( camQuad )
-			camQuad.GetComponent<Renderer>().enabled = false;
-
-		if( compassQuad )
-			compassQuad.GetComponent<Renderer>().enabled = false;
 	}
 
 	public void TeleportTo( Vector3 coordinate )
