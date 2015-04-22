@@ -6,8 +6,8 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: KidsRoomWall
-  m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
+  m_Name: CarouselHorseBoy
+  m_Shader: {fileID: 45, guid: 0000000000000000f000000000000000, type: 0}
   m_ShaderKeywords: 
   m_LightmapFlags: 5
   m_CustomRenderQueue: -1
@@ -18,8 +18,8 @@ Material:
         first:
           name: _MainTex
         second:
-          m_Texture: {fileID: 2800000, guid: c118c1beff8244491902433a9f40c108, type: 3}
-          m_Scale: {x: .5, y: .5}
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
       data:
         first:
@@ -54,7 +54,7 @@ Material:
           name: _EmissionMap
         second:
           m_Texture: {fileID: 0}
-          m_Scale: {x: .5, y: .5}
+          m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
       data:
         first:
@@ -73,6 +73,13 @@ Material:
       data:
         first:
           name: _MetallicGlossMap
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _SpecGlossMap
         second:
           m_Texture: {fileID: 0}
           m_Scale: {x: 1, y: 1}
@@ -101,7 +108,7 @@ Material:
       data:
         first:
           name: _Glossiness
-        second: .100000001
+        second: .5
       data:
         first:
           name: _BumpScale
@@ -138,8 +145,12 @@ Material:
       data:
         first:
           name: _Color
-        second: {r: 1, g: 1, b: 1, a: 1}
+        second: {r: .841316998, g: .977941155, b: .915753603, a: 1}
+      data:
+        first:
+          name: _SpecColor
+        second: {r: .737456739, g: .808823526, b: .79996419, a: 1}
       data:
         first:
           name: _EmissionColorUI
-        second: {r: 1, g: 1, b: 1, a: 1}
+        second: {r: .664792359, g: .852941155, b: .829584777, a: 1}
