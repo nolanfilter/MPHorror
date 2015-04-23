@@ -191,6 +191,7 @@ public class InputController : MonoBehaviour {
 					codes[ (int)ButtonType.A ] = (KeyCode)( (int)KeyCode.Joystick1Button0 );
 					codes[ (int)ButtonType.B ] = (KeyCode)( (int)KeyCode.Joystick1Button1 );
 					codes[ (int)ButtonType.X ] = (KeyCode)( (int)KeyCode.Joystick1Button2 );
+					codes[ (int)ButtonType.Y ] = (KeyCode)( (int)KeyCode.Joystick1Button3 );
 				} break;
 
 				//XBOX 360 on OSX
@@ -214,6 +215,7 @@ public class InputController : MonoBehaviour {
 					codes[ (int)ButtonType.A ] = (KeyCode)( (int)KeyCode.Joystick1Button16 );
 					codes[ (int)ButtonType.B ] = (KeyCode)( (int)KeyCode.Joystick1Button17 );
 					codes[ (int)ButtonType.X ] = (KeyCode)( (int)KeyCode.Joystick1Button18 );
+					codes[ (int)ButtonType.Y ] = (KeyCode)( (int)KeyCode.Joystick1Button19 );
 				} break;
 				}
 				
@@ -239,6 +241,7 @@ public class InputController : MonoBehaviour {
 				codes[ (int)ButtonType.A ] = KeyCode.RightCommand;
 				codes[ (int)ButtonType.B ] = KeyCode.Backspace;
 				codes[ (int)ButtonType.X ] = KeyCode.LeftCommand;
+				codes[ (int)ButtonType.Y ] = KeyCode.Y;
 				
 				currentInputType = "Keyboard";
 			}
