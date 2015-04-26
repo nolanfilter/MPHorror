@@ -59,7 +59,6 @@ public class PlayerController : Photon.MonoBehaviour {
 	
 	private Vector3 movementVector;
 	private Vector2 viewChangeVector;
-	private Vector2 oldViewChangeVector;
 	private float viewChangeRate = 1.75f;
 	private float timeViewChangeStatic;
 	private float timeViewChangeStaticThreshold = 1f;
@@ -69,7 +68,7 @@ public class PlayerController : Photon.MonoBehaviour {
  	private Transform cameraTransform;
 	private float cameraFoV = 40f;
 	private float cameraZoomFoV = 20f;
-	private Quaternion cameraRotationOffset = Quaternion.Euler( new Vector3( 0f, 0f, 0f ) );
+	private Quaternion cameraRotationOffset = Quaternion.Euler( new Vector3( 4f, 0f, 0f ) );
 	private float cameraRotationRate = 0.025f;
 
 	private Vector3 clippingOffset = Vector3.zero;
@@ -98,6 +97,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	public RawImage camUI;
 	public RawImage rageUI;
 	public RawImage compassUI;
+	public RawImage motionBlindUI;
 
 	private Renderer[] modelRenderers = null;
 
@@ -125,16 +125,18 @@ public class PlayerController : Photon.MonoBehaviour {
 	private float angularMaxSpeed = 15.0f;
 	private float snapSmoothLag = 0.2f;
 	private float snapMaxSpeed = 720.0f;
-	private float clampHeadPositionScreenSpace = 0.75f;
-	private Vector3 headOffset = new Vector3( 0f, 0f, 0f );
-	private Vector3 centerOffset = new Vector3( 0f, 0.6125f, 0f );
-	private float shoulderOffset = 0.325f;
+	private Vector3 centerOffset = new Vector3( 0f, 0.6f, 0f );//new Vector3( 0f, 0.6125f, 0f );
+	private float shoulderOffset = 0.4f;//0.325f;
 	private float angleVelocity = 0.0f;
 	private bool snap = false;
-	private float distance = 1f;
+	private float distance = 1.125f;//1f;
 
 	private float maxRotationSpeed = 5f;
 	private bool invertY = false;
+
+	private float movementRefocusAmount = 1.125f;
+	private float movementRefocusDuration = 0.25f;
+	private bool isRefocusing = false;
 
 	private struct JoystickValue
 	{
@@ -237,14 +239,13 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		if( UIRootObject )
 		{
-			UIRootObject.SetActive( false );
+			//UIRootObject.SetActive( false );
 			UIRootObject.transform.SetParent( null, false );
 		}
 
 		DisableUI();
 
 		viewChangeVector = Vector2.zero;
-		oldViewChangeVector = viewChangeVector;
 
 		speed = Random.Range( 4.5f, 6.5f );
 
@@ -268,12 +269,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		inputController.OnButtonHeld += OnButtonHeld;
 		inputController.OnButtonUp += OnButtonUp;
 
-		//centerOffset = Vector3.up * 0.25f;
-		//headOffset = centerOffset + Vector3.up * 0.25f;
-		//headOffset.y = characterController.bounds.max.y - transform.position.y;
-		
-		
-		Cut(transform, centerOffset);
+		Cut();
 	}
 	
 	void OnDisable()
@@ -313,7 +309,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	void LateUpdate()
 	{
 		if( photonView.isMine )
-			Apply(cameraTransform, Vector3.zero);
+			Apply();
 	}
 
 	void OnGUI()
@@ -375,7 +371,11 @@ public class PlayerController : Photon.MonoBehaviour {
 				TeleportTo( fromDoorTransform.position + fromDoorTransform.forward * 1.25f );
 				transform.LookAt( transform.position + fromDoorTransform.forward, Vector3.up );
 
+				snap = true;
+
 				SnapCamera();
+
+				StartCoroutine( "DoMotionBlind" );
 			}
 		}
 	}
@@ -424,6 +424,9 @@ public class PlayerController : Photon.MonoBehaviour {
 				{
 					movementVector = joystickValues[0].xy;
 					joystickValues.Clear();
+				
+					StopCoroutine( "DoMovementRefocus" );
+					StartCoroutine( "DoMovementRefocus" );
 				}
 				else
 				{
@@ -490,7 +493,15 @@ public class PlayerController : Photon.MonoBehaviour {
 		}
 
 		if( currentState != State.Raging )
+		{
+			Vector3 oldPosition = transform.position;
+
 			characterController.Move( movement );
+
+			Vector3 deltaPosition = transform.position - oldPosition;
+
+			cameraTransform.position += deltaPosition;
+		}
 
 		if( zoomProgress == 1f )
 		{
@@ -568,9 +579,6 @@ public class PlayerController : Photon.MonoBehaviour {
 		float angle = Mathf.DeltaAngle( Mathf.Atan2( cameraTransform.forward.x, cameraTransform.forward.z ) * Mathf.Rad2Deg,
 		                               Mathf.Atan2( closestMannequinVector.x, closestMannequinVector.z ) * Mathf.Rad2Deg );
 
-		if( !compassUI.enabled )
-			compassUI.enabled = true;
-
 		compassUI.rectTransform.localRotation = Quaternion.AngleAxis( angle, Vector3.back );
 	}
 
@@ -582,10 +590,6 @@ public class PlayerController : Photon.MonoBehaviour {
 				zoomProgress = Mathf.Clamp01( zoomProgress + Time.deltaTime / zoomDuration );
 			else
 				zoomProgress = Mathf.Clamp01( zoomProgress - Time.deltaTime / zoomDuration );
-
-			//check for jumps
-			if( Mathf.Abs( oldZoomProgress - zoomProgress ) > 0.5f )
-				zoomProgress = Mathf.Clamp01( oldZoomProgress + 0.1f * Mathf.Sign( oldZoomProgress - zoomProgress ) );
 
 			if( zoomProgress == 1f )
 			{
@@ -601,19 +605,36 @@ public class PlayerController : Photon.MonoBehaviour {
 			if( zoomProgress != 0f )
 				lockCameraTimer = 0f;
 
-			float longestDistance = 0f;
-			RaycastHit[] hits = Physics.RaycastAll( cameraTransform.position, cameraTransform.forward, Vector3.Distance( cameraTransform.position, transform.position + headOffset ) );
-			
-			for( int i = 0; i < hits.Length; i++ )
-				if( hits[i].transform != transform && hits[i].normal != Vector3.up && hits[i].distance > longestDistance )
-					longestDistance = hits[i].distance;
-			
-			clippingOffset = cameraTransform.forward * longestDistance;
+			Vector3 directionVector = cameraTransform.forward;
+			directionVector = new Vector3( directionVector.x, 0f, directionVector.z ).normalized;
 
-			zoomOffset = Vector3.Lerp( clippingOffset, Quaternion.AngleAxis( cameraTransform.eulerAngles.y, Vector3.up ) * Vector3.forward * 0.75f, zoomProgress );
+			float raycastDistance = Vector3.Distance( cameraTransform.position, transform.position );
+
+			//Debug.DrawRay( cameraTransform.position + cameraTransform.right * 0.1f + directionVector * raycastDistance,  directionVector * -1.25f, Color.green, 1f );
+			//Debug.DrawRay( cameraTransform.position - cameraTransform.right * 0.1f + directionVector * raycastDistance,  directionVector * -1.25f, Color.green, 1f );
+			
+			float shortestDistance = Mathf.Infinity;
+			RaycastHit[] hits;
+
+			hits = Physics.RaycastAll( cameraTransform.position + cameraTransform.right * 0.1f + directionVector * raycastDistance,  directionVector * -1f, raycastDistance * 1.25f );
+
+			for( int i = 0; i < hits.Length; i++ )
+				if( hits[i].transform != transform && hits[i].normal != Vector3.up && hits[i].distance < shortestDistance )
+					shortestDistance = hits[i].distance;
+
+			hits = Physics.RaycastAll( cameraTransform.position - cameraTransform.right * 0.1f + directionVector * raycastDistance,  directionVector * -1f, raycastDistance * 1.25f );
+
+			for( int i = 0; i < hits.Length; i++ )
+				if( hits[i].transform != transform && hits[i].normal != Vector3.up && hits[i].distance < shortestDistance )
+					shortestDistance = hits[i].distance;
+
+			clippingOffset = directionVector * Mathf.Clamp( ( raycastDistance * 1.25f - shortestDistance ), 0f, raycastDistance * 1.25f );
+
+			zoomOffset = Vector3.Lerp( clippingOffset, Quaternion.AngleAxis( cameraTransform.eulerAngles.y, Vector3.up ) * Vector3.forward, zoomProgress );
 			cameraTransform.position += zoomOffset;
 
-			cameraTransform.GetComponent<Camera>().fieldOfView = Mathf.RoundToInt( Mathf.Lerp( cameraFoV, cameraZoomFoV, zoomProgress ) );
+			if( !isRefocusing )
+				cameraTransform.GetComponent<Camera>().fieldOfView = Mathf.Lerp( cameraFoV, cameraZoomFoV, zoomProgress );
 
 			if( flashlight != null && currentState != State.Dead )
 			{
@@ -637,17 +658,17 @@ public class PlayerController : Photon.MonoBehaviour {
 			}
 			
 			oldZoomProgress = zoomProgress;
-			oldViewChangeVector = viewChangeVector;
 		}
 	}
 
-	private void Apply( Transform dummyTarget, Vector3 dummyCenter )
+	private void Apply()
 	{
 		if( photonView.isMine )
 		{
 			Vector3 targetCenter = transform.position + centerOffset;
-			Vector3 targetHead = transform.position + headOffset;
-			
+
+			SetUpRotation( targetCenter );
+
 			float originalTargetAngle = transform.eulerAngles.y;
 			float currentAngle = cameraTransform.eulerAngles.y;
 			
@@ -657,8 +678,10 @@ public class PlayerController : Photon.MonoBehaviour {
 			{
 				if (AngleDistance(currentAngle, originalTargetAngle) < 3.0f)
 					snap = false;
-				
-				currentAngle = Mathf.SmoothDampAngle(currentAngle, targetAngle, ref angleVelocity, snapSmoothLag, snapMaxSpeed);
+
+				currentAngle = targetAngle;
+
+				//currentAngle = Mathf.SmoothDampAngle(currentAngle, targetAngle, ref angleVelocity, snapSmoothLag, snapMaxSpeed);
 			}
 			else
 			{
@@ -671,31 +694,33 @@ public class PlayerController : Photon.MonoBehaviour {
 				
 				currentAngle = Mathf.SmoothDampAngle(currentAngle, targetAngle, ref angleVelocity, angularSmoothLag, angularMaxSpeed);
 			}
-			
+
 			float currentHeight = transform.position.y + centerOffset.y;
 			
 			Quaternion currentRotation = Quaternion.Euler(0, currentAngle, 0);
 
-			Vector3 oldCameraPosition = cameraTransform.position;
 
-			cameraTransform.position = targetCenter;
-			cameraTransform.position += currentRotation * Vector3.back * distance;
+			Vector3 temp = targetCenter + currentRotation * Vector3.back * distance;
+			temp = new Vector3( temp.x, currentHeight, temp.z );
+
+			//cameraTransform.position = targetCenter;
+			//cameraTransform.position += currentRotation * Vector3.back * distance;
 			
-			cameraTransform.position = new Vector3(cameraTransform.position.x, currentHeight, cameraTransform.position.z);
+			//cameraTransform.position = new Vector3(cameraTransform.position.x, currentHeight, cameraTransform.position.z);
 
 			Vector3 shoulderOffsetVector = cameraTransform.right * shoulderOffset;
 
+			//temp += shoulderOffsetVector;
+
+			cameraTransform.position = temp;
+
 			cameraTransform.position += shoulderOffsetVector;
 
-			//cameraTransform.position = Vector3.MoveTowards( oldCameraPosition, cameraTransform.position, 0.05f );
-
 			SnapCamera();
-			
-			SetUpRotation(targetCenter + shoulderOffsetVector, targetHead + shoulderOffsetVector);
 		}
 	}
 	
-	private void Cut( Transform dummyTarget, Vector3 dummyCenter )
+	private void Cut()
 	{
 		if( photonView.isMine )
 		{
@@ -704,50 +729,31 @@ public class PlayerController : Photon.MonoBehaviour {
 			
 			snapMaxSpeed = 10000f;
 			snapSmoothLag = 0.001f;
-			
+
 			snap = true;
-			Apply(cameraTransform, Vector3.zero);
+			Apply();
 			
 			snapMaxSpeed = oldSnapMaxSpeed;
 			snapSmoothLag = oldSnapSmooth;
 		}
 	}
 	
-	private void SetUpRotation( Vector3 centerPos, Vector3 headPos )
+	private void SetUpRotation( Vector3 centerPos )
 	{
 		if( photonView.isMine )
 		{
-			Vector3 cameraPos = cameraTransform.position - zoomOffset;
+			Vector3 cameraPos = cameraTransform.position - zoomOffset - cameraTransform.right * shoulderOffset;
 			Vector3 offsetToCenter = centerPos - cameraPos;
 			
-			Quaternion yRotation = Quaternion.LookRotation( new Vector3(offsetToCenter.x, 0f, offsetToCenter.z ) );
+			Quaternion yRotation = Quaternion.LookRotation( new Vector3( offsetToCenter.x, 0f, offsetToCenter.z ) );
 			
-			Vector3 relativeOffset = Vector3.forward * distance + Vector3.down * height;
-			cameraTransform.rotation = yRotation * Quaternion.LookRotation(relativeOffset);
-			
-			Ray centerRay = cameraTransform.GetComponent<Camera>().ViewportPointToRay( new Vector3( 0.5f, 0.5f, 1f ) );
-			Ray topRay = cameraTransform.GetComponent<Camera>().ViewportPointToRay( new Vector3( 0.5f, clampHeadPositionScreenSpace, 1f ) );
-			
-			Vector3 centerRayPos = centerRay.GetPoint( distance );
-			Vector3 topRayPos = topRay.GetPoint( distance );
-			
-			float centerToTopAngle = Vector3.Angle( centerRay.direction, topRay.direction );
-			
-			float heightToAngle = centerToTopAngle / ( centerRayPos.y - topRayPos.y );
-			
-			float extraLookAngle = heightToAngle * ( centerRayPos.y - centerPos.y);
-			if( extraLookAngle < centerToTopAngle )
-			{
-				extraLookAngle = 0;
-			}
-			else
-			{
-				extraLookAngle = extraLookAngle - centerToTopAngle;
-				cameraTransform.rotation *= Quaternion.Euler(-extraLookAngle, 0, 0);
-			}
+			//Vector3 relativeOffset = Vector3.forward * distance + Vector3.down * height;
+			//cameraTransform.rotation = yRotation * Quaternion.LookRotation( relativeOffset );
+
+			cameraTransform.rotation = yRotation;
 			
 			float xAngleOffset = cameraRotationOffset.eulerAngles.x;
-			
+
 			if( viewChangeVector != Vector2.zero )
 			{
 				if( zoomProgress == 0f )
@@ -764,7 +770,7 @@ public class PlayerController : Photon.MonoBehaviour {
 				xAngleOffset = cameraRotationOffset.eulerAngles.x;
 				
 				viewChangeVector = Vector2.zero;
-				
+
 				lockCameraTimer = 0f;
 			}
 
@@ -784,11 +790,11 @@ public class PlayerController : Photon.MonoBehaviour {
 				if( xAngleOffset > 180f && xAngleOffset < 290f )
 					xAngleOffset = 290f;
 			}
-			
+
 			cameraRotationOffset.eulerAngles = new Vector3( xAngleOffset, cameraRotationOffset.eulerAngles.y, cameraRotationOffset.eulerAngles.z );
 			cameraTransform.rotation *= cameraRotationOffset;
 			
-			cameraTransform.eulerAngles = new Vector3 (cameraTransform.eulerAngles.x, cameraTransform.eulerAngles.y, 0f);
+			cameraTransform.eulerAngles = new Vector3( cameraTransform.eulerAngles.x, cameraTransform.eulerAngles.y, 0f );
 		}
 	}
 
@@ -897,6 +903,11 @@ public class PlayerController : Photon.MonoBehaviour {
 		{
 			compassUI.enabled = false;
 		}
+
+		if( motionBlindUI )
+		{
+			motionBlindUI.enabled = false;
+		}
 	}
 
 	//coroutines
@@ -973,6 +984,9 @@ public class PlayerController : Photon.MonoBehaviour {
 			screenshotUI.enabled = false;
 
 		SetFlashlightTo( oldFlashlightState );
+
+		if( compassUI && MannequinAgent.GetNumActiveMannequins() <= PlayerAgent.GetCompassActivationNumber() )
+			compassUI.enabled = true;
 	}
 
 	private IEnumerator RageMode()
@@ -1140,6 +1154,40 @@ public class PlayerController : Photon.MonoBehaviour {
 			Destroy( source );
 		}
 	}
+
+	private IEnumerator DoMovementRefocus()
+	{
+		isRefocusing = true;
+
+		float beginTime = Time.time;
+		float currentTime = 0f;
+		float lerp;
+
+		do
+		{
+			currentTime += Time.deltaTime;
+			lerp = Mathf.Clamp01( Mathf.Pow( currentTime / movementRefocusDuration, 0.5f ) );
+
+			cameraTransform.GetComponent<Camera>().fieldOfView = Mathf.Lerp( cameraFoV, cameraZoomFoV, zoomProgress ) * Mathf.Lerp( movementRefocusAmount, 1f, lerp );
+
+			yield return null;
+
+		} while( currentTime < movementRefocusDuration );
+
+		isRefocusing = false;
+	}
+
+	private IEnumerator DoMotionBlind()
+	{
+		if( motionBlindUI == null )
+			yield break;
+
+		motionBlindUI.enabled = true;
+
+		yield return new WaitForSeconds( 0.1f );
+
+		motionBlindUI.enabled = false;
+	}
 	//end coroutines
 
 	//server calls
@@ -1201,7 +1249,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		DisableUI();
 
 		if( UIRootObject )
-			UIRootObject.SetActive( true );
+			UIRootObject.SetActive( photonView.isMine );
 
 		FastBloom fastBloom = Camera.main.gameObject.GetComponent<FastBloom>();
 			
@@ -1298,15 +1346,13 @@ public class PlayerController : Photon.MonoBehaviour {
 		
 		if( noiseController )
 			Destroy( noiseController );
-		
-		GameAgent.ChangeGameState( GameAgent.GameState.End );
-		
+
 		messageString = "";
-		
+
 		DisableUI();
 		
-		if( UIRootObject )
-			UIRootObject.SetActive( false );
+		//if( UIRootObject )
+		//	UIRootObject.SetActive( false );
 	}
 
 	[RPC]
@@ -1384,6 +1430,8 @@ public class PlayerController : Photon.MonoBehaviour {
 	
 	private void OnButtonUp( InputController.ButtonType button )
 	{
+		EvaluateViewChange( button );
+
 		switch( button )
 		{
 			case InputController.ButtonType.Zoom:
@@ -1647,7 +1695,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	public void StartGame()
 	{
 		DisableUI();
-		
+
 		if( UIRootObject )
 			UIRootObject.SetActive( photonView.isMine );
 
@@ -1683,9 +1731,6 @@ public class PlayerController : Photon.MonoBehaviour {
 		zoomSurvivorController.playerController = this;
 		
 		gameObject.AddComponent<NoiseController>();
-		
-		GameAgent.ChangeGameState( GameAgent.GameState.Game );
-		PlayerAgent.SetMonster();
 
 		photonView.RPC( "RPCStartGame", PhotonTargets.OthersBuffered );
 	}
@@ -1747,15 +1792,13 @@ public class PlayerController : Photon.MonoBehaviour {
 		
 		if( noiseController )
 			Destroy( noiseController );
-		
-		GameAgent.ChangeGameState( GameAgent.GameState.End );
-		
+
 		messageString = "";
 		
 		DisableUI();
 		
-		if( UIRootObject )
-			UIRootObject.SetActive( false );
+		//if( UIRootObject )
+		//	UIRootObject.SetActive( false );
 
 		photonView.RPC( "RPCEndGame", PhotonTargets.OthersBuffered );
 	}
