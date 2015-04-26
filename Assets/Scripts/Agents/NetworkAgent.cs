@@ -18,6 +18,7 @@ public class NetworkAgent : MonoBehaviour {
 	private int selectionIndex;
 	
 	private bool isHost = false;
+	private bool isReady = false;
 
 	private GUIStyle textStyle;
 	private GUIStyle shadowStyle;
@@ -164,10 +165,18 @@ public class NetworkAgent : MonoBehaviour {
 		roomsList = PhotonNetwork.GetRoomList();
 	}
 
+	void OnJoinedLobby()
+	{
+		isReady = true;
+	}
+
+	void OnConnectedToMaster()
+	{
+		isReady = true;
+	}
+
 	void OnJoinedRoom()
 	{
-		DoorAgent.RandomizeDoorConnections();
-
 		if( playerStartPositions.Length == 0 )
 		{
 			Debug.LogError( "No player start positions." );
@@ -268,6 +277,9 @@ public class NetworkAgent : MonoBehaviour {
 
 	private void internalActivateSelected()
 	{
+		if( PhotonNetwork.connectionState != ConnectionState.Connected || !isReady )
+			return;
+
 		if( selectionIndex == 0 )
 		{
 			PhotonNetwork.CreateRoom( roomName + System.Guid.NewGuid().ToString( "N" ), true, true, numPlayers );

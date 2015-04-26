@@ -260,9 +260,11 @@ public class PlayerAgent : MonoBehaviour {
 	private void internalStartGame()
 	{
 		NetworkAgent.LockRoom();
+		GameAgent.ChangeGameState( GameAgent.GameState.Game );
+		SetMonster();
 
-		if( playerControllers.Count > 0 )
-			playerControllers[ 0 ].StartGame();
+		for( int i = 0; i < playerControllers.Count; i++ )
+			playerControllers[i].StartGame();
 	}
 	
 	public static void EndGame()
@@ -273,8 +275,10 @@ public class PlayerAgent : MonoBehaviour {
 
 	private void internalEndGame()
 	{
-		if( playerControllers.Count > 0 )
-			playerControllers[ 0 ].EndGame();
+		GameAgent.ChangeGameState( GameAgent.GameState.End );
+
+		for( int i = 0; i < playerControllers.Count; i++ )
+			playerControllers[i].EndGame();
 	}
 
 	public static void MonsterizeNearestPlayer( Vector3 position )

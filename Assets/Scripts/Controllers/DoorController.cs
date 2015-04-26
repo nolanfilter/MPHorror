@@ -12,6 +12,11 @@ public class DoorController : MonoBehaviour {
 		uniqueID = DoorAgent.RegisterDoor( this );
 	}
 
+	void OnEnable()
+	{
+		DoorAgent.RandomizeDoorConnections();
+	}
+
 	public int getUniqueID()
 	{
 		return uniqueID;
