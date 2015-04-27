@@ -523,8 +523,8 @@ public class PlayerController : Photon.MonoBehaviour {
 			{
 				if( joystickValues.Count == 0 )
 					transform.rotation = Quaternion.LookRotation( axes );
-				else
-					transform.rotation = Quaternion.RotateTowards( transform.rotation, Quaternion.LookRotation( axes ), maxRotationSpeed );
+				//else
+				//	transform.rotation = Quaternion.RotateTowards( transform.rotation, Quaternion.LookRotation( axes ), maxRotationSpeed );
 			}
 
 			if( rageUI )
@@ -910,6 +910,14 @@ public class PlayerController : Photon.MonoBehaviour {
 		}
 	}
 
+	private void KillPlayer()
+	{
+		StopStatuses();
+		ChangeState( (int)State.Voyeur );
+		DisplayMessage( "Your friend destroyed you" );
+		ChangeColor( new Quaternion( 0f, 0f, 0f, 0f ) );
+	}
+
 	//coroutines
 	private IEnumerator DoDisplayMessage( string messageToDisplay )
 	{
@@ -964,10 +972,12 @@ public class PlayerController : Photon.MonoBehaviour {
 		{
 			screenshotUI.enabled = true;
 
-			yield return StartCoroutine( DoColorFade( screenshotUI, Color.black, Color.white, 1.75f ) );
+			yield return StartCoroutine( DoColorFade( screenshotUI, Color.black, Color.white, 1f ) );
 		}
 
 		hasPhoto = false;
+
+		yield return new WaitForSeconds( 0.75f );
 
 		if( photoFrameUI )
 			StartCoroutine( DoColorFade( photoFrameUI, Color.white, whiteClear, 0.5f ) );
@@ -1459,14 +1469,6 @@ public class PlayerController : Photon.MonoBehaviour {
 	//end event handlers
 
 	//public functions
-	public bool CanIncreaseFear()
-	{
-		//TODO tie into mechanic
-		
-		return true;
-		//return ( Time.time - fearAttackLastTime > fearAttackTimeBuffer );
-	}
-
 	public void ChangeColider( int state )
 	{
 		if( characterController )
@@ -1486,26 +1488,6 @@ public class PlayerController : Photon.MonoBehaviour {
 		}
 		
 		photonView.RPC( "RPCChangeColor", PhotonTargets.OthersBuffered, colorVector4 );
-	}
-
-	public bool ChangeFear( float amount )
-	{
-		bool wasAlive = ( currentFear > 0f );
-		
-		if( amount > 0f )
-		{
-			if( CanIncreaseFear() )
-			{
-				currentFear -= amount;
-				fearAttackLastTime = Time.time;
-			}
-		}
-		else
-		{
-			currentFear -= amount;
-		}
-		
-		return wasAlive && ( currentFear <= 0f );
 	}
 
 	public void ChangeFlashBulb( int state )
@@ -1572,15 +1554,19 @@ public class PlayerController : Photon.MonoBehaviour {
 		return currentState;
 	}
 
-	public bool IncreaseFear()
+	public void IncreaseFear()
 	{
-		//TODO tie into mechanic
-		
-		ChangeState( (int)State.Frozen );
-		PlayerAgent.CheckForEnd();
-		Freeze();
+		if( currentState == State.None )
+		{
+			ChangeState( (int)State.Frozen );
+			Freeze();
+		}
+		else if( currentState == State.Stunned )
+		{
+			KillPlayer();
+		}
 
-		return true;
+		PlayerAgent.CheckForEnd();
 	}
 	
 	public void IncreaseSanity()
@@ -1662,10 +1648,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		if( currentState == State.Frozen )
 		{
-			StopStatuses();
-			ChangeState( (int)State.Voyeur );
-			DisplayMessage( "Your friend destroyed you" );
-			ChangeColor( new Quaternion( 0f, 0f, 0f, 0f ) );
+			KillPlayer();
 			
 			PlayerAgent.CheckForEnd();
 		}
