@@ -67,22 +67,6 @@ public class FunctionObjectController : MonoBehaviour {
 
 			switch( functionName )
 			{
-				case FunctionObjectController.FunctionName.ChangeSanity:
-				{
-					if( sanityDamageOverTime )
-						playerController.ChangeFear( sanityChange * Time.deltaTime );
-					else
-						playerController.ChangeFear( sanityChange );
-				} break;
-					
-				case FunctionObjectController.FunctionName.ChangeFear:
-				{
-					if( fearDamageOverTime )
-						playerController.ChangeFear( fearChange * Time.deltaTime );
-					else
-						playerController.ChangeFear( fearChange );
-				} break;
-
 				case FunctionObjectController.FunctionName.DecreaseSanity:
 				{
 					playerController.DecreaseSanity();
