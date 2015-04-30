@@ -239,8 +239,15 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		if( UIRootObject )
 		{
-			//UIRootObject.SetActive( false );
-			UIRootObject.transform.SetParent( null, false );
+			if( photonView.isMine )
+			{
+				UIRootObject.SetActive( false );
+				UIRootObject.transform.SetParent( null, false );
+			}
+			else
+			{
+				Destroy( UIRootObject );
+			}
 		}
 
 		DisableUI();
@@ -1259,7 +1266,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		DisableUI();
 
 		if( UIRootObject )
-			UIRootObject.SetActive( photonView.isMine );
+			UIRootObject.SetActive( true );
 
 		FastBloom fastBloom = Camera.main.gameObject.GetComponent<FastBloom>();
 			
@@ -1295,7 +1302,6 @@ public class PlayerController : Photon.MonoBehaviour {
 		gameObject.AddComponent<NoiseController>();
 
 		GameAgent.ChangeGameState( GameAgent.GameState.Game );
-		PlayerAgent.SetMonster();
 	}
 
 	[RPC]
@@ -1361,8 +1367,10 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		DisableUI();
 		
-		//if( UIRootObject )
-		//	UIRootObject.SetActive( false );
+		if( UIRootObject )
+			UIRootObject.SetActive( false );
+
+		GameAgent.ChangeGameState( GameAgent.GameState.End );
 	}
 
 	[RPC]
@@ -1680,7 +1688,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		DisableUI();
 
 		if( UIRootObject )
-			UIRootObject.SetActive( photonView.isMine );
+			UIRootObject.SetActive( true );
 
 		FastBloom fastBloom = Camera.main.gameObject.GetComponent<FastBloom>();
 		
@@ -1714,6 +1722,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		zoomSurvivorController.playerController = this;
 		
 		gameObject.AddComponent<NoiseController>();
+
+		GameAgent.ChangeGameState( GameAgent.GameState.Game );
 
 		photonView.RPC( "RPCStartGame", PhotonTargets.OthersBuffered );
 	}
@@ -1780,8 +1790,10 @@ public class PlayerController : Photon.MonoBehaviour {
 		
 		DisableUI();
 		
-		//if( UIRootObject )
-		//	UIRootObject.SetActive( false );
+		if( UIRootObject )
+			UIRootObject.SetActive( false );
+
+		GameAgent.ChangeGameState( GameAgent.GameState.End );
 
 		photonView.RPC( "RPCEndGame", PhotonTargets.OthersBuffered );
 	}
