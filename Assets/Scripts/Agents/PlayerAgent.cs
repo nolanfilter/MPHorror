@@ -260,8 +260,6 @@ public class PlayerAgent : MonoBehaviour {
 	private void internalStartGame()
 	{
 		NetworkAgent.LockRoom();
-		GameAgent.ChangeGameState( GameAgent.GameState.Game );
-		SetMonster();
 
 		for( int i = 0; i < playerControllers.Count; i++ )
 			playerControllers[i].StartGame();
@@ -275,8 +273,6 @@ public class PlayerAgent : MonoBehaviour {
 
 	private void internalEndGame()
 	{
-		GameAgent.ChangeGameState( GameAgent.GameState.End );
-
 		for( int i = 0; i < playerControllers.Count; i++ )
 			playerControllers[i].EndGame();
 	}
