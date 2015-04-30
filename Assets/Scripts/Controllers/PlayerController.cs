@@ -796,8 +796,12 @@ public class PlayerController : Photon.MonoBehaviour {
 			
 			float xAngleOffset = cameraRotationOffset.eulerAngles.x;
 
+			bool viewInputThisFrame = false;
+
 			if( viewChangeVector != Vector2.zero )
 			{
+				viewInputThisFrame = true;
+
 				if( zoomProgress == 0f )
 				{
 					cameraRotationOffset *= Quaternion.AngleAxis( viewChangeVector.y * -30f, Vector3.right );
@@ -828,8 +832,8 @@ public class PlayerController : Photon.MonoBehaviour {
 				}
 				else
 				{
-					if( xAngleOffset > 5f && xAngleOffset < 180f )
-						xAngleOffset = 5f;
+					if( xAngleOffset > 13f && xAngleOffset < 180f )
+						xAngleOffset = 13f;
 					
 					if( xAngleOffset > 180f && xAngleOffset < 355f )
 						xAngleOffset = 355f;
@@ -843,6 +847,9 @@ public class PlayerController : Photon.MonoBehaviour {
 				if( xAngleOffset > 180f && xAngleOffset < 290f )
 					xAngleOffset = 290f;
 			}
+
+			if( !viewInputThisFrame )
+				xAngleOffset = Mathf.MoveTowardsAngle( xAngleOffset, 4f, 37.5f * Time.deltaTime );
 
 			cameraRotationOffset.eulerAngles = new Vector3( xAngleOffset, cameraRotationOffset.eulerAngles.y, cameraRotationOffset.eulerAngles.z );
 			cameraTransform.rotation *= cameraRotationOffset;
@@ -1928,12 +1935,8 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		photonView.RPC( "RPCFallApart", PhotonTargets.OthersBuffered );
 
-		Debug.Log( "hi" );
-
 		if( deathModel )
 		{
-			Debug.Log( "has death model" );
-
 			deathModel.transform.parent = null;
 			deathModel.SetActive( true );
 		}
