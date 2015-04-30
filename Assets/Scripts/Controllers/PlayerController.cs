@@ -444,11 +444,7 @@ public class PlayerController : Photon.MonoBehaviour {
 					StopCoroutine( "DoMovementRefocus" );
 					StartCoroutine( "DoMovementRefocus" );
 					
-					if( movementParticleSystem )
-						movementParticleSystem.Play();
-					
-					if( wireframeParticleSystem )
-						wireframeParticleSystem.Play();
+					DrawParticles();
 
 					didMove = false;
 				}
@@ -632,7 +628,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		if( photonView.isMine )
 		{
-			if( ( isZoomingIn && currentState != State.Stunned ) || currentState == State.Raging )
+			if( ( isZoomingIn && currentState != State.Stunned && currentState != State.Frozen ) || currentState == State.Raging )
 				zoomProgress = Mathf.Clamp01( zoomProgress + Time.deltaTime / zoomDuration );
 			else
 				zoomProgress = Mathf.Clamp01( zoomProgress - Time.deltaTime / zoomDuration );
@@ -820,13 +816,24 @@ public class PlayerController : Photon.MonoBehaviour {
 				lockCameraTimer = 0f;
 			}
 
-			if( zoomProgress == 0f )
+			if( zoomProgress < 0.5f )
 			{
-				if( xAngleOffset > 40f && xAngleOffset < 180f )
-					xAngleOffset = 40f;
+				if( currentState == State.Voyeur )
+				{
+					if( xAngleOffset > 40f && xAngleOffset < 180f )
+						xAngleOffset = 40f;
+						
+					if( xAngleOffset > 180f && xAngleOffset < 300f )
+						xAngleOffset = 300f;
+				}
+				else
+				{
+					if( xAngleOffset > 5f && xAngleOffset < 180f )
+						xAngleOffset = 5f;
 					
-				if( xAngleOffset > 180f && xAngleOffset < 300f )
-					xAngleOffset = 300f;
+					if( xAngleOffset > 180f && xAngleOffset < 355f )
+						xAngleOffset = 355f;
+				}
 			}
 			else
 			{
@@ -880,52 +887,55 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( GameAgent.GetCurrentGameState() != GameAgent.GameState.Game )
 			return;
 
-		/*
-		switch( button )
+		if( currentState == State.Voyeur )
 		{
-		case InputController.ButtonType.RLeft:
-		{	
-			viewChangeVector = new Vector2( Mathf.Clamp( viewChangeVector.x - viewChangeRate * Time.deltaTime, -1f, 1f ), viewChangeVector.y );
-		} break;
-			
-		case InputController.ButtonType.RRight: 
-		{
-			viewChangeVector = new Vector2( Mathf.Clamp( viewChangeVector.x + viewChangeRate * Time.deltaTime, -1f, 1f ), viewChangeVector.y );
-		} break;
-			
-		case InputController.ButtonType.RUp: 
-		{
-			viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y + viewChangeRate * Time.deltaTime * ( invertY ? -1f : 1f ), -1f, 1f ) );
-		} break;
-			
-		case InputController.ButtonType.RDown: 
-		{
-			viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y - viewChangeRate * Time.deltaTime * ( invertY ? -1f : 1f ), -1f, 1f ) );
-		} break;
+			switch( button )
+			{
+				case InputController.ButtonType.RLeft:
+				{	
+					viewChangeVector = new Vector2( Mathf.Clamp( viewChangeVector.x - viewChangeRate * Time.deltaTime, -1f, 1f ), viewChangeVector.y );
+				} break;
+					
+				case InputController.ButtonType.RRight: 
+				{
+					viewChangeVector = new Vector2( Mathf.Clamp( viewChangeVector.x + viewChangeRate * Time.deltaTime, -1f, 1f ), viewChangeVector.y );
+				} break;
+					
+				case InputController.ButtonType.RUp: 
+				{
+					viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y + viewChangeRate * Time.deltaTime * ( invertY ? -1f : 1f ), -1f, 1f ) );
+				} break;
+					
+				case InputController.ButtonType.RDown: 
+				{
+					viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y - viewChangeRate * Time.deltaTime * ( invertY ? -1f : 1f ), -1f, 1f ) );
+				} break;
+			}
 		}
-		*/
-
-		switch( button )
+		else
 		{
-		case InputController.ButtonType.Left:
-		{	
-			viewChangeVector = new Vector2( Mathf.Clamp( viewChangeVector.x - viewChangeRate * Time.deltaTime, -1f, 1f ), viewChangeVector.y );
-		} break;
-			
-		case InputController.ButtonType.Right: 
-		{
-			viewChangeVector = new Vector2( Mathf.Clamp( viewChangeVector.x + viewChangeRate * Time.deltaTime, -1f, 1f ), viewChangeVector.y );
-		} break;
-			
-		case InputController.ButtonType.Up: 
-		{
-			viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y + viewChangeRate * Time.deltaTime * ( invertY ? -1f : 1f ), -1f, 1f ) );
-		} break;
-			
-		case InputController.ButtonType.Down: 
-		{
-			viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y - viewChangeRate * Time.deltaTime * ( invertY ? -1f : 1f ), -1f, 1f ) );
-		} break;
+			switch( button )
+			{
+					case InputController.ButtonType.Left:
+					{	
+						viewChangeVector = new Vector2( Mathf.Clamp( viewChangeVector.x - viewChangeRate * Time.deltaTime, -1f, 1f ), viewChangeVector.y );
+					} break;
+						
+					case InputController.ButtonType.Right: 
+					{
+						viewChangeVector = new Vector2( Mathf.Clamp( viewChangeVector.x + viewChangeRate * Time.deltaTime, -1f, 1f ), viewChangeVector.y );
+					} break;
+						
+					case InputController.ButtonType.Up: 
+					{
+						viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y + viewChangeRate * Time.deltaTime * ( invertY ? -1f : 1f ), -1f, 1f ) );
+					} break;
+						
+					case InputController.ButtonType.Down: 
+					{
+						viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y - viewChangeRate * Time.deltaTime * ( invertY ? -1f : 1f ), -1f, 1f ) );
+					} break;
+			}
 		}
 	}
 
@@ -983,6 +993,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private void KillPlayer()
 	{
+		FallApart();
 		StopStatuses();
 		ChangeState( (int)State.Voyeur );
 		DisplayMessage( "Your friend destroyed you" );
@@ -1469,6 +1480,16 @@ public class PlayerController : Photon.MonoBehaviour {
 			deathModel.SetActive( true );
 		}
 	}
+
+	[RPC]
+	public void RPCDrawParticles()
+	{
+		if( movementParticleSystem )
+			movementParticleSystem.Play();
+		
+		if( wireframeParticleSystem )
+			wireframeParticleSystem.Play();
+	}
 	// end server calls
 
 	//event handlers
@@ -1907,11 +1928,26 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		photonView.RPC( "RPCFallApart", PhotonTargets.OthersBuffered );
 
+		Debug.Log( "hi" );
+
 		if( deathModel )
 		{
+			Debug.Log( "has death model" );
+
 			deathModel.transform.parent = null;
 			deathModel.SetActive( true );
 		}
+	}
+
+	public void DrawParticles()
+	{
+		photonView.RPC( "RPCDrawParticles", PhotonTargets.OthersBuffered );
+
+		if( movementParticleSystem )
+			movementParticleSystem.Play();
+		
+		if( wireframeParticleSystem )
+			wireframeParticleSystem.Play();
 	}
 
 	public void TeleportTo( Vector3 coordinate )
