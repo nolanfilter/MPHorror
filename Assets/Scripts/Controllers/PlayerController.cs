@@ -90,6 +90,11 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private NetworkView networkView;
 
+	public GameObject deathModel;
+
+	public ParticleSystem movementParticleSystem;
+	public ParticleSystem wireframeParticleSystem;
+
 	public GameObject UIRootObject;
 	public RawImage flashUI;
 	public RawImage screenshotUI;
@@ -154,6 +159,8 @@ public class PlayerController : Photon.MonoBehaviour {
 	private float flickThreshold = 0.75f;
 	private float flickMinDelta = 0.5f;
 	private float flickWindow = 0.1f;
+
+	private bool didMove = false;
 
 	private float jumpDistance = 2f;
 
@@ -291,6 +298,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		PlayerAgent.UnregisterPlayer( this );
 
 		Destroy( UIRootObject );
+
+		Destroy( deathModel );
 	}
 	
 	void Update()
@@ -426,7 +435,29 @@ public class PlayerController : Photon.MonoBehaviour {
 					index--;
 					
 				} while( index > 0 && timeDifference > flickWindow );
-				
+
+				if( didMove )
+				{
+					movementVector = Vector3.up;
+					joystickValues.Clear();
+					
+					StopCoroutine( "DoMovementRefocus" );
+					StartCoroutine( "DoMovementRefocus" );
+					
+					if( movementParticleSystem )
+						movementParticleSystem.Play();
+					
+					if( wireframeParticleSystem )
+						wireframeParticleSystem.Play();
+
+					didMove = false;
+				}
+				else
+				{
+					movementVector = Vector3.zero;
+				}
+
+				/*
 				if( joystickValues.Count > 0 && joystickValues[0].xy.magnitude > flickThreshold && ( joystickValues[0].xy.magnitude - joystickValues[ joystickValues.Count - 1 ].xy.magnitude > flickMinDelta ) )
 				{
 					movementVector = joystickValues[0].xy;
@@ -434,11 +465,18 @@ public class PlayerController : Photon.MonoBehaviour {
 				
 					StopCoroutine( "DoMovementRefocus" );
 					StartCoroutine( "DoMovementRefocus" );
+
+					if( movementParticleSystem )
+						movementParticleSystem.Play();
+
+					if( wireframeParticleSystem )
+						wireframeParticleSystem.Play();
 				}
 				else
 				{
 					movementVector = Vector3.zero;
 				}
+				*/
 
 				/*
 				Debug.Log( "Joystick Values" );
@@ -523,6 +561,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		else
 		{
 			Vector3 axes = inputController.getRawAxes();
+			axes = Vector3.up;
 
 			axes = axes.x * right + axes.y * forward;
 
@@ -841,6 +880,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( GameAgent.GetCurrentGameState() != GameAgent.GameState.Game )
 			return;
 
+		/*
 		switch( button )
 		{
 		case InputController.ButtonType.RLeft:
@@ -859,6 +899,30 @@ public class PlayerController : Photon.MonoBehaviour {
 		} break;
 			
 		case InputController.ButtonType.RDown: 
+		{
+			viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y - viewChangeRate * Time.deltaTime * ( invertY ? -1f : 1f ), -1f, 1f ) );
+		} break;
+		}
+		*/
+
+		switch( button )
+		{
+		case InputController.ButtonType.Left:
+		{	
+			viewChangeVector = new Vector2( Mathf.Clamp( viewChangeVector.x - viewChangeRate * Time.deltaTime, -1f, 1f ), viewChangeVector.y );
+		} break;
+			
+		case InputController.ButtonType.Right: 
+		{
+			viewChangeVector = new Vector2( Mathf.Clamp( viewChangeVector.x + viewChangeRate * Time.deltaTime, -1f, 1f ), viewChangeVector.y );
+		} break;
+			
+		case InputController.ButtonType.Up: 
+		{
+			viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y + viewChangeRate * Time.deltaTime * ( invertY ? -1f : 1f ), -1f, 1f ) );
+		} break;
+			
+		case InputController.ButtonType.Down: 
 		{
 			viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y - viewChangeRate * Time.deltaTime * ( invertY ? -1f : 1f ), -1f, 1f ) );
 		} break;
@@ -1301,6 +1365,9 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		gameObject.AddComponent<NoiseController>();
 
+		if( wireframeParticleSystem )
+			wireframeParticleSystem.Stop();
+
 		GameAgent.ChangeGameState( GameAgent.GameState.Game );
 	}
 
@@ -1392,6 +1459,16 @@ public class PlayerController : Photon.MonoBehaviour {
 		StopCoroutine( "DoStun" );
 		StopCoroutine( "RageMode" );
 	}
+
+	[RPC]
+	public void RPCFallApart()
+	{
+		if( deathModel )
+		{
+			deathModel.transform.parent = null;
+			deathModel.SetActive( true );
+		}
+	}
 	// end server calls
 
 	//event handlers
@@ -1429,9 +1506,14 @@ public class PlayerController : Photon.MonoBehaviour {
 			SetShoulderOffset( 1f );
 		} break;
 		
-		case InputController.ButtonType.A: case InputController.ButtonType.X:
+		case InputController.ButtonType.X:
 		{
 			isOpeningDoor = true;
+		} break;
+
+		case InputController.ButtonType.A:
+		{
+			didMove = true;
 		} break;
 
 		case InputController.ButtonType.Y:
@@ -1819,6 +1901,17 @@ public class PlayerController : Photon.MonoBehaviour {
 		StopCoroutine( "DoFreeze" );
 		StopCoroutine( "DoStun" );
 		StopCoroutine( "RageMode" );
+	}
+
+	public void FallApart()
+	{
+		photonView.RPC( "RPCFallApart", PhotonTargets.OthersBuffered );
+
+		if( deathModel )
+		{
+			deathModel.transform.parent = null;
+			deathModel.SetActive( true );
+		}
 	}
 
 	public void TeleportTo( Vector3 coordinate )
