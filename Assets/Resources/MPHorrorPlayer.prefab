@@ -13,6 +13,7 @@ GameObject:
   - 114: {fileID: 11400000}
   - 143: {fileID: 14300000}
   - 54: {fileID: 5400000}
+  - 114: {fileID: 11490252}
   m_Layer: 0
   m_Name: MPHorrorPlayer
   m_TagString: Player
@@ -1679,7 +1680,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 141228}
-  m_LocalRotation: {x: -.355935305, y: -.530338168, z: -.520520985, w: .566665113}
+  m_LocalRotation: {x: -.355935335, y: -.530338228, z: -.520521045, w: .566665173}
   m_LocalPosition: {x: .107073002, y: 5.00000033e-06, z: -.0522063971}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -3806,6 +3807,108 @@ MonoBehaviour:
     y: 0
     width: 1
     height: 1
+--- !u!114 &11490252
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1384774831, guid: de72a6d2da64d114d95e3c5a01cfaec5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fsm:
+    usedInTemplate: {fileID: 0}
+    name: FSM
+    startState: Get Player Position
+    states:
+    - name: Get Player Position
+      description: 
+      colorIndex: 0
+      position:
+        serializedVersion: 2
+        x: 50
+        y: 100
+        width: 137
+        height: 16
+      isBreakpoint: 0
+      isSequence: 0
+      hideUnused: 0
+      transitions: []
+      actionData:
+        actionNames:
+        - HutongGames.PlayMaker.Actions.GetPosition
+        customNames:
+        - 
+        actionEnabled: 01
+        actionIsOpen: 01
+        actionStartIndex: 00000000
+        actionHashCodes: a290608e
+        unityObjectParams: []
+        fsmGameObjectParams: []
+        fsmOwnerDefaultParams:
+        - ownerOption: 0
+          gameObject:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: {fileID: 0}
+        animationCurveParams: []
+        functionCallParams: []
+        fsmTemplateControlParams: []
+        fsmEventTargetParams: []
+        fsmPropertyParams: []
+        layoutOptionParams: []
+        fsmStringParams: []
+        fsmObjectParams: []
+        fsmVarParams: []
+        byteData: 00000000000000000000000001706c61796572506f730000000001000000000100000000010000000001
+        arrayParamSizes: 
+        arrayParamTypes: []
+        customTypeSizes: 
+        customTypeNames: []
+        paramDataType: 140000001c0000000f0000000f0000000f0000000700000001000000
+        paramName:
+        - gameObject
+        - vector
+        - x
+        - y
+        - z
+        - space
+        - everyFrame
+        paramDataPos: 0000000000000000160000001b000000200000002500000029000000
+        paramByteDataSize: 00000000160000000500000005000000050000000400000001000000
+    events: []
+    globalTransitions: []
+    variables:
+      floatVariables: []
+      intVariables: []
+      boolVariables: []
+      stringVariables: []
+      vector2Variables: []
+      vector3Variables: []
+      colorVariables: []
+      rectVariables: []
+      quaternionVariables: []
+      gameObjectVariables: []
+      objectVariables: []
+      materialVariables: []
+      textureVariables: []
+    description: 
+    docUrl: 
+    showStateLabel: 1
+    maxLoopCount: 0
+    watermark: 
+    version: 0
+    ExposedEvents: []
+    RestartOnEnable: 1
+    EnableDebugFlow: 0
+    StepFrame: 0
+    activeStateName: 
+  fsmTemplate: {fileID: 0}
 --- !u!114 &11493176
 MonoBehaviour:
   m_ObjectHideFlags: 1
