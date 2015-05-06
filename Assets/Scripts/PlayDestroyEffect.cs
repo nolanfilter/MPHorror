@@ -4,8 +4,10 @@ using System.Collections;
 public class PlayDestroyEffect : MonoBehaviour {
 
 	public GameObject particleEffect;
+	public GameObject SoulParticle1;
+	public GameObject SoulParticle2;
 	
-	void Start ()
+	void Awake ()
 	{
 
 	}
@@ -19,6 +21,7 @@ public class PlayDestroyEffect : MonoBehaviour {
 	{
 		//Debug.Log("Particles!");
 		GameObject particle = Instantiate(particleEffect, transform.position, Quaternion.identity) as GameObject;
-		particle.GetComponent<ParticleSystem>().Play();
+		GameObject particle1 = Instantiate(SoulParticle1, transform.position, Quaternion.identity) as GameObject;
+		GameObject particle2 = Instantiate(SoulParticle2, transform.position, Quaternion.identity) as GameObject;
 	}
 }
