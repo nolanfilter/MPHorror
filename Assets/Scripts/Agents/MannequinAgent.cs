@@ -11,6 +11,8 @@ public class MannequinAgent : MonoBehaviour {
 	public float minMannequinDistance = 1f;
 	public Transform mannequinAreaRoot;
 
+	private string[] possiblePoses = { "Pose 2", "Pose 3", "Pose 4" };
+
 	private List<GameObject> mannequins;
 	private List<GameObject> randomMannequins;
 	private List<Rect> mannequinAreas;
@@ -109,21 +111,22 @@ public class MannequinAgent : MonoBehaviour {
 			randomMannequins.Clear();
 		}
 
+		int seed = Utilities.HexToInt( PhotonNetwork.room.name[ PhotonNetwork.room.name.Length - 2 ] );
+		
+		Random.seed = seed;
+
 		if( mannequins.Count > 0 )
 		{
 			for( int i = 0; i < mannequins.Count; i++ )
 			{
 				mannequins[i].SetActive( true );
+				mannequins[i].GetComponent<MannequinController>().SetPose( possiblePoses[ Random.Range( 0, possiblePoses.Length ) ] );
 				//mannequins[i].tag = "Activatable";
 			}
 		}
 
 		if( mannequinPrefab == null || mannequinAreaRoot == null )
 			return;
-
-		int seed = Utilities.HexToInt( PhotonNetwork.room.name[ PhotonNetwork.room.name.Length - 2 ] );
-		
-		Random.seed = seed;
 
 		int attempts = 0;
 		int maxAttempts = numMannequinsToGenerate * 3;

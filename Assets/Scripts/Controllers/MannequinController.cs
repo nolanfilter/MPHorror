@@ -3,6 +3,8 @@ using System.Collections;
 
 public class MannequinController : MonoBehaviour {
 
+	public Animation animation;
+
 	void Start()
 	{
 		MannequinAgent.RegisterMannequin( gameObject );
@@ -19,5 +21,11 @@ public class MannequinController : MonoBehaviour {
 	void OnDestroy()
 	{
 		MannequinAgent.UnregisterMannequin( gameObject );
+	}
+
+	public void SetPose( string pose )
+	{
+		if( animation )
+			animation.Play( pose );
 	}
 }

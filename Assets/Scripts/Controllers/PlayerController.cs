@@ -76,7 +76,6 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private float zoomDuration = 0.1f;
 	private float zoomProgress = 0f;
-	private float oldZoomProgress;
 	private float zoomSpeedScale = 0.5f;
 	private float timeZoomedIn = 0f;
 	private float timeZoomedInThreshold = 0.5f;
@@ -89,6 +88,14 @@ public class PlayerController : Photon.MonoBehaviour {
 	private float messageDisplayDuration = 7.5f;
 
 	private NetworkView networkView;
+	
+	public string[] movementPoses;
+	public string picturePose;
+	public string pouncePose;
+	public string stunPose;
+	private List<string> poseDeck = new List<string>();
+
+	public Animation animation;
 
 	public GameObject deathModel;
 
@@ -226,7 +233,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		if( modelRenderers != null )
 		{
-			Color color = new Color( 1f, 0.9f, 0.9f, 1f );
+			Color color = new Color( 1f, 0.95f, 0.95f, 1f );
 			
 			for( int i = 0; i < modelRenderers.Length; i++ )
 				modelRenderers[i].material.color = color;
@@ -275,6 +282,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		SnapCamera();
 
 		PlayerAgent.RegisterPlayer( this, photonView.isMine );
+
+		SetPose( NextRandomPose() );
 	}
 	
 	void OnEnable()
@@ -320,6 +329,9 @@ public class PlayerController : Photon.MonoBehaviour {
 			transform.position = new Vector3( transform.position.x, height, transform.position.z );
 
 		UpdateCompass();
+
+		if( photonView.isMine && Input.GetKeyDown( KeyCode.K ) )
+			KillPlayer();
 	}
 
 	void LateUpdate()
@@ -445,6 +457,9 @@ public class PlayerController : Photon.MonoBehaviour {
 					StartCoroutine( "DoMovementRefocus" );
 					
 					DrawParticles();
+
+					if( ( currentState == State.None || currentState == State.Monster ) && zoomProgress == 0f )
+						SetPose( NextRandomPose() );
 
 					didMove = false;
 				}
@@ -628,6 +643,8 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		if( photonView.isMine )
 		{
+			float oldZoomProgress = zoomProgress;
+
 			if( ( isZoomingIn && currentState != State.Stunned && currentState != State.Frozen ) || currentState == State.Raging )
 				zoomProgress = Mathf.Clamp01( zoomProgress + Time.deltaTime / zoomDuration );
 			else
@@ -635,11 +652,17 @@ public class PlayerController : Photon.MonoBehaviour {
 
 			if( zoomProgress == 1f )
 			{
+				if( oldZoomProgress != 1f )
+					SetPose( picturePose );
+
 				timeZoomedIn += Time.deltaTime;
 				Camera.main.gameObject.GetComponent<DepthOfField34>().enabled = ( currentState != State.Monster );
 			}
 			else
 			{
+				if( zoomProgress == 0f && oldZoomProgress != 0f && ( currentState == State.None || currentState == State.Monster ) )
+					SetPose( NextRandomPose() );
+
 				timeZoomedIn = 0f;
 				Camera.main.gameObject.GetComponent<DepthOfField34>().enabled = false;
 			}
@@ -698,8 +721,6 @@ public class PlayerController : Photon.MonoBehaviour {
 
 				flashlight.transform.rotation = Quaternion.Lerp( flashlight.transform.rotation, newFlashlightRotation, percent );
 			}
-			
-			oldZoomProgress = zoomProgress;
 		}
 	}
 
@@ -1007,6 +1028,43 @@ public class PlayerController : Photon.MonoBehaviour {
 		ChangeColor( new Quaternion( 0f, 0f, 0f, 0f ) );
 	}
 
+	private string NextRandomPose()
+	{
+		if( poseDeck.Count < 2 )
+		{
+			for( int i = 0; i < movementPoses.Length; i++ )
+			{
+				if( !poseDeck.Contains( movementPoses[i] ) )
+					poseDeck.Add( movementPoses[i] );
+			}
+
+			int randomValue;
+			string temp;
+
+			for( int i = 1; i < poseDeck.Count; i++ )
+			{
+				randomValue = Random.Range( 1, poseDeck.Count );
+				temp = poseDeck[i];
+				poseDeck[i] = poseDeck[randomValue];
+				poseDeck[randomValue] = temp;
+			}
+		}
+
+		string randomPose = poseDeck[0];
+
+		poseDeck.RemoveAt( 0 );
+
+		return randomPose;
+	}
+
+	private void SetPose( string pose )
+	{
+		if( animation )
+			animation.Play( pose );
+
+		photonView.RPC( "RPCSetPose", PhotonTargets.OthersBuffered, pose );
+	}
+
 	//coroutines
 	private IEnumerator DoDisplayMessage( string messageToDisplay )
 	{
@@ -1096,6 +1154,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		ChangeState( (int)State.Raging );
 		ChangeColor(  new Quaternion( 0.75f, 0f, 0f, 1f ) );
 
+		SetPose( pouncePose );
+
 		RageController rageController = null;
 
 		if( photonView.isMine )
@@ -1124,6 +1184,9 @@ public class PlayerController : Photon.MonoBehaviour {
 		} while( currentDistance < distance );
 
 		ChangeState( (int)State.Stunned );
+
+		SetPose( stunPose );
+
 		//MonsterReveal();
 
 		/*
@@ -1149,8 +1212,10 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( rageController )
 			Destroy( rageController );
 
-		ChangeColor( new Quaternion( 1f, 0.9f, 0.9f, 1f ) );
+		ChangeColor( new Quaternion( 1f, 0.95f, 0.95f, 1f ) );
 		ChangeState( (int)State.Monster );
+
+		SetPose( NextRandomPose() );
 	}
 
 	private IEnumerator DoStun()
@@ -1162,16 +1227,20 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		ChangeState( (int)State.Stunned );
 
+		SetPose( stunPose );
+
 		if( photonView.isMine )
 			gameObject.AddComponent<StunController>();
 
 		yield return new WaitForSeconds( StunController.StunDuration );
 
-		ChangeColor( new Quaternion( 1f, 0.9f, 0.9f, 1f ) );
+		ChangeColor( new Quaternion( 1f, 0.95f, 0.95f, 1f ) );
 
 		RemoveStunEffect();
 
 		ChangeState( (int)originalState );
+
+		SetPose( NextRandomPose() );
 	}
 
 	private IEnumerator DoFreeze()
@@ -1497,6 +1566,13 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( wireframeParticleSystem )
 			wireframeParticleSystem.Play();
 	}
+
+	[RPC]
+	public void RPCSetPose( string pose )
+	{
+		if( animation )
+			animation.Play( pose );
+	}
 	// end server calls
 
 	//event handlers
@@ -1744,7 +1820,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		StopCoroutine( "RageMode" );
 		ChangeState( (int)State.Monster );
 		DisplayMessage( "Trapped your friend" );
-		ChangeColor( new Quaternion( 1f, 0.9f, 0.9f, 1f ) );
+		ChangeColor( new Quaternion( 1f, 0.95f, 0.95f, 1f ) );
 	}
 
 	public void MonsterReveal()
