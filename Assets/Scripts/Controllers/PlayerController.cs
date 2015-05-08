@@ -59,7 +59,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	
 	private Vector3 movementVector;
 	private Vector2 viewChangeVector;
-	private float viewChangeRate = 1.75f;
+	private float viewChangeRate = 1f;
 	private float timeViewChangeStatic;
 	private float timeViewChangeStaticThreshold = 1f;
 
