@@ -156,6 +156,9 @@ public class MannequinAgent : MonoBehaviour {
 				randomMannequins.Add( Instantiate( mannequinPrefab, randomPosition, Quaternion.AngleAxis( Random.Range( 0, 360f ), Vector3.up ) ) as GameObject );
 			}
 		}
+
+		for( int i = 0; i < randomMannequins.Count; i++ )
+			randomMannequins[i].GetComponent<MannequinController>().SetPose( possiblePoses[ Random.Range( 0, possiblePoses.Length ) ] );
 	}
 
 	public static bool GetAllMannequinsDisabled()
