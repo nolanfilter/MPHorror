@@ -1070,6 +1070,13 @@ public class PlayerController : Photon.MonoBehaviour {
 		photonView.RPC( "RPCSetPose", PhotonTargets.OthersBuffered, pose );
 	}
 
+	private void PhotographMannequin( int ID )
+	{
+		MannequinAgent.DestroyMannequin( ID );
+
+		photonView.RPC( "RPCPhotographMannequin", PhotonTargets.OthersBuffered, ID );
+	}
+
 	//coroutines
 	private IEnumerator DoDisplayMessage( string messageToDisplay )
 	{
@@ -1121,7 +1128,7 @@ public class PlayerController : Photon.MonoBehaviour {
 				if( otherPlayerController )
 				{
 					if( otherPlayerController.GetCurrentState() == State.Monster || otherPlayerController.GetCurrentState() == State.Raging )
-						otherPlayerController.ChangeColor( new Quaternion( 1f, 0.5f, 0.75f, 1f ), false );
+						otherPlayerController.ChangeColor(  new Quaternion( 0.75f, 0f, 0f, 1f ), false );
 					else if( otherPlayerController.GetCurrentState() == State.Normal || otherPlayerController.GetCurrentState() == State.None || otherPlayerController.GetCurrentState() == State.Frozen || otherPlayerController.GetCurrentState() == State.Stunned )
 						otherPlayerController.ChangeColor( new Quaternion( 0f, 0.75f, 0f, 1f ), false );
 				}
@@ -1167,10 +1174,7 @@ public class PlayerController : Photon.MonoBehaviour {
 			}
 			else if( photographedObjects[i].tag == "Activatable" )
 			{
-				PlayMakerFSM fsm = photographedObjects[i].GetComponent<PlayMakerFSM>();
-				
-				if( fsm )
-					fsm.SendEvent( "ObjectSeen" );
+				PhotographMannequin( MannequinAgent.GetIDByMannequin( photographedObjects[i] ) );
 			}
 		}
 
@@ -1220,7 +1224,7 @@ public class PlayerController : Photon.MonoBehaviour {
 			yield break;
 
 		ChangeState( (int)State.Raging );
-		ChangeColor(  new Quaternion( 0.75f, 0f, 0f, 1f ) );
+		//ChangeColor(  new Quaternion( 0.75f, 0f, 0f, 1f ) );
 
 		SetPose( pouncePose );
 
@@ -1302,7 +1306,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		yield return new WaitForSeconds( StunController.StunDuration );
 
-		//ChangeColor( new Quaternion( 1f, 0.95f, 0.95f, 1f ) );
+		ChangeColor( new Quaternion( 1f, 0.95f, 0.95f, 1f ) );
 
 		RemoveStunEffect();
 
@@ -1640,6 +1644,12 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		if( animation )
 			animation.Play( pose );
+	}
+
+	[RPC]
+	public void RPCPhotographMannequin( int ID )
+	{
+		MannequinAgent.DestroyMannequin( ID );
 	}
 	// end server calls
 
