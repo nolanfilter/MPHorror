@@ -1114,7 +1114,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		isTakingPhoto = true;
 
-		yield return null;
+		yield return new WaitForSeconds( 0.1f );
 
 		isTakingPhoto = false;
 
@@ -1191,7 +1191,9 @@ public class PlayerController : Photon.MonoBehaviour {
 			yield return StartCoroutine( DoColorFade( screenshotUI, Color.black, Color.white, 1f ) );
 		}
 
-		yield return new WaitForSeconds( 0.75f );
+		//yield return new WaitForSeconds( 0.75f );
+
+		yield return new WaitForSeconds( 7.5f );
 
 		if( flashUI )
 			flashUI.enabled = false;
