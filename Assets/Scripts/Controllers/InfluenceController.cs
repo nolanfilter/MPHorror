@@ -105,12 +105,17 @@ public class InfluenceController : MonoBehaviour {
 					}
 				}
 
+
 				if( playerController.GetCurrentState() == PlayerController.State.Normal || playerController.GetCurrentState() == PlayerController.State.None )
 				{
+					playerController.AddPhotographedObject( collider.gameObject );
+
+					/*
 					if( otherPlayerController.GetCurrentState() == PlayerController.State.Monster  )
 						otherPlayerController.MonsterReveal();
 					else if( otherPlayerController.GetCurrentState() == PlayerController.State.Normal || otherPlayerController.GetCurrentState() == PlayerController.State.None || otherPlayerController.GetCurrentState() == PlayerController.State.Frozen )
 						otherPlayerController.SurvivorReveal();
+					*/
 				}
 			}
 		}
@@ -125,10 +130,14 @@ public class InfluenceController : MonoBehaviour {
 				return;
 			}
 
+			playerController.AddPhotographedObject( collider.gameObject );
+
+			/*
 			PlayMakerFSM fsm = collider.GetComponent<PlayMakerFSM>();
 
 			if( fsm != null )
 				fsm.SendEvent( "ObjectSeen" );
+			*/
 		}
 		else if( collider.tag == "Activatable" )
 		{
@@ -141,10 +150,14 @@ public class InfluenceController : MonoBehaviour {
 				return;
 			}
 
+			playerController.AddPhotographedObject( collider.gameObject );
+
+			/*
 			PlayMakerFSM fsm = collider.GetComponent<PlayMakerFSM>();
 
 			if( fsm != null )
 				fsm.SendEvent( "ObjectSeen" );
+			*/
 		}
 		else if( collider.tag == "Door" )
 		{
