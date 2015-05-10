@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public class PlayerAgent : MonoBehaviour {
 
@@ -34,6 +35,9 @@ public class PlayerAgent : MonoBehaviour {
 	public int monsterizingMannequinNumber = 13;
 	public int compassActivationNumber = 25;
 
+	private Dictionary<int, float> potentialMonstersByTime;
+	private float monsterizeBuffer = 0.5f;
+
 	private static PlayerAgent mInstance = null;
 	public static PlayerAgent instance
 	{
@@ -54,6 +58,7 @@ public class PlayerAgent : MonoBehaviour {
 		mInstance = this;
 
 		playerControllers = new List<PlayerController>();
+		potentialMonstersByTime = new Dictionary<int, float>();
 	}
 
 	void Start()
@@ -260,6 +265,7 @@ public class PlayerAgent : MonoBehaviour {
 	private void internalStartGame()
 	{
 		NetworkAgent.LockRoom();
+		potentialMonstersByTime.Clear();
 
 		for( int i = 0; i < playerControllers.Count; i++ )
 			playerControllers[i].StartGame();
@@ -303,10 +309,13 @@ public class PlayerAgent : MonoBehaviour {
 			}
 		}
 
-		monsterID = closestPlayerID;
+		if( potentialMonstersByTime.Count == 0 )
+			StartCoroutine( "DoMonsterizeBuffer" );
 
-		if( monsterID >= 0 && monsterID < playerControllers.Count )
-			playerControllers[ monsterID ].Monsterize();
+		if( potentialMonstersByTime.ContainsKey( closestPlayerID ) )
+			potentialMonstersByTime[ closestPlayerID ] = Mathf.Min( potentialMonstersByTime[ closestPlayerID ], Time.time );
+		else
+			potentialMonstersByTime.Add( closestPlayerID, Time.time );
 	}
 
 	public static void SetMonster()
@@ -423,5 +432,30 @@ public class PlayerAgent : MonoBehaviour {
 		EndGame();
 
 		isEnding = false;
+	}
+
+	private IEnumerator DoMonsterizeBuffer()
+	{
+		yield return new WaitForSeconds( monsterizeBuffer );
+
+		float earliestTime = Mathf.Infinity;
+		int earliestPlayerID = -1;
+
+		foreach( KeyValuePair<int, float> kvp in potentialMonstersByTime )
+		{
+			if( kvp.Value < earliestTime )
+			{
+				earliestTime = kvp.Value;
+				earliestPlayerID = kvp.Key;
+			}
+		}
+
+		if( earliestPlayerID == -1 )
+			yield break;
+
+		monsterID = earliestPlayerID;
+
+		if( monsterID >= 0 && monsterID < playerControllers.Count )
+			playerControllers[ monsterID ].Monsterize();
 	}
 }

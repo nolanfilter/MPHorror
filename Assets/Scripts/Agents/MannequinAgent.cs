@@ -257,4 +257,61 @@ public class MannequinAgent : MonoBehaviour {
 
 		return ( mannequins.Count - numActiveMannequins >= PlayerAgent.GetMonsterizingMannequinNumber() );
 	}
+
+	public static int GetIDByMannequin( GameObject mannequin )
+	{
+		if( instance )
+			return instance.internalGetIDByMannequin( mannequin );
+
+		return -1;
+	}
+
+	private int internalGetIDByMannequin( GameObject mannequin )
+	{
+		int ID = mannequins.IndexOf( mannequin );
+
+		if( ID == -1 )
+		{
+			ID = randomMannequins.IndexOf( mannequin );
+
+			if( ID != -1 )
+				ID += mannequins.Count;
+		}
+
+		return ID;
+	}
+
+	public static void DestroyMannequin( int ID )
+	{
+		if( instance )
+			instance.internalDestroyMannequin( ID );
+	}
+
+	private void internalDestroyMannequin( int ID )
+	{
+		if( ID == -1 )
+			return;
+
+		GameObject mannequin = null;
+
+		if( ID < mannequins.Count )
+		{
+			mannequin = mannequins[ ID ];
+		}
+		else
+		{
+			ID -= mannequins.Count;
+
+			if( ID < randomMannequins.Count )
+				mannequin = randomMannequins[ ID ];
+		}
+
+		if( mannequin )
+		{
+			PlayMakerFSM fsm = mannequin.GetComponent<PlayMakerFSM>();
+			
+			if( fsm )
+				fsm.SendEvent( "ObjectSeen" );
+		}
+	}
 }
