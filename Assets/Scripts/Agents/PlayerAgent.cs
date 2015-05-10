@@ -266,6 +266,7 @@ public class PlayerAgent : MonoBehaviour {
 	{
 		NetworkAgent.LockRoom();
 		potentialMonstersByTime.Clear();
+		monsterID = -1;
 
 		for( int i = 0; i < playerControllers.Count; i++ )
 			playerControllers[i].StartGame();
