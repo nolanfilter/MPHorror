@@ -119,6 +119,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	private Color whiteClear = new Color( 1f, 1f, 1f, 0f );
 
 	private bool isWaitingForPhotoFinish = false;
+	private bool isTakingPhoto = false;
 
 	//new movement variables
 	private Vector3 moveDirection = Vector3.zero;
@@ -149,6 +150,8 @@ public class PlayerController : Photon.MonoBehaviour {
 	private float movementRefocusAmount = 1.125f;
 	private float movementRefocusDuration = 0.25f;
 	private bool isRefocusing = false;
+
+	private List<GameObject> photographedObjects = new List<GameObject>();
 
 	private struct JoystickValue
 	{
@@ -428,7 +431,7 @@ public class PlayerController : Photon.MonoBehaviour {
 			{
 				movementVector = inputController.getRawAxes();
 			}
-			else if( currentState != State.Frozen )
+			else if( currentState != State.Frozen && !isWaitingForPhotoFinish )
 			{
 				joystickValues.Insert( 0, new JoystickValue( inputController.getRawAxes(), Time.time ) );
 				
@@ -505,9 +508,11 @@ public class PlayerController : Photon.MonoBehaviour {
 		
 		Vector3 targetDirection = movementVector.x * right + movementVector.y * forward;
 
+		/*
 		lockCameraTimer += Time.deltaTime;
 		if (isMoving != wasMoving )
 			lockCameraTimer = 0.0f;
+		*/
 
 		Vector3 movement = Vector3.zero;
 
@@ -645,7 +650,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		{
 			float oldZoomProgress = zoomProgress;
 
-			if( ( isZoomingIn && currentState != State.Stunned && currentState != State.Frozen ) || currentState == State.Raging )
+			if( ( isZoomingIn && currentState != State.Stunned && currentState != State.Frozen ) || currentState == State.Raging || isWaitingForPhotoFinish )
 				zoomProgress = Mathf.Clamp01( zoomProgress + Time.deltaTime / zoomDuration );
 			else
 				zoomProgress = Mathf.Clamp01( zoomProgress - Time.deltaTime / zoomDuration );
@@ -675,25 +680,25 @@ public class PlayerController : Photon.MonoBehaviour {
 
 			float raycastDistance = Vector3.Distance( cameraTransform.position, transform.position );
 
-			//Debug.DrawRay( cameraTransform.position + cameraTransform.right * 0.1f + directionVector * raycastDistance,  directionVector * -1.25f, Color.green, 1f );
-			//Debug.DrawRay( cameraTransform.position - cameraTransform.right * 0.1f + directionVector * raycastDistance,  directionVector * -1.25f, Color.green, 1f );
+			Debug.DrawRay( cameraTransform.position + cameraTransform.right * 0.1f + directionVector * raycastDistance * 1.25f,  directionVector * -1.5f, Color.green, 0.5f );
+			Debug.DrawRay( cameraTransform.position - cameraTransform.right * 0.1f + directionVector * raycastDistance * 1.25f,  directionVector * -1.5f, Color.green, 0.5f );
 			
 			float shortestDistance = Mathf.Infinity;
 			RaycastHit[] hits;
 
-			hits = Physics.RaycastAll( cameraTransform.position + cameraTransform.right * 0.1f + directionVector * raycastDistance,  directionVector * -1f, raycastDistance * 1.25f );
+			hits = Physics.RaycastAll( cameraTransform.position + cameraTransform.right * 0.1f + directionVector * raycastDistance * 1.25f, directionVector * -1f, raycastDistance * 1.5f );
 
 			for( int i = 0; i < hits.Length; i++ )
 				if( hits[i].transform != transform && hits[i].normal != Vector3.up && hits[i].distance < shortestDistance )
 					shortestDistance = hits[i].distance;
 
-			hits = Physics.RaycastAll( cameraTransform.position - cameraTransform.right * 0.1f + directionVector * raycastDistance,  directionVector * -1f, raycastDistance * 1.25f );
+			hits = Physics.RaycastAll( cameraTransform.position - cameraTransform.right * 0.1f + directionVector * raycastDistance * 1.25f,  directionVector * -1f, raycastDistance * 1.5f );
 
 			for( int i = 0; i < hits.Length; i++ )
 				if( hits[i].transform != transform && hits[i].normal != Vector3.up && hits[i].distance < shortestDistance )
 					shortestDistance = hits[i].distance;
 
-			clippingOffset = directionVector * Mathf.Clamp( ( raycastDistance * 1.25f - shortestDistance ), 0f, raycastDistance * 1.25f );
+			clippingOffset = directionVector * Mathf.Clamp( ( raycastDistance * 1.15f - shortestDistance ), 0f, raycastDistance * 1.15f );
 
 			zoomOffset = Vector3.Lerp( clippingOffset, Quaternion.AngleAxis( cameraTransform.eulerAngles.y, Vector3.up ) * Vector3.forward, zoomProgress );
 			cameraTransform.position += zoomOffset;
@@ -1077,24 +1082,10 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private IEnumerator TakePhoto()
 	{
-		if( ( zoomProgress != 1f ) || isWaitingForPhotoFinish || hasPhoto )
+		if( ( zoomProgress != 1f ) || hasPhoto )
 			yield break;
 
-		isWaitingForPhotoFinish = true;
-
-		ScreenshotAgent.instance.OnPostRenderFinish += OnScreenshotFinish;
-		ScreenshotAgent.Enable();
-
-		while( isWaitingForPhotoFinish )
-			yield return null;
-
-		bool oldFlashlightState = ( flashlight && flashlight.enabled );
-
-		SetFlashlightTo( false );
-
 		hasPhoto = true;
-
-		StartCoroutine( "PlayCameraCooldown" );
 
 		SetFlashBulbTo( true );
 
@@ -1102,12 +1093,86 @@ public class PlayerController : Photon.MonoBehaviour {
 		{
 			flashUI.enabled = true;
 
-			yield return StartCoroutine( DoColorFade( flashUI, Color.white, whiteClear, 0.5f ) );
-
-			flashUI.enabled = false;
+			StartCoroutine( DoColorFade( flashUI, Color.white, whiteClear, 0.5f ) );
 		}
 
+		StartCoroutine( "PlayCameraCooldown" );
+
+		bool oldFlashlightState = ( flashlight && flashlight.enabled );
+
+		SetFlashlightTo( false );
+
+
+		photographedObjects.Clear();
+
+		isTakingPhoto = true;
+
+		yield return null;
+
+		isTakingPhoto = false;
+
+
+		for( int i = 0; i < photographedObjects.Count; i++ )
+		{
+			if( photographedObjects[i].tag == "Player" )
+			{
+				PlayerController otherPlayerController = photographedObjects[i].GetComponent<PlayerController>();
+
+				if( otherPlayerController )
+				{
+					if( otherPlayerController.GetCurrentState() == State.Monster || otherPlayerController.GetCurrentState() == State.Raging )
+						otherPlayerController.ChangeColor( new Quaternion( 1f, 0.5f, 0.75f, 1f ), false );
+					else if( otherPlayerController.GetCurrentState() == State.Normal || otherPlayerController.GetCurrentState() == State.None || otherPlayerController.GetCurrentState() == State.Frozen || otherPlayerController.GetCurrentState() == State.Stunned )
+						otherPlayerController.ChangeColor( new Quaternion( 0f, 0.75f, 0f, 1f ), false );
+				}
+			}
+			else if( photographedObjects[i].tag == "Activatable" )
+			{
+				PlayMakerFSM fsm = photographedObjects[i].GetComponent<PlayMakerFSM>();
+				
+				if( fsm )
+					fsm.SendEvent( "CameraReveal" );
+			}
+		}
+
+		isWaitingForPhotoFinish = true;
+		
+		ScreenshotAgent.instance.OnPostRenderFinish += OnScreenshotFinish;
+		ScreenshotAgent.Enable();
+		
+		while( isWaitingForPhotoFinish )
+			yield return null;
+
 		SetFlashBulbTo( false );
+
+		for( int i = 0; i < photographedObjects.Count; i++ )
+		{
+			if( photographedObjects[i].tag == "Player" )
+			{
+				PlayerController otherPlayerController = photographedObjects[i].GetComponent<PlayerController>();
+				
+				if( otherPlayerController )
+				{
+					if( otherPlayerController.GetCurrentState() == State.Monster || otherPlayerController.GetCurrentState() == State.Raging )
+					{
+						otherPlayerController.ChangeColor( new Quaternion( 1f, 0.95f, 0.95f, 1f ), false );
+						otherPlayerController.MonsterReveal();
+					}
+					else if( otherPlayerController.GetCurrentState() == State.Normal || otherPlayerController.GetCurrentState() == State.None || otherPlayerController.GetCurrentState() == State.Frozen || otherPlayerController.GetCurrentState() == State.Stunned )
+					{
+						otherPlayerController.ChangeColor( new Quaternion( 1f, 0.95f, 0.95f, 1f ), false );
+						otherPlayerController.SurvivorReveal();
+					}
+				}
+			}
+			else if( photographedObjects[i].tag == "Activatable" )
+			{
+				PlayMakerFSM fsm = photographedObjects[i].GetComponent<PlayMakerFSM>();
+				
+				if( fsm )
+					fsm.SendEvent( "ObjectSeen" );
+			}
+		}
 
 		if( photoFrameUI )
 		{
@@ -1122,9 +1187,10 @@ public class PlayerController : Photon.MonoBehaviour {
 			yield return StartCoroutine( DoColorFade( screenshotUI, Color.black, Color.white, 1f ) );
 		}
 
-		hasPhoto = false;
-
 		yield return new WaitForSeconds( 0.75f );
+
+		if( flashUI )
+			flashUI.enabled = false;
 
 		if( photoFrameUI )
 			StartCoroutine( DoColorFade( photoFrameUI, Color.white, whiteClear, 0.5f ) );
@@ -1137,10 +1203,12 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( photoFrameUI )
 			photoFrameUI.enabled = false;
 
-		if (screenshotUI)
+		if( screenshotUI )
 			screenshotUI.enabled = false;
 
 		SetFlashlightTo( oldFlashlightState );
+
+		hasPhoto = false;
 
 		if( compassUI && MannequinAgent.GetNumActiveMannequins() <= PlayerAgent.GetCompassActivationNumber() )
 			compassUI.enabled = true;
@@ -1234,7 +1302,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		yield return new WaitForSeconds( StunController.StunDuration );
 
-		ChangeColor( new Quaternion( 1f, 0.95f, 0.95f, 1f ) );
+		//ChangeColor( new Quaternion( 1f, 0.95f, 0.95f, 1f ) );
 
 		RemoveStunEffect();
 
@@ -1671,7 +1739,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		photonView.RPC( "RPCChangeColider", PhotonTargets.OthersBuffered, state );
 	}
 
-	public void ChangeColor( Quaternion colorVector4 )
+	public void ChangeColor( Quaternion colorVector4, bool sync = true )
 	{
 		if( modelRenderers != null )
 		{
@@ -1680,8 +1748,9 @@ public class PlayerController : Photon.MonoBehaviour {
 			for( int i = 0; i < modelRenderers.Length; i++ )
 				modelRenderers[i].material.color = color;
 		}
-		
-		photonView.RPC( "RPCChangeColor", PhotonTargets.OthersBuffered, colorVector4 );
+
+		if( sync )
+			photonView.RPC( "RPCChangeColor", PhotonTargets.OthersBuffered, colorVector4 );
 	}
 
 	public void ChangeFlashBulb( int state )
@@ -1776,7 +1845,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public bool IsZoomedIn()
 	{
-		return flashBulb.enabled || currentState == State.Raging;
+		return isTakingPhoto || currentState == State.Raging;
 	}
 
 	public float GetZoomProgress()
@@ -1834,7 +1903,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		ChangeState( (int)State.Monster );
 
-		ChangeColor( new Quaternion( 1f, 0.5f, 0.75f, 1f ) );
+		//ChangeColor( new Quaternion( 1f, 0.5f, 0.75f, 1f ) );
 		Stun();
 	}
 
@@ -1848,7 +1917,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		}
 		else
 		{
-			ChangeColor( new Quaternion( 0f, 0.75f, 0f, 1f ) );
+			//ChangeColor( new Quaternion( 0f, 0.75f, 0f, 1f ), false );
 			Stun();
 		}
 	}
@@ -2033,6 +2102,12 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		transform.position = coordinate;
 		transform.position = new Vector3( transform.position.x, height, transform.position.z );
+	}
+
+	public void AddPhotographedObject( GameObject photographedObject )
+	{
+		if( !photographedObjects.Contains( photographedObject ) )
+			photographedObjects.Add( photographedObject );
 	}
 	//end public functions
 }
