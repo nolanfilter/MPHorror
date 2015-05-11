@@ -119,7 +119,7 @@ public class MannequinAgent : MonoBehaviour {
 		{
 			for( int i = 0; i < mannequins.Count; i++ )
 			{
-				mannequins[i].transform.localScale = Vector3.zero;
+				mannequins[i].transform.localScale = Vector3.one;
 				mannequins[i].SetActive( true );
 				mannequins[i].GetComponent<MannequinController>().SetPose( possiblePoses[ Random.Range( 0, possiblePoses.Length ) ] );
 				//mannequins[i].tag = "Activatable";
