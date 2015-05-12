@@ -310,6 +310,8 @@ public class PlayerAgent : MonoBehaviour {
 			}
 		}
 
+		Debug.Log( "Potential Monsters Count = " + potentialMonstersByTime.Count );
+
 		if( potentialMonstersByTime.Count == 0 )
 			StartCoroutine( "DoMonsterizeBuffer" );
 
@@ -458,5 +460,7 @@ public class PlayerAgent : MonoBehaviour {
 
 		if( monsterID >= 0 && monsterID < playerControllers.Count )
 			playerControllers[ monsterID ].Monsterize();
+
+		potentialMonstersByTime.Clear();
 	}
 }

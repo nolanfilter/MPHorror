@@ -5,6 +5,8 @@ public class MannequinController : MonoBehaviour {
 
 	public Animation animation;
 
+	private bool shouldCount = true;
+
 	void Start()
 	{
 		MannequinAgent.RegisterMannequin( gameObject );
@@ -12,6 +14,9 @@ public class MannequinController : MonoBehaviour {
 
 	void OnDisable()
 	{
+		if( !shouldCount )
+			return;
+
 		if( !PlayerAgent.GetIsMonsterSet() && MannequinAgent.GetShouldMonsterize() )
 			PlayerAgent.MonsterizeNearestPlayer( transform.position );
 
@@ -27,5 +32,10 @@ public class MannequinController : MonoBehaviour {
 	{
 		if( animation )
 			animation.Play( pose );
+	}
+
+	public void SetShouldCount( bool newShouldCount )
+	{
+		shouldCount = newShouldCount;
 	}
 }

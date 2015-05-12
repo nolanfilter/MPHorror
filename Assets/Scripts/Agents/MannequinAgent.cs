@@ -11,12 +11,15 @@ public class MannequinAgent : MonoBehaviour {
 	public float minMannequinDistance = 1f;
 	public Transform mannequinAreaRoot;
 
+	public int maxMonsterMannequins = int.MaxValue;
+
 	private string[] possiblePoses = { "Pose 2", "Pose 3", "Pose 4" };
 
 	private List<GameObject> mannequins;
 	private List<GameObject> randomMannequins;
+	private List<GameObject> monsterMannequins;
 	private List<Rect> mannequinAreas;
-	
+
 	private static MannequinAgent mInstance = null;
 	public static MannequinAgent instance
 	{
@@ -38,6 +41,7 @@ public class MannequinAgent : MonoBehaviour {
 		
 		mannequins = new List<GameObject>();
 		randomMannequins = new List<GameObject>();
+		monsterMannequins = new List<GameObject>();
 
 		mannequinAreas = new List<Rect>();
 
@@ -104,11 +108,26 @@ public class MannequinAgent : MonoBehaviour {
 		{
 			for( int i = 0; i < randomMannequins.Count; i++ )
 			{
+				randomMannequins[i].GetComponent<MannequinController>().SetShouldCount( false );
+
 				mannequins.Remove( randomMannequins[i] );
 				Destroy( randomMannequins[i] );
 			}
 
 			randomMannequins.Clear();
+		}
+
+		if( monsterMannequins.Count > 0 )
+		{
+			for( int i = 0; i < monsterMannequins.Count; i++ )
+			{
+				monsterMannequins[i].GetComponent<MannequinController>().SetShouldCount( false );
+
+				mannequins.Remove( monsterMannequins[i] );
+				Destroy( monsterMannequins[i] );
+			}
+
+			monsterMannequins.Clear();
 		}
 
 		int seed = Utilities.HexToInt( PhotonNetwork.room.name[ PhotonNetwork.room.name.Length - 2 ] );
@@ -257,6 +276,26 @@ public class MannequinAgent : MonoBehaviour {
 				numActiveMannequins++;
 
 		return ( mannequins.Count - numActiveMannequins >= PlayerAgent.GetMonsterizingMannequinNumber() );
+	}
+
+	public static void CreateMonsterMannequin( Vector3 position )
+	{
+		if( instance )
+			instance.internalCreateMonsterMannequin( position );
+	}
+
+	private void internalCreateMonsterMannequin( Vector3 position )
+	{
+		monsterMannequins.Insert( 0, Instantiate( mannequinPrefab, position, Quaternion.AngleAxis( Random.Range( 0, 360f ), Vector3.up ) ) as GameObject );
+
+		monsterMannequins[0].GetComponent<MannequinController>().SetPose( possiblePoses[ Random.Range( 0, possiblePoses.Length ) ] );
+
+		while( monsterMannequins.Count > maxMonsterMannequins )
+		{
+			monsterMannequins[ maxMonsterMannequins ].GetComponent<MannequinController>().SetShouldCount( false );
+			Destroy( monsterMannequins[ maxMonsterMannequins ] );
+			monsterMannequins.RemoveAt( maxMonsterMannequins );
+		}
 	}
 
 	public static int GetIDByMannequin( GameObject mannequin )
