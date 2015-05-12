@@ -1077,6 +1077,13 @@ public class PlayerController : Photon.MonoBehaviour {
 		photonView.RPC( "RPCPhotographMannequin", PhotonTargets.OthersBuffered, ID );
 	}
 
+	private void CreateMannequin( Vector3 position )
+	{
+		MannequinAgent.CreateMonsterMannequin( position );
+
+		photonView.RPC( "RPCCreateMannequin", PhotonTargets.OthersBuffered, position );
+	}
+
 	//coroutines
 	private IEnumerator DoDisplayMessage( string messageToDisplay )
 	{
@@ -1653,6 +1660,12 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		MannequinAgent.DestroyMannequin( ID );
 	}
+
+	[RPC]
+	private void RPCCreateMannequin( Vector3 position )
+	{
+		MannequinAgent.CreateMonsterMannequin( position );		
+	}
 	// end server calls
 
 	//event handlers
@@ -1692,7 +1705,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		
 		case InputController.ButtonType.X:
 		{
-			isOpeningDoor = true;
+			if( currentState == State.Monster )
+				CreateMannequin( transform.position );
 		} break;
 
 		case InputController.ButtonType.A:
@@ -1721,11 +1735,6 @@ public class PlayerController : Photon.MonoBehaviour {
 			case InputController.ButtonType.Zoom:
 			{
 				ChangeZoom( 0 );
-			} break;
-
-			case InputController.ButtonType.A: case InputController.ButtonType.X:
-			{
-				isOpeningDoor = false;
 			} break;
 		}
 
