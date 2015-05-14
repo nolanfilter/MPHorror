@@ -310,8 +310,6 @@ public class PlayerAgent : MonoBehaviour {
 			}
 		}
 
-		Debug.Log( "Potential Monsters Count = " + potentialMonstersByTime.Count );
-
 		if( potentialMonstersByTime.Count == 0 )
 			StartCoroutine( "DoMonsterizeBuffer" );
 
@@ -338,6 +336,24 @@ public class PlayerAgent : MonoBehaviour {
 			else
 				StartCoroutine( "WaitAndMonsterizeRandom" );
 		}
+	}
+
+	public static bool GetIsPlayerMonster( PlayerController playerController )
+	{
+		if( instance )
+			return instance.internalGetIsPlayerMonster( playerController );
+
+		return false;
+	}
+
+	private bool internalGetIsPlayerMonster( PlayerController playerController )
+	{
+		int playerID = playerControllers.IndexOf( playerController );
+
+		if( playerID != -1 )
+			return ( playerID == monsterID );
+
+		return false;
 	}
 
 	public static float GetClosestPlayerPosition( Vector3 currentPosition )
@@ -460,6 +476,10 @@ public class PlayerAgent : MonoBehaviour {
 
 		if( monsterID >= 0 && monsterID < playerControllers.Count )
 			playerControllers[ monsterID ].Monsterize();
+
+		for( int i = 0; i < playerControllers.Count; i++ )
+			if( i != monsterID )
+				playerControllers[i].ShowMonsterTutorial();
 
 		potentialMonstersByTime.Clear();
 	}
