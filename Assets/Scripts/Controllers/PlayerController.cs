@@ -22,6 +22,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	private bool isZoomingIn = false;
 	private bool hasPhoto = false;
 	private bool isOpeningDoor = false;
+	private bool isTutorializing = false;
 
 	private float currentFear = 1f;
 	private float currentSanity = 1f;
@@ -44,8 +45,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	private bool hasReRandomized = false;
 
 	private float speed;
-	public Texture2D meterTexture;
-	
+
 	private float lastSynchronizationTime = 0f;
 	private float syncDelay = 0f;
 	private float syncTime = 0f;
@@ -103,13 +103,22 @@ public class PlayerController : Photon.MonoBehaviour {
 	public ParticleSystem wireframeParticleSystem;
 
 	public GameObject UIRootObject;
-	public RawImage flashUI;
+	public Image flashUI;
 	public RawImage screenshotUI;
-	public RawImage photoFrameUI;
-	public RawImage camUI;
-	public RawImage rageUI;
-	public RawImage compassUI;
-	public RawImage motionBlindUI;
+	public Image photoFrameUI;
+	public Image camUI;
+	public Image rageUI;
+	public Image compassUI;
+	public Image motionBlindUI;
+	public Image tutorialUI;
+	public Image demonizedUI;
+	public Image demon1toGoUI;
+	public Image demon2toGoUI;
+	public Image gatherer2LeftUI;
+	public Image gatherer1LeftUI;
+	public Image gathererTrappedForever;
+
+	public PlayMakerFSM uiFSM;
 
 	private Renderer[] modelRenderers = null;
 
@@ -175,6 +184,13 @@ public class PlayerController : Photon.MonoBehaviour {
 	private float jumpDistance = 2f;
 
 	private float freezeDuration = 20f;
+
+	private int tutorialIndex;
+	private float gifTime = 0.6f;
+
+	public Sprite[] everyoneTutorialImages;
+	public Sprite[] demonTutorialImages;
+	public Sprite[] gathererTutorialImages;
 	
 	void Awake()
 	{
@@ -341,14 +357,6 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		if( photonView.isMine )
 			Apply();
-	}
-
-	void OnGUI()
-	{
-		if( photonView.isMine )
-		{
-			DisplayGUI();
-		}
 	}
 
 	void OnTriggerEnter( Collider collider )
@@ -892,21 +900,6 @@ public class PlayerController : Photon.MonoBehaviour {
 		return Mathf.Abs( b - a );
 	}
 
-	private void DisplayGUI()
-	{
-		if( currentState == State.Normal )
-		{
-			GUI.color = fearColor;
-			GUI.DrawTexture( new Rect( 0f, Screen.height * currentFear, Screen.width * 0.05f, Screen.height * ( 1f- currentFear ) ), meterTexture );
-
-			GUI.color = sanityColor;
-			GUI.DrawTexture( new Rect( Screen.width * 0.95f, Screen.height * ( 1f - currentSanity ), Screen.width * 0.05f, Screen.height * currentSanity  ), meterTexture );
-		}
-
-		GUI.color = Color.white;
-		GUI.Label( messageRect, messageString, textStyle );
-	}
-
 	private void ToggleFlashlight()
 	{
 		if( flashlight == null )
@@ -917,7 +910,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private void EvaluateViewChange( InputController.ButtonType button )
 	{
-		if( GameAgent.GetCurrentGameState() != GameAgent.GameState.Game )
+		if( GameAgent.GetCurrentGameState() != GameAgent.GameState.Game || isTutorializing )
 			return;
 
 		if( currentState == State.Voyeur )
@@ -1022,6 +1015,11 @@ public class PlayerController : Photon.MonoBehaviour {
 		{
 			motionBlindUI.enabled = false;
 		}
+
+		if( tutorialUI )
+		{
+			tutorialUI.enabled = false;
+		}
 	}
 
 	private void KillPlayer()
@@ -1105,9 +1103,8 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		if( flashUI )
 		{
+			flashUI.color = Color.white;
 			flashUI.enabled = true;
-
-			StartCoroutine( DoColorFade( flashUI, Color.white, whiteClear, 0.5f ) );
 		}
 
 		StartCoroutine( "PlayCameraCooldown" );
@@ -1125,6 +1122,8 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		isTakingPhoto = false;
 
+		if( flashUI )
+			StartCoroutine( DoImageColorFade( flashUI, Color.white, whiteClear, 0.25f ) );
 
 		for( int i = 0; i < photographedObjects.Count; i++ )
 		{
@@ -1134,9 +1133,9 @@ public class PlayerController : Photon.MonoBehaviour {
 
 				if( otherPlayerController )
 				{
-					if( otherPlayerController.GetCurrentState() == State.Monster || otherPlayerController.GetCurrentState() == State.Raging )
+					if( PlayerAgent.GetIsPlayerMonster( otherPlayerController ) )
 						otherPlayerController.ChangeColor(  new Quaternion( 0.75f, 0f, 0f, 1f ), false );
-					else if( otherPlayerController.GetCurrentState() == State.Normal || otherPlayerController.GetCurrentState() == State.None || otherPlayerController.GetCurrentState() == State.Frozen || otherPlayerController.GetCurrentState() == State.Stunned )
+					else
 						otherPlayerController.ChangeColor( new Quaternion( 0f, 0.75f, 0f, 1f ), false );
 				}
 			}
@@ -1185,6 +1184,13 @@ public class PlayerController : Photon.MonoBehaviour {
 			}
 		}
 
+		float currentTime = 0f;
+		float lerp;
+		float duration = 0.5f;
+
+		Vector3 fromPosition = new Vector3( -596f, -654f, 0f );
+		Vector3 toPosition = new Vector3( -537f, -207f, 0f );
+
 		if( photoFrameUI )
 		{
 			photoFrameUI.color = Color.white;
@@ -1195,23 +1201,29 @@ public class PlayerController : Photon.MonoBehaviour {
 		{
 			screenshotUI.enabled = true;
 
-			yield return StartCoroutine( DoColorFade( screenshotUI, Color.black, Color.white, 1f ) );
+			StartCoroutine( DoRawImageColorFade( screenshotUI, Color.black, Color.white, 1f ) );
 		}
+
+		if( uiFSM )
+			uiFSM.SendEvent( "UI_Screenshot_in" );
 
 		//yield return new WaitForSeconds( 0.75f );
 
-		yield return new WaitForSeconds( 7.5f );
+		yield return new WaitForSeconds( 7f );
 
 		if( flashUI )
 			flashUI.enabled = false;
 
-		if( photoFrameUI )
-			StartCoroutine( DoColorFade( photoFrameUI, Color.white, whiteClear, 0.5f ) );
+		//if( photoFrameUI )
+		//	StartCoroutine( DoColorFade( photoFrameUI, Color.white, whiteClear, 0.5f ) );
 
-		if( screenshotUI )
-			StartCoroutine( DoColorFade( screenshotUI, Color.white, whiteClear, 0.5f ) );
+		//if( screenshotUI )
+		//	StartCoroutine( DoColorFade( screenshotUI, Color.white, whiteClear, 0.5f ) );
 
-		yield return new WaitForSeconds( 0.5f );
+		if( uiFSM )
+			uiFSM.SendEvent( "UI_Screenshot_out" );
+
+		yield return new WaitForSeconds( 1f );
 
 		if( photoFrameUI )
 			photoFrameUI.enabled = false;
@@ -1349,9 +1361,9 @@ public class PlayerController : Photon.MonoBehaviour {
 			ChangeState( (int)State.None );
 	}
 
-	private IEnumerator DoColorFade( RawImage rawImage, Color fromColor, Color toColor, float duration )
+	private IEnumerator DoRawImageColorFade( RawImage image, Color fromColor, Color toColor, float duration )
 	{
-		rawImage.color = fromColor;
+		image.color = fromColor;
 		
 		float beginTime = Time.time;
 		float currentTime = 0f;
@@ -1362,13 +1374,35 @@ public class PlayerController : Photon.MonoBehaviour {
 			currentTime += Time.deltaTime;
 			lerp = currentTime / duration;
 			
-			rawImage.color = Color.Lerp( fromColor, toColor, lerp );
+			image.color = Color.Lerp( fromColor, toColor, lerp );
 			
 			yield return null;
 			
 		} while ( currentTime < duration );
 		
-		rawImage.color = toColor;
+		image.color = toColor;
+	}
+
+	private IEnumerator DoImageColorFade( Image image, Color fromColor, Color toColor, float duration )
+	{
+		image.color = fromColor;
+		
+		float beginTime = Time.time;
+		float currentTime = 0f;
+		float lerp = 0f;
+		
+		do
+		{
+			currentTime += Time.deltaTime;
+			lerp = currentTime / duration;
+			
+			image.color = Color.Lerp( fromColor, toColor, lerp );
+			
+			yield return null;
+			
+		} while ( currentTime < duration );
+		
+		image.color = toColor;
 	}
 
 	//TODO generalize
@@ -1436,6 +1470,119 @@ public class PlayerController : Photon.MonoBehaviour {
 		yield return new WaitForSeconds( 0.1f );
 
 		motionBlindUI.enabled = false;
+	}
+
+	private IEnumerator DoTutorial( Sprite[] images )
+	{
+		if( tutorialUI == null || isTutorializing )
+			yield break;
+
+		tutorialUI.enabled = true;
+
+		yield return null;
+
+		isTutorializing = true;
+
+		tutorialIndex = 0;
+		int oldTutorialIndex = -1;
+
+		List<Sprite> subImages = new List<Sprite>();
+		int subTutorialIndex = -1;
+
+		float currentTime = 0f;
+
+		while( tutorialIndex < images.Length )
+		{
+			if( tutorialIndex != oldTutorialIndex )
+				tutorialIndex = Mathf.Clamp( tutorialIndex, 0, images.Length );
+
+			if( tutorialIndex > oldTutorialIndex )
+			{
+				subImages.Clear();
+				subTutorialIndex = -1;
+
+				string name = images[ tutorialIndex ].name;
+
+				if( name.Substring( name.Length - 2, 1 ) == "-" )
+				{
+					string subname = name.Substring( 0, name.Length - 1 );
+
+					while( tutorialIndex < images.Length && name.Substring( 0, name.Length - 1 ) == subname )
+					{
+						subImages.Add( images[ tutorialIndex ] );
+
+						tutorialIndex++;
+
+						if( tutorialIndex < images.Length )
+							name = images[ tutorialIndex ].name;
+					}
+
+					tutorialIndex--;
+				}
+				else
+				{
+					subImages.Add( images[ tutorialIndex ] );
+				}
+
+				currentTime = gifTime;
+			}
+			else if( tutorialIndex < oldTutorialIndex )
+			{
+				subImages.Clear();
+				subTutorialIndex = -1;
+
+				string name = images[ tutorialIndex ].name;
+				string oldName = images[ oldTutorialIndex ].name;
+
+				while( tutorialIndex > 0 && name.Substring( 0, name.Length - 1 ) == oldName.Substring( 0, oldName.Length - 1 ) )
+				{
+					tutorialIndex--;
+					name = images[ tutorialIndex ].name;
+				}
+
+				if( name.Substring( name.Length - 2, 1 ) == "-" )
+				{
+					string subname = name.Substring( 0, name.Length - 1 );
+
+					int newTutorialIndex = tutorialIndex;
+
+					while( tutorialIndex >= 0 && name.Substring( 0, name.Length - 1 ) == subname )
+					{
+						subImages.Insert( 0, images[ tutorialIndex ] );
+						
+						tutorialIndex--;
+						name = images[ tutorialIndex ].name;
+					}
+					
+					tutorialIndex = newTutorialIndex;
+				}
+				else
+				{
+					subImages.Add( images[ tutorialIndex ] );
+				}
+				
+				currentTime = gifTime;
+			}
+
+			currentTime += Time.deltaTime;
+
+			if( currentTime >= gifTime && subImages.Count > 0 )
+			{
+				subTutorialIndex = ( subTutorialIndex + 1 )%subImages.Count;
+
+				tutorialUI.sprite = subImages[ subTutorialIndex ];
+
+				while( currentTime > gifTime )
+					currentTime -= gifTime;
+			}
+
+			oldTutorialIndex = tutorialIndex;
+
+			yield return null;
+		}
+
+		tutorialUI.enabled = false;
+		isTutorializing = false;
 	}
 	//end coroutines
 
@@ -1537,6 +1684,8 @@ public class PlayerController : Photon.MonoBehaviour {
 			wireframeParticleSystem.Stop();
 
 		GameAgent.ChangeGameState( GameAgent.GameState.Game );
+
+		StartCoroutine( "DoTutorial", everyoneTutorialImages );
 	}
 
 	[RPC]
@@ -1693,6 +1842,7 @@ public class PlayerController : Photon.MonoBehaviour {
 				StartCoroutine( "RageMode" );
 		} break;
 
+		/*
 		case InputController.ButtonType.LeftShoulder: 
 		{
 			SetShoulderOffset( -1f );
@@ -1702,7 +1852,18 @@ public class PlayerController : Photon.MonoBehaviour {
 		{
 			SetShoulderOffset( 1f );
 		} break;
+		*/
 		
+		case InputController.ButtonType.Start: 
+		{
+			if( isTutorializing )
+			{
+				StopCoroutine( "DoTutorial" );
+				tutorialUI.enabled = false;
+				isTutorializing = false;
+			}
+		} break;
+
 		case InputController.ButtonType.X:
 		{
 			if( currentState == State.Monster )
@@ -1711,12 +1872,21 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		case InputController.ButtonType.A:
 		{
-			didMove = true;
+			if( isTutorializing )
+				tutorialIndex++;
+			else
+				didMove = true;
 		} break;
 
 		case InputController.ButtonType.Y:
 		{
 			invertY = !invertY;
+		} break;
+
+		case InputController.ButtonType.B:
+		{
+			if( isTutorializing )
+				tutorialIndex--;
 		} break;
 		}
 	}
@@ -1903,6 +2073,13 @@ public class PlayerController : Photon.MonoBehaviour {
 		zoomKillerController.playerController = this;
 
 		PlayerAgent.CheckForEnd();
+
+		StartCoroutine( "DoTutorial", demonTutorialImages );
+	}
+
+	public void ShowMonsterTutorial()
+	{
+		StartCoroutine( "DoTutorial", gathererTutorialImages );
 	}
 
 	public void RageHit()
@@ -2000,6 +2177,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		gameObject.AddComponent<NoiseController>();
 
 		GameAgent.ChangeGameState( GameAgent.GameState.Game );
+
+		StartCoroutine( "DoTutorial", everyoneTutorialImages );
 
 		photonView.RPC( "RPCStartGame", PhotonTargets.OthersBuffered );
 	}
