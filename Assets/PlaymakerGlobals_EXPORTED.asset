@@ -175,6 +175,18 @@ MonoBehaviour:
     vector2Variables: []
     vector3Variables:
     - useVariable: 1
+      name: UI_Demonized_1_originPos
+      tooltip: 
+      showInInspector: 0
+      networkSync: 0
+      value: {x: 0, y: 0, z: 0}
+    - useVariable: 1
+      name: UI_Demonized_3_originPos
+      tooltip: 
+      showInInspector: 0
+      networkSync: 0
+      value: {x: 0, y: 0, z: 0}
+    - useVariable: 1
       name: playerPos
       tooltip: 
       showInInspector: 0
