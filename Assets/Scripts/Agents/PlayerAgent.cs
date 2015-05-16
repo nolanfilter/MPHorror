@@ -383,6 +383,34 @@ public class PlayerAgent : MonoBehaviour {
 		return closestDistance;
 	}
 
+	public static void MessagePlayersLeft()
+	{
+		if( instance )
+			instance.internalMessagePlayersLeft();
+	}
+
+	private void internalMessagePlayersLeft()
+	{
+		int count = 0;
+
+		for( int i = 0; i < playerControllers.Count; i++ )
+		{
+			if( i != monsterID && playerControllers[i].GetCurrentState() != PlayerController.State.Voyeur )
+				count++;
+		}
+
+		for( int i = 0; i < playerControllers.Count; i++ )
+		{
+			if( playerControllers[i].GetCurrentState() != PlayerController.State.Voyeur )
+			{
+				if( i == monsterID )
+					playerControllers[i].DisplayPlayersLeftForDemon( count );
+				else
+					playerControllers[i].DisplayPlayersLeftForGatherers( count );
+			}
+		}
+	}
+
 	public void SetAllFlashlightsTo( bool on )
 	{
 		for( int i = 0; i < playerControllers.Count; i++ )
