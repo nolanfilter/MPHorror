@@ -13,7 +13,7 @@ GameObject:
   - 114: {fileID: 11483600}
   - 114: {fileID: 11431904}
   m_Layer: 0
-  m_Name: MannequinSoulParticle1
+  m_Name: DemonizedParticle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -520,7 +520,7 @@ ParticleSystem:
         rgba: 4294967295
       maxColor:
         serializedVersion: 2
-        rgba: 4286677377
+        rgba: 4284703743
       minMaxState: 0
     startSize:
       scalar: .300000012
