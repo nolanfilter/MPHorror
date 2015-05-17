@@ -57,8 +57,26 @@ public class MenuController : MonoBehaviour {
 			{
 				if( button == InputController.ButtonType.Start || button == InputController.ButtonType.A )
 				{
-					NetworkAgent.SetSelectionIndex( 0 );
-					GameAgent.ChangeGameState( GameAgent.GameState.Lobby );
+					StartScreen.Activate();
+					lastButtonTime = Time.time;
+				}
+				else if( button == InputController.ButtonType.Left || button == InputController.ButtonType.RLeft )
+				{
+					StartScreen.HighlightPlay();
+					lastButtonTime = Time.time;
+				}
+				else if( button == InputController.ButtonType.Right || button == InputController.ButtonType.RRight )
+				{
+					StartScreen.HighlightCredits();
+					lastButtonTime = Time.time;
+				}
+			} break;
+
+			case GameAgent.GameState.Credits:
+			{
+				if( button == InputController.ButtonType.Start || button == InputController.ButtonType.A || button == InputController.ButtonType.B )
+				{
+					GameAgent.ChangeGameState( GameAgent.GameState.Start );
 					lastButtonTime = Time.time;
 				}
 			} break;
@@ -67,40 +85,35 @@ public class MenuController : MonoBehaviour {
 			{
 				if( button == InputController.ButtonType.Start || button == InputController.ButtonType.A )
 				{
-					NetworkAgent.ActivateSelected();
+					LobbyScreen.Activate();
 					lastButtonTime = Time.time;
-				}
-				else if( button == InputController.ButtonType.Left || button == InputController.ButtonType.RLeft )
-				{
-					if( NetworkAgent.GetSelectionIndex() != 0 )
-					{
-						NetworkAgent.SetSelectionIndex( 0 );
-						lastButtonTime = Time.time;
-					}
-				}
-				else if( button == InputController.ButtonType.Right || button == InputController.ButtonType.RRight )
-				{
-					if( NetworkAgent.GetSelectionIndex() == 0 )
-					{
-						NetworkAgent.SetSelectionIndex( 1 );
-						lastButtonTime = Time.time;
-					}
 				}
 				else if( button == InputController.ButtonType.Up || button == InputController.ButtonType.RUp )
 				{
-					if( NetworkAgent.GetSelectionIndex() > 1 )
-					{
-						NetworkAgent.SetSelectionIndex( NetworkAgent.GetSelectionIndex() - 1 );
-						lastButtonTime = Time.time;
-					}
+					LobbyScreen.HighlightHost();
+					lastButtonTime = Time.time;
 				}
 				else if( button == InputController.ButtonType.Down || button == InputController.ButtonType.RDown )
 				{
-					if( NetworkAgent.GetSelectionIndex() > 0 )
-					{
-						NetworkAgent.SetSelectionIndex( NetworkAgent.GetSelectionIndex() + 1 );
-						lastButtonTime = Time.time;
-					}
+					LobbyScreen.HighlightJoin();
+					lastButtonTime = Time.time;
+				}
+				else if( button == InputController.ButtonType.B )
+				{
+					GameAgent.ChangeGameState( GameAgent.GameState.BackToStart );
+					lastButtonTime = Time.time;
+				}
+			} break;
+
+			case GameAgent.GameState.Waiting:
+			{
+				if( !WaitingScreen.GetCanCancel() )
+					return;
+
+				if( button == InputController.ButtonType.B )
+				{
+					GameAgent.ChangeGameState( GameAgent.GameState.Start );
+					lastButtonTime = Time.time;
 				}
 			} break;
 
@@ -108,14 +121,12 @@ public class MenuController : MonoBehaviour {
 			{
 				if( button == InputController.ButtonType.Start || button == InputController.ButtonType.A )
 				{
-					if( NetworkAgent.GetIsHost() )
-					{
-						PlayerAgent.StartGame();
-						lastButtonTime = Time.time;
-					}
+					RoomScreen.Activate();
+					lastButtonTime = Time.time;
 				} else if( button == InputController.ButtonType.B )
 				{
 					NetworkAgent.LeaveRoom();
+					GameAgent.ChangeGameState( GameAgent.GameState.BackToLobby );
 					lastButtonTime = Time.time;
 				}
 			} break;
@@ -125,6 +136,7 @@ public class MenuController : MonoBehaviour {
 				if( button == InputController.ButtonType.Start || button == InputController.ButtonType.A )
 				{
 					NetworkAgent.LeaveRoom();
+					GameAgent.ChangeGameState( GameAgent.GameState.Lobby );
 					lastButtonTime = Time.time;
 				}
 			} break;

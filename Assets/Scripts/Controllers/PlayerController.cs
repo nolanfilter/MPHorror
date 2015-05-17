@@ -349,8 +349,8 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		UpdateCompass();
 
-		if( photonView.isMine && Input.GetKeyDown( KeyCode.K ) )
-			KillPlayer();
+		//if( photonView.isMine && Input.GetKeyDown( KeyCode.K ) )
+		//	KillPlayer();
 	}
 
 	void LateUpdate()
@@ -359,14 +359,13 @@ public class PlayerController : Photon.MonoBehaviour {
 			Apply();
 	}
 
-	void OnTriggerEnter( Collider collider )
+	void OnGUI()
 	{
-		CheckForDoor( collider );
-	}
-	
-	void OnTriggerStay( Collider collider )
-	{
-		CheckForDoor( collider );
+		if( photonView.isMine )
+		{
+			GUI.color = Color.white;
+			GUI.Label( messageRect, messageString, textStyle );
+		}
 	}
 
 	void OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo info )
@@ -1029,6 +1028,11 @@ public class PlayerController : Photon.MonoBehaviour {
 		ChangeState( (int)State.Voyeur );
 		DisplayMessage( "Your friend destroyed you" );
 		ChangeColor( new Quaternion( 0f, 0f, 0f, 0f ) );
+
+		if( uiFSM )
+			uiFSM.SendEvent( "UI_People_TrappedFoever" );
+
+		PlayerAgent.MessagePlayersLeft();
 	}
 
 	private string NextRandomPose()
@@ -1474,7 +1478,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private IEnumerator DoTutorial( Sprite[] images )
 	{
-		if( tutorialUI == null || isTutorializing )
+		if( !PlayerAgent.GetShowTutorials() || tutorialUI == null || isTutorializing )
 			yield break;
 
 		tutorialUI.enabled = true;
@@ -1815,6 +1819,32 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		MannequinAgent.CreateMonsterMannequin( position );		
 	}
+
+	[RPC]
+	private void RPCDisplayPlayersLeftForGatherers( int playersLeft )
+	{
+		if( uiFSM == null )
+			return;
+
+		switch( playersLeft )
+		{
+			case 1: uiFSM.SendEvent( "UI_People_1PeopleLeft" ); break;
+			case 2: uiFSM.SendEvent( "UI_People_2PeopleLeft" ); break;
+		}
+	}
+
+	[RPC]
+	private void RPCDisplayPlayersLeftForDemon( int playersLeft )
+	{
+		if( uiFSM == null )
+			return;
+		
+		switch( playersLeft )
+		{
+			case 1: uiFSM.SendEvent( "UI_Demon_1toGo" ); break;
+			case 2: uiFSM.SendEvent( "UI_Demon_2toGo" ); break;
+		}
+	}
 	// end server calls
 
 	//event handlers
@@ -2074,6 +2104,9 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		PlayerAgent.CheckForEnd();
 
+		if( uiFSM )
+			uiFSM.SendEvent( "UI_Demonized" );
+
 		StartCoroutine( "DoTutorial", demonTutorialImages );
 	}
 
@@ -2308,6 +2341,34 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		if( !photographedObjects.Contains( photographedObject ) )
 			photographedObjects.Add( photographedObject );
+	}
+
+	public void DisplayPlayersLeftForGatherers( int playersLeft )
+	{
+		photonView.RPC( "RPCDisplayPlayersLeftForGatherers", PhotonTargets.OthersBuffered, playersLeft );
+		
+		if( uiFSM == null )
+			return;
+		
+		switch( playersLeft )
+		{
+			case 1: uiFSM.SendEvent( "UI_People_1PeopleLeft" ); break;
+			case 2: uiFSM.SendEvent( "UI_People_2PeopleLeft" ); break;
+		}
+	}
+	
+	public void DisplayPlayersLeftForDemon( int playersLeft )
+	{
+		photonView.RPC( "RPCDisplayPlayersLeftForDemon", PhotonTargets.OthersBuffered, playersLeft );
+		
+		if( uiFSM == null )
+			return;
+		
+		switch( playersLeft )
+		{
+			case 1: uiFSM.SendEvent( "UI_Demon_1toGo" ); break;
+			case 2: uiFSM.SendEvent( "UI_Demon_2toGo" ); break;
+		}
 	}
 	//end public functions
 }

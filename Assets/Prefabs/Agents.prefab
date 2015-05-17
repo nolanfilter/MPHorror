@@ -29,7 +29,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100000}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -.808524132, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -57,16 +57,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameStatePrefabs:
-  - {fileID: 100000, guid: c954d073180844c8ca97e1ded8a3a7b1, type: 2}
-  - {fileID: 100000, guid: 5eac146a239f94e6eb501b44506159d7, type: 2}
-  - {fileID: 100000, guid: 603bf4564b4354f71a28c3127ceb2be8, type: 2}
+  - {fileID: 170070, guid: e05fe9b85aee94497910c803d7a988f0, type: 2}
+  - {fileID: 170070, guid: 9bb60a92574444befa4fc53944732482, type: 2}
+  - {fileID: 170070, guid: ce29007dd53914022a3ce6c373349911, type: 2}
   - {fileID: 0}
-  - {fileID: 100006, guid: 46f9a1e3b37dd49849b289812d5554ef, type: 2}
+  - {fileID: 170070, guid: b3af2f688737045c1ada13bd543947a4, type: 2}
   - {fileID: 0}
+  - {fileID: 170070, guid: 9bef7d409ae7643acb5932bed48da376, type: 2}
   - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 100006, guid: 6729b56c082ca4604b1b732f4cf736cc, type: 2}
-  - {fileID: 100000, guid: d4836a03e6f864770818ec0fcd21f554, type: 2}
+  - {fileID: 170070, guid: 66d31c74d5fef4b9ebdb70cc7562a46b, type: 2}
+  - {fileID: 170070, guid: 602733ecd01244fc6999c91468652948, type: 2}
+  - {fileID: 170070, guid: eb5b6f93b9c6f462aabb7c0581670922, type: 2}
+  - {fileID: 170070, guid: 524c4e3ba849d4a2da6ad229ccf6dc2e, type: 2}
+  - {fileID: 170070, guid: f0d483a5443684358acb672da2fed892, type: 2}
   menuControllerPrefab: {fileID: 100000, guid: e61fad5d754d44d9292f8ffb7199bf53, type: 2}
   darkQuadPrefab: {fileID: 0}
 --- !u!114 &11400004
@@ -80,11 +83,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2162a4370b1a64be1b680839b0dbfb1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selectionCursor: {fileID: 2800000, guid: 8d06bfa830515497d8c31288e04ecb65, type: 3}
   numPlayers: 4
   playerPrefab: {fileID: 100000, guid: afb5c7e6a90424178a67485185db9d18, type: 2}
-  networkBackgroundPrefab: {fileID: 100000, guid: 31af3ae2df7ba4ae8b37d917edabeec6,
-    type: 2}
   playerStartPositions:
   - {x: 3, y: 0, z: 2.79999995}
   - {x: 1, y: 0, z: -2.20000005}
@@ -132,10 +132,11 @@ MonoBehaviour:
   monsterize: 1
   monsterizeMaster: 0
   checkForEnd: 1
+  showTutorials: 1
   waitTime: 15
   endBuffer: 8
   monsterizingMannequinNumber: 13
-  compassActivationNumber: 27
+  compassActivationNumber: 13
 --- !u!114 &11400010
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -148,10 +149,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mannequinPrefab: {fileID: 128126, guid: e1c40c99d037648028c3fdab455c29ee, type: 2}
-  numMannequinsToGenerate: 10
+  numMannequinsToGenerate: 1
   mannequinHeight: .959999979
   minMannequinDistance: 1
   mannequinAreaRoot: {fileID: 0}
+  maxMonsterMannequins: 100
 --- !u!114 &11429286
 MonoBehaviour:
   m_ObjectHideFlags: 1
