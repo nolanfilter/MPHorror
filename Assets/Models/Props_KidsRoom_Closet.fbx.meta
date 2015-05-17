@@ -1,0 +1,139 @@
+fileFormatVersion: 2
+guid: 403ae884dda384f4580946a2095fb0d3
+timeCreated: 1431900974
+licenseType: Pro
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: Closet_Inner
+    100002: Closet_Outer
+    100004: Hearts
+    100006: L_Door
+    100008: pasted__Drawer_KidRoom
+    100010: pCone2
+    100012: pCube18
+    100014: pCube19
+    100016: pCube20
+    100018: pCube21
+    100020: pCube22
+    100022: pCube23
+    100024: Props_KidsRoom_Bed:KidsRoom_Bed
+    100026: Props_KidsRoom_Bed:pCone2
+    100028: Props_KidsRoom_Bed:pCube18
+    100030: //RootNode
+    100032: R_Door
+    400000: Closet_Inner
+    400002: Closet_Outer
+    400004: Hearts
+    400006: L_Door
+    400008: pasted__Drawer_KidRoom
+    400010: pCone2
+    400012: pCube18
+    400014: pCube19
+    400016: pCube20
+    400018: pCube21
+    400020: pCube22
+    400022: pCube23
+    400024: Props_KidsRoom_Bed:KidsRoom_Bed
+    400026: Props_KidsRoom_Bed:pCone2
+    400028: Props_KidsRoom_Bed:pCube18
+    400030: //RootNode
+    400032: R_Door
+    2300000: Closet_Inner
+    2300002: Closet_Outer
+    2300004: L_Door
+    2300006: pCone2
+    2300008: pCube18
+    2300010: pCube19
+    2300012: pCube20
+    2300014: pCube21
+    2300016: pCube22
+    2300018: pCube23
+    2300020: Props_KidsRoom_Bed:pCone2
+    2300022: Props_KidsRoom_Bed:pCube18
+    2300024: R_Door
+    3300000: Closet_Inner
+    3300002: Closet_Outer
+    3300004: L_Door
+    3300006: pCone2
+    3300008: pCube18
+    3300010: pCube19
+    3300012: pCube20
+    3300014: pCube21
+    3300016: pCube22
+    3300018: pCube23
+    3300020: Props_KidsRoom_Bed:pCone2
+    3300022: Props_KidsRoom_Bed:pCube18
+    3300024: R_Door
+    4300000: Closet_Outer
+    4300002: R_Door
+    4300004: L_Door
+    4300006: Closet_Inner
+    4300008: Props_KidsRoom_Bed:pCone2
+    4300010: Props_KidsRoom_Bed:pCube18
+    4300012: pCube18
+    4300014: pCube19
+    4300016: pCube20
+    4300018: pCube21
+    4300020: pCube22
+    4300022: pCone2
+    4300024: pCube23
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
