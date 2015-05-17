@@ -23,6 +23,7 @@ public class PlayerAgent : MonoBehaviour {
 	public bool monsterize = true;
 	public bool monsterizeMaster = false;
 	public bool checkForEnd = true;
+	public bool showTutorials = true;
 
 	private bool isEnding = false;
 
@@ -180,6 +181,14 @@ public class PlayerAgent : MonoBehaviour {
 		return false;
 	}
 
+	public static bool GetShowTutorials()
+	{
+		if( instance )
+			return instance.showTutorials;
+
+		return true;
+	}
+
 	public static void CheckForEnd()
 	{
 		if( instance )
@@ -223,7 +232,16 @@ public class PlayerAgent : MonoBehaviour {
 		if( client != null && monsterID >= 0 && monsterID < playerControllers.Count )
 		{
 			if( client == playerControllers[ monsterID ] )
+			{
 				return PlayerController.State.Monster;
+			}
+			else
+			{
+				if( client.GetCurrentState() == PlayerController.State.Stunned )
+					return PlayerController.State.None;
+				else if( client.GetCurrentState() == PlayerController.State.Frozen )
+					return PlayerController.State.Voyeur;
+			}
 
 			return client.GetCurrentState();
 		}

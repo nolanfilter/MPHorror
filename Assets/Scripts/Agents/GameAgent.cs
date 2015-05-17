@@ -17,7 +17,10 @@ public class GameAgent : MonoBehaviour {
 		Options = 7,
 		Room = 8,
 		Intro = 9,
-		Invalid = 10,
+		Outro = 10,
+		BackToStart = 11,
+		BackToLobby = 12,
+		Invalid = 11,
 	}
 	private List<GameState> gameStateStack = new List<GameState>();
 

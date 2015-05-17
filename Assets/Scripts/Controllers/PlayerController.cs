@@ -359,14 +359,13 @@ public class PlayerController : Photon.MonoBehaviour {
 			Apply();
 	}
 
-	void OnTriggerEnter( Collider collider )
+	void OnGUI()
 	{
-		CheckForDoor( collider );
-	}
-	
-	void OnTriggerStay( Collider collider )
-	{
-		CheckForDoor( collider );
+		if( photonView.isMine )
+		{
+			GUI.color = Color.white;
+			GUI.Label( messageRect, messageString, textStyle );
+		}
 	}
 
 	void OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo info )
@@ -1479,7 +1478,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private IEnumerator DoTutorial( Sprite[] images )
 	{
-		if( tutorialUI == null || isTutorializing )
+		if( !PlayerAgent.GetShowTutorials() || tutorialUI == null || isTutorializing )
 			yield break;
 
 		tutorialUI.enabled = true;
