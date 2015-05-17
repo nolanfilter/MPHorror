@@ -2073,7 +2073,7 @@ MonoBehaviour:
             value: {fileID: 0}
         animationCurveParams: []
         functionCallParams:
-        - FunctionName: PlayEffect
+        - FunctionName: playDemonizedEffect
           parameterType: None
           BoolParameter:
             useVariable: 0
@@ -2257,6 +2257,177 @@ MonoBehaviour:
         - lateUpdate
         paramDataPos: 00000000000000000d00000012000000170000001c0000001d000000
         paramByteDataSize: 000000000d0000000500000005000000050000000100000001000000
+    - name: Play Demonized Particle
+      description: 
+      colorIndex: 0
+      position:
+        serializedVersion: 2
+        x: 249.5
+        y: 219
+        width: 169
+        height: 16
+      isBreakpoint: 0
+      isSequence: 0
+      hideUnused: 0
+      transitions: []
+      actionData:
+        actionNames:
+        - HutongGames.PlayMaker.Actions.SendMessage
+        - HutongGames.PlayMaker.Actions.ActivateGameObject
+        customNames:
+        - 
+        - 
+        actionEnabled: 0101
+        actionIsOpen: 0101
+        actionStartIndex: 0000000004000000
+        actionHashCodes: 6e5036b6b4797e4a
+        unityObjectParams: []
+        fsmGameObjectParams: []
+        fsmOwnerDefaultParams:
+        - ownerOption: 0
+          gameObject:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: {fileID: 0}
+        - ownerOption: 0
+          gameObject:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: {fileID: 0}
+        animationCurveParams: []
+        functionCallParams:
+        - FunctionName: playDemonizedEffect
+          parameterType: None
+          BoolParameter:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: 0
+          FloatParameter:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: 0
+          IntParameter:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: 0
+          GameObjectParameter:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: {fileID: 0}
+          ObjectParameter:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            typeName: 
+            value: {fileID: 0}
+          StringParameter:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: 
+          Vector2Parameter:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: {x: 0, y: 0}
+          Vector3Parameter:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: {x: 0, y: 0, z: 0}
+          RectParamater:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value:
+              serializedVersion: 2
+              x: 0
+              y: 0
+              width: 0
+              height: 0
+          QuaternionParameter:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: {x: 0, y: 0, z: 0, w: 0}
+          MaterialParameter:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            typeName: 
+            value: {fileID: 0}
+          TextureParameter:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            typeName: 
+            value: {fileID: 0}
+          ColorParameter:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: {r: 0, g: 0, b: 0, a: 1}
+        fsmTemplateControlParams: []
+        fsmEventTargetParams: []
+        fsmPropertyParams: []
+        layoutOptionParams: []
+        fsmStringParams: []
+        fsmObjectParams: []
+        fsmVarParams: []
+        byteData: 0000000001000000000000000000
+        arrayParamSizes: 
+        arrayParamTypes: []
+        customTypeSizes: 
+        customTypeNames: []
+        paramDataType: 140000000700000007000000150000001400000011000000110000000100000001000000
+        paramName:
+        - gameObject
+        - delivery
+        - options
+        - functionCall
+        - gameObject
+        - activate
+        - recursive
+        - resetOnExit
+        - everyFrame
+        paramDataPos: 0000000000000000040000000000000001000000080000000a0000000c0000000d000000
+        paramByteDataSize: 000000000400000004000000000000000000000002000000020000000100000001000000
     events:
     - name: FINISHED
       isSystemEvent: 1
@@ -2265,6 +2436,9 @@ MonoBehaviour:
       isSystemEvent: 0
       isGlobal: 0
     - name: ObjectSeen
+      isSystemEvent: 0
+      isGlobal: 0
+    - name: PlayDemonizedParticle
       isSystemEvent: 0
       isGlobal: 0
     - name: destroy self
@@ -2290,6 +2464,14 @@ MonoBehaviour:
         isSystemEvent: 0
         isGlobal: 0
       toState: Change stuff in the Photo
+      linkStyle: 0
+      linkConstraint: 0
+      colorIndex: 0
+    - fsmEvent:
+        name: PlayDemonizedParticle
+        isSystemEvent: 0
+        isGlobal: 0
+      toState: Play Demonized Particle
       linkStyle: 0
       linkConstraint: 0
       colorIndex: 0
@@ -2338,6 +2520,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   particleEffect: {fileID: 193066, guid: 5823788c4387c4cdfaf303b90bc31f15, type: 2}
   SoulParticle1: {fileID: 171522, guid: e8f28e28ba605446ba9e79fa094321ee, type: 2}
+  DemonizedParticle: {fileID: 171522, guid: 1fcca2900181c42f790758972d0ddf6e, type: 2}
 --- !u!136 &13628134
 CapsuleCollider:
   m_ObjectHideFlags: 1
