@@ -222,7 +222,7 @@ public class GameAgent : MonoBehaviour {
 
 		if( gameStateObjectStack.Count > 0 )
 		{
-			Destroy( gameStateObjectStack[0] );
+			StartCoroutine( "WaitAndDestroy", gameStateObjectStack[0] );
 			gameStateObjectStack.RemoveAt( 0 );
 		}
 
@@ -241,5 +241,12 @@ public class GameAgent : MonoBehaviour {
 
 		if( menuController )
 			menuController.SetActive( !( currentGameState == GameState.Game || currentGameState == GameState.Invalid ) );
+	}
+
+	private IEnumerator WaitAndDestroy( GameObject gameObject )
+	{
+		yield return null;
+
+		Destroy( gameObject );
 	}
 }
