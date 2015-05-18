@@ -50,9 +50,9 @@ public class MannequinController : MonoBehaviour {
 
 		collider.enabled = false;
 
-		Vector3 start = transform.position - Vector3.up * collider.height * 0.5f;
-		Vector3 end = transform.position + Vector3.up * collider.height * 0.5f;
-		float radius = collider.radius;
+		Vector3 start = transform.position - Vector3.up * collider.height * 0.25f;
+		Vector3 end = transform.position + Vector3.up * collider.height * 0.25f;
+		float radius = collider.radius * 0.5f;
 
 		while( !collider.enabled )
 		{
@@ -60,5 +60,7 @@ public class MannequinController : MonoBehaviour {
 
 			yield return null;
 		}
+
+		Debug.Log( "Enabled!" );
 	}
 }
