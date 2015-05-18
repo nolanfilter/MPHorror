@@ -112,7 +112,7 @@ public class MenuController : MonoBehaviour {
 
 				if( button == InputController.ButtonType.B )
 				{
-					GameAgent.ChangeGameState( GameAgent.GameState.Start );
+					GameAgent.ChangeGameState( GameAgent.GameState.BackToLobby );
 					lastButtonTime = Time.time;
 				}
 			} break;

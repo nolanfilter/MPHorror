@@ -23,6 +23,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	private bool hasPhoto = false;
 	private bool isOpeningDoor = false;
 	private bool isTutorializing = false;
+	private bool hasShowDemonTutorial = false;
 
 	private float currentFear = 1f;
 	private float currentSanity = 1f;
@@ -107,8 +108,12 @@ public class PlayerController : Photon.MonoBehaviour {
 	public RawImage screenshotUI;
 	public Image photoFrameUI;
 	public Image camUI;
+	public Image rechargeUI;
+	public Image slashUI;
 	public Image rageUI;
-	public Image compassUI;
+	public Image compassWheel;
+	public Image compassTriangle;
+	public Image compassIndicator;
 	public Image motionBlindUI;
 	public Image tutorialUI;
 	public Image demonizedUI;
@@ -129,6 +134,8 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private bool isWaitingForPhotoFinish = false;
 	private bool isTakingPhoto = false;
+
+	private bool isCompassActive = false;
 
 	//new movement variables
 	private Vector3 moveDirection = Vector3.zero;
@@ -640,15 +647,81 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private void UpdateCompass()
 	{
-		if( !photonView.isMine || GameAgent.GetCurrentGameState() != GameAgent.GameState.Game || compassUI == null || MannequinAgent.GetNumActiveMannequins() > PlayerAgent.GetCompassActivationNumber() )
+		bool isMonster = PlayerAgent.GetIsPlayerMonster( this );
+
+		if( photonView.isMine && zoomProgress == 1f && GameAgent.GetCurrentGameState() == GameAgent.GameState.Game && MannequinAgent.GetNumActiveMannequins() <= PlayerAgent.GetCompassActivationNumber() && ( !isMonster || hasShowDemonTutorial ) )
+		{
+			if( !isCompassActive )
+			{
+				if( compassWheel )
+					compassWheel.enabled = true;
+
+				if( compassTriangle )
+					compassTriangle.enabled = true;
+
+				if( compassIndicator )
+					compassIndicator.enabled = true;
+
+				isCompassActive = true;
+			}
+		}
+		else
+		{
+			if( isCompassActive )
+			{
+				if( compassWheel )
+					compassWheel.enabled = false;
+				
+				if( compassTriangle )
+					compassTriangle.enabled = false;
+				
+				if( compassIndicator )
+					compassIndicator.enabled = false;
+				
+				isCompassActive = false;
+			}
+		}
+
+		if( !isCompassActive )
 			return;
+	
+		float forward = Mathf.Atan2( cameraTransform.forward.x, cameraTransform.forward.z ) * Mathf.Rad2Deg;
 
-		Vector3 closestMannequinVector = MannequinAgent.GetClosestMannequin( transform.position ) - transform.position;
+		float northAngle = Mathf.DeltaAngle( forward, Mathf.Atan2( Vector3.forward.x, Vector3.forward.z ) * Mathf.Rad2Deg );
 
-		float angle = Mathf.DeltaAngle( Mathf.Atan2( cameraTransform.forward.x, cameraTransform.forward.z ) * Mathf.Rad2Deg,
+		Vector3 closestMannequinVector = Vector3.up * -1f;
+
+		if( isMonster )
+			closestMannequinVector = PlayerAgent.GetClosestStunnedPlayer( cameraTransform.position );
+		else
+			closestMannequinVector = MannequinAgent.GetClosestMannequin( cameraTransform.position ) - cameraTransform.position;
+
+		float soulAngle = Mathf.DeltaAngle( Mathf.Atan2( cameraTransform.forward.x, cameraTransform.forward.z ) * Mathf.Rad2Deg,
 		                               Mathf.Atan2( closestMannequinVector.x, closestMannequinVector.z ) * Mathf.Rad2Deg );
 
-		compassUI.rectTransform.localRotation = Quaternion.AngleAxis( angle, Vector3.back );
+		if( Mathf.Abs( soulAngle ) > 30f )
+			soulAngle = 30f * Mathf.Sign( soulAngle );
+
+		soulAngle *= Mathf.Deg2Rad;
+
+		if( compassWheel == null )
+			return;
+
+		bool shouldShowCompass = ( closestMannequinVector != Vector3.up * -1f );
+
+		compassWheel.enabled = shouldShowCompass;
+
+		compassWheel.rectTransform.localRotation = Quaternion.AngleAxis( northAngle, Vector3.back );
+
+		if( compassIndicator )
+		{
+			compassIndicator.enabled = shouldShowCompass;
+
+			compassIndicator.rectTransform.localPosition = compassWheel.rectTransform.localPosition + new Vector3( Mathf.Sin( soulAngle ), Mathf.Cos( soulAngle ), 0f ) * 960f;
+		}
+
+		if( compassTriangle )
+			compassTriangle.enabled = shouldShowCompass;
 	}
 
 	private void SnapCamera()
@@ -914,26 +987,31 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		if( currentState == State.Voyeur )
 		{
+			float adjustedChangeRate = viewChangeRate;
+
+			if( zoomProgress == 1f )
+				adjustedChangeRate *= 0.25f;
+
 			switch( button )
 			{
 				case InputController.ButtonType.RLeft:
 				{	
-					viewChangeVector = new Vector2( Mathf.Clamp( viewChangeVector.x - viewChangeRate * Time.deltaTime, -1f, 1f ), viewChangeVector.y );
+					viewChangeVector = new Vector2( Mathf.Clamp( viewChangeVector.x - adjustedChangeRate * Time.deltaTime, -1f, 1f ), viewChangeVector.y );
 				} break;
 					
 				case InputController.ButtonType.RRight: 
 				{
-					viewChangeVector = new Vector2( Mathf.Clamp( viewChangeVector.x + viewChangeRate * Time.deltaTime, -1f, 1f ), viewChangeVector.y );
+					viewChangeVector = new Vector2( Mathf.Clamp( viewChangeVector.x + adjustedChangeRate * Time.deltaTime, -1f, 1f ), viewChangeVector.y );
 				} break;
 					
 				case InputController.ButtonType.RUp: 
 				{
-					viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y + viewChangeRate * Time.deltaTime * ( invertY ? -1f : 1f ), -1f, 1f ) );
+					viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y + adjustedChangeRate * Time.deltaTime * ( invertY ? -1f : 1f ), -1f, 1f ) );
 				} break;
 					
 				case InputController.ButtonType.RDown: 
 				{
-					viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y - viewChangeRate * Time.deltaTime * ( invertY ? -1f : 1f ), -1f, 1f ) );
+					viewChangeVector = new Vector2( viewChangeVector.x, Mathf.Clamp( viewChangeVector.y - adjustedChangeRate * Time.deltaTime * ( invertY ? -1f : 1f ), -1f, 1f ) );
 				} break;
 			}
 		}
@@ -999,15 +1077,35 @@ public class PlayerController : Photon.MonoBehaviour {
 		{
 			camUI.enabled = false;
 		}
-		
+
+		if( rechargeUI )
+		{
+			rechargeUI.enabled = false;
+		}
+
+		if( slashUI )
+		{
+			slashUI.enabled = false;
+		}
+
 		if( rageUI )
 		{
 			rageUI.enabled = false;
 		}
 		
-		if( compassUI )
+		if( compassWheel )
 		{
-			compassUI.enabled = false;
+			compassWheel.enabled = false;
+		}
+
+		if( compassTriangle )
+		{
+			compassTriangle.enabled = false;
+		}
+
+		if( compassIndicator )
+		{
+			compassIndicator.enabled = false;
 		}
 
 		if( motionBlindUI )
@@ -1084,6 +1182,13 @@ public class PlayerController : Photon.MonoBehaviour {
 		MannequinAgent.CreateMonsterMannequin( position );
 
 		photonView.RPC( "RPCCreateMannequin", PhotonTargets.OthersBuffered, position );
+	}
+
+	private void PlayMonsterizeClip()
+	{
+		StartCoroutine( "PlayMonsterizeSound" );
+
+		photonView.RPC( "RPCPlayMonsterizeClip", PhotonTargets.OthersBuffered );
 	}
 
 	//coroutines
@@ -1188,6 +1293,8 @@ public class PlayerController : Photon.MonoBehaviour {
 			}
 		}
 
+		StartCoroutine( "DoRecharge" );
+
 		float currentTime = 0f;
 		float lerp;
 		float duration = 0.5f;
@@ -1218,12 +1325,6 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( flashUI )
 			flashUI.enabled = false;
 
-		//if( photoFrameUI )
-		//	StartCoroutine( DoColorFade( photoFrameUI, Color.white, whiteClear, 0.5f ) );
-
-		//if( screenshotUI )
-		//	StartCoroutine( DoColorFade( screenshotUI, Color.white, whiteClear, 0.5f ) );
-
 		if( uiFSM )
 			uiFSM.SendEvent( "UI_Screenshot_out" );
 
@@ -1239,8 +1340,15 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		hasPhoto = false;
 
-		if( compassUI && MannequinAgent.GetNumActiveMannequins() <= PlayerAgent.GetCompassActivationNumber() )
-			compassUI.enabled = true;
+		yield return null;
+
+		StopCoroutine( "DoRecharge" );
+		
+		if( rechargeUI )
+			rechargeUI.enabled = false;
+		
+		if( slashUI )
+			slashUI.enabled = false;
 	}
 
 	private IEnumerator RageMode()
@@ -1442,6 +1550,25 @@ public class PlayerController : Photon.MonoBehaviour {
 		}
 	}
 
+	private IEnumerator PlayMonsterizeSound()
+	{
+		AudioClip monsterizeClip = PlayerAgent.GetMonsterizeClip();
+		
+		if( monsterizeClip )
+		{
+			AudioSource source = gameObject.AddComponent<AudioSource>();
+			source.clip = monsterizeClip;
+			source.loop = false;
+			source.volume = 1f;
+			source.Play();
+
+			while( source.isPlaying )
+				yield return null;
+			
+			Destroy( source );
+		}
+	}
+
 	private IEnumerator DoMovementRefocus()
 	{
 		isRefocusing = true;
@@ -1476,10 +1603,20 @@ public class PlayerController : Photon.MonoBehaviour {
 		motionBlindUI.enabled = false;
 	}
 
+	private IEnumerator WaitAndShowTutorial( Sprite[] images )
+	{
+		yield return new WaitForSeconds( 3f );
+
+		StartCoroutine( "DoTutorial", images );
+	}
+
 	private IEnumerator DoTutorial( Sprite[] images )
 	{
 		if( !PlayerAgent.GetShowTutorials() || tutorialUI == null || isTutorializing )
 			yield break;
+
+		if( images == demonTutorialImages )
+			hasShowDemonTutorial = true;
 
 		tutorialUI.enabled = true;
 
@@ -1588,6 +1725,46 @@ public class PlayerController : Photon.MonoBehaviour {
 		tutorialUI.enabled = false;
 		isTutorializing = false;
 	}
+
+	private IEnumerator DoRecharge()
+	{
+		bool displayRecharge = true;
+		bool displaySlash = true;
+		float slashDuration = 0.5f;
+		float currentTime = 0f;
+
+		while( true )
+		{
+			if( PlayerAgent.GetIsPlayerMonster( this ) )
+			{
+				if( rechargeUI )
+					rechargeUI.enabled = false;
+
+				if( slashUI )
+					slashUI.enabled = false;
+
+				yield break;
+			}
+
+			currentTime += Time.deltaTime;
+
+			while( currentTime >= slashDuration )
+			{
+				displaySlash = !displaySlash;
+				currentTime -= slashDuration;
+			}
+
+			displayRecharge = ( zoomProgress == 1f );
+
+			if( rechargeUI )
+				rechargeUI.enabled = displayRecharge;
+
+			if( slashUI )
+				slashUI.enabled = displayRecharge && displaySlash;
+
+			yield return null;
+		}
+	}
 	//end coroutines
 
 	//server calls
@@ -1650,6 +1827,8 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		if( UIRootObject )
 			UIRootObject.SetActive( true );
+
+		isCompassActive = false;
 
 		FastBloom fastBloom = Camera.main.gameObject.GetComponent<FastBloom>();
 			
@@ -1844,6 +2023,12 @@ public class PlayerController : Photon.MonoBehaviour {
 			case 1: uiFSM.SendEvent( "UI_Demon_1toGo" ); break;
 			case 2: uiFSM.SendEvent( "UI_Demon_2toGo" ); break;
 		}
+	}
+
+	[RPC]
+	private void RPCPlayMonsterizeClip()
+	{
+		StartCoroutine( "PlayMonsterizeSound" );
 	}
 	// end server calls
 
@@ -2091,7 +2276,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		StopCoroutine( "DoStun" );
 		RemoveStunEffect();
 		ChangeState( (int)State.Monster );
-		DisplayMessage( "Attack your friends" );
+		//DisplayMessage( "Attack your friends" );
 
 		ZoomSurvivorController zoomSurvivorController = gameObject.GetComponent<ZoomSurvivorController>();
 
@@ -2105,14 +2290,19 @@ public class PlayerController : Photon.MonoBehaviour {
 		PlayerAgent.CheckForEnd();
 
 		if( uiFSM )
+		{
+			uiFSM.SendEvent( "UI_Screenshot_out" );
 			uiFSM.SendEvent( "UI_Demonized" );
+		}
 
-		StartCoroutine( "DoTutorial", demonTutorialImages );
+		PlayMonsterizeClip();
+
+		StartCoroutine( "WaitAndShowTutorial", demonTutorialImages );
 	}
 
 	public void ShowMonsterTutorial()
 	{
-		StartCoroutine( "DoTutorial", gathererTutorialImages );
+		StartCoroutine( "WaitAndShowTutorial", gathererTutorialImages );
 	}
 
 	public void RageHit()
@@ -2175,6 +2365,8 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		if( UIRootObject )
 			UIRootObject.SetActive( true );
+
+		isCompassActive = false;
 
 		FastBloom fastBloom = Camera.main.gameObject.GetComponent<FastBloom>();
 		

@@ -115,7 +115,7 @@ MonoBehaviour:
   quality: 1
   resolution: 4
   simpleTweakMode: 1
-  focalPoint: 5
+  focalPoint: 5.5
   smoothness: .100000001
   focalZDistance: .300000012
   focalZStartCurve: 1
