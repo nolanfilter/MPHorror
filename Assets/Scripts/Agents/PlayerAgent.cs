@@ -19,6 +19,7 @@ public class PlayerAgent : MonoBehaviour {
 	public Texture scratchTexture;
 
 	public AudioClip cameraCooldownClip;
+	public AudioClip monsterizeClip;
 
 	public bool monsterize = true;
 	public bool monsterizeMaster = false;
@@ -189,6 +190,56 @@ public class PlayerAgent : MonoBehaviour {
 		return true;
 	}
 
+	public static Vector3 GetClosestStunnedPlayer( Vector3 position )
+	{
+		if( instance )
+			return instance.internalGetClosestStunnedPlayer( position );
+
+		return Vector3.up * -1f;
+	}
+
+	private Vector3 internalGetClosestStunnedPlayer( Vector3 position )
+	{
+		float closestDistance = Mathf.Infinity;
+		Vector3 closestPosition = Vector3.up * -1f;
+		float distance;
+
+		for( int i = 0; i < playerControllers.Count; i++ )
+		{
+			if( playerControllers[i].GetCurrentState() == PlayerController.State.Stunned )
+			{
+				distance = Vector3.Distance( position, playerControllers[i].transform.position );
+				
+				if( distance < closestDistance )
+				{
+					closestDistance = distance;
+					closestPosition = playerControllers[i].transform.position;
+				}
+			}
+		}
+
+		return closestPosition;
+	}
+
+	public static List<Vector3> GetFrozenPlayerPositions()
+	{
+		if( instance )
+			return instance.internalGetFrozenPlayerPositions();
+
+		return new List<Vector3>();
+	}
+
+	private List<Vector3> internalGetFrozenPlayerPositions()
+	{
+		List<Vector3> frozenPlayerPositions = new List<Vector3>();
+
+		for( int i = 0; i < playerControllers.Count; i++ )
+			if( playerControllers[i].GetCurrentState() == PlayerController.State.Frozen )
+				frozenPlayerPositions.Add( playerControllers[i].transform.position );
+
+		return frozenPlayerPositions;
+	}
+
 	public static void CheckForEnd()
 	{
 		if( instance )
@@ -270,6 +321,14 @@ public class PlayerAgent : MonoBehaviour {
 	{
 		if( instance )
 			return instance.cameraCooldownClip;
+
+		return null;
+	}
+
+	public static AudioClip GetMonsterizeClip()
+	{
+		if( instance )
+			return instance.monsterizeClip;
 
 		return null;
 	}

@@ -234,6 +234,19 @@ public class MannequinAgent : MonoBehaviour {
 			}
 		}
 
+		List<Vector3> frozenPlayerPositions = PlayerAgent.GetFrozenPlayerPositions();
+
+		for( int i = 0; i < frozenPlayerPositions.Count; i++ )
+		{
+			distance = Vector3.Distance( position, frozenPlayerPositions[i] );
+			
+			if( distance < closestDistance )
+			{
+				closestDistance = distance;
+				closestPosition = frozenPlayerPositions[i];
+			}
+		}
+
 		return closestPosition;
 	}
 
