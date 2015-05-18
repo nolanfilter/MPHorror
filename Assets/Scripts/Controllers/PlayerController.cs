@@ -111,6 +111,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	public Image rechargeUI;
 	public Image slashUI;
 	public Image rageUI;
+	public Image frozenUI;
 	public Image compassWheel;
 	public Image compassTriangle;
 	public Image compassIndicator;
@@ -356,8 +357,11 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		UpdateCompass();
 
-		//if( photonView.isMine && Input.GetKeyDown( KeyCode.K ) )
-		//	KillPlayer();
+		if( photonView.isMine && Input.GetKeyDown( KeyCode.K ) )
+			KillPlayer();
+
+		if( photonView.isMine && Input.GetKeyDown( KeyCode.Z ) )
+			cameraTransform.gameObject.AddComponent<ShakeEffect>();
 	}
 
 	void LateUpdate()
@@ -649,7 +653,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		bool isMonster = PlayerAgent.GetIsPlayerMonster( this );
 
-		if( photonView.isMine && zoomProgress == 1f && GameAgent.GetCurrentGameState() == GameAgent.GameState.Game && MannequinAgent.GetNumActiveMannequins() <= PlayerAgent.GetCompassActivationNumber() && ( !isMonster || hasShowDemonTutorial ) )
+		if( photonView.isMine && zoomProgress == 1f && GameAgent.GetCurrentGameState() == GameAgent.GameState.Game && ( !isMonster || hasShowDemonTutorial ) )
 		{
 			if( !isCompassActive )
 			{
@@ -707,21 +711,14 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( compassWheel == null )
 			return;
 
-		bool shouldShowCompass = ( closestMannequinVector != Vector3.up * -1f );
-
-		compassWheel.enabled = shouldShowCompass;
-
 		compassWheel.rectTransform.localRotation = Quaternion.AngleAxis( northAngle, Vector3.back );
 
 		if( compassIndicator )
 		{
-			compassIndicator.enabled = shouldShowCompass;
+			compassIndicator.enabled = ( closestMannequinVector != Vector3.up * -1f );
 
 			compassIndicator.rectTransform.localPosition = compassWheel.rectTransform.localPosition + new Vector3( Mathf.Sin( soulAngle ), Mathf.Cos( soulAngle ), 0f ) * 960f;
 		}
-
-		if( compassTriangle )
-			compassTriangle.enabled = shouldShowCompass;
 	}
 
 	private void SnapCamera()
@@ -1092,6 +1089,11 @@ public class PlayerController : Photon.MonoBehaviour {
 		{
 			rageUI.enabled = false;
 		}
+
+		if( frozenUI )
+		{
+			frozenUI.enabled = false;
+		}
 		
 		if( compassWheel )
 		{
@@ -1189,6 +1191,14 @@ public class PlayerController : Photon.MonoBehaviour {
 		StartCoroutine( "PlayMonsterizeSound" );
 
 		photonView.RPC( "RPCPlayMonsterizeClip", PhotonTargets.OthersBuffered );
+	}
+
+	private void Shake()
+	{
+		if( photonView.isMine )
+			cameraTransform.gameObject.AddComponent<ShakeEffect>();
+
+		photonView.RPC( "RPCShake", PhotonTargets.OthersBuffered );
 	}
 
 	//coroutines
@@ -1452,22 +1462,34 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		float beginTime = Time.time;
 
-		DisplayMessage( "You've been frozen in place" );
+		if( frozenUI )
+			frozenUI.enabled = true;
 
+		yield return new WaitForSeconds( freezeDuration );
+
+		/*
+		//DisplayMessage( "You've been frozen in place" );
+	
 		yield return new WaitForSeconds( messageDisplayDuration );
 
 		int timeLeft;
+
+
 
 		while( Time.time - beginTime < freezeDuration )
 		{
 			timeLeft = Mathf.RoundToInt( freezeDuration - ( Time.time - beginTime ) ) + 1;
 
-			DisplayMessage( "" + timeLeft );
+			//DisplayMessage( "" + timeLeft );
 
 			yield return new WaitForSeconds( 1f );
 		}
 
-		DisplayMessage( "" );
+		//DisplayMessage( "" );
+		*/
+
+		if( frozenUI )
+			frozenUI.enabled = false;
 
 		if( currentState == State.Frozen )
 			ChangeState( (int)State.None );
@@ -2030,6 +2052,13 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		StartCoroutine( "PlayMonsterizeSound" );
 	}
+
+	[RPC]
+	private void RPCShake()
+	{
+		if( photonView.isMine )
+			cameraTransform.gameObject.AddComponent<ShakeEffect>();
+	}
 	// end server calls
 
 	//event handlers
@@ -2225,6 +2254,8 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public void IncreaseFear()
 	{
+		Shake();
+
 		if( currentState == State.None )
 		{
 			ChangeState( (int)State.Frozen );
