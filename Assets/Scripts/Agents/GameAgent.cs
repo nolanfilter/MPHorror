@@ -36,7 +36,10 @@ public class GameAgent : MonoBehaviour {
 	private bool isPendingChange = false;
 
 	private float resetTime;
-	private float resetDuration = 2f;
+	private float resetDuration = 1.5f;
+
+	private float exitTime;
+	private float exitDuration = 0.5f;
 
 	private static GameAgent mInstance = null;
 	public static GameAgent instance
@@ -93,15 +96,21 @@ public class GameAgent : MonoBehaviour {
 
 	void Update()
 	{
-		if( Input.GetKeyDown( KeyCode.Escape ) )
+		if( Input.GetMouseButtonDown( 1 ) || Input.GetMouseButtonDown( 2 ) )
+			exitTime = 0f;
+
+		if( Input.GetMouseButton( 1 ) || Input.GetMouseButton( 2 ) )
+			exitTime += Time.deltaTime;
+
+		if( exitTime > exitDuration || Input.GetKeyDown( KeyCode.Escape ) )
 			Application.Quit();
 
 		if( GetCurrentGameState() == GameState.Game )
 		{
-			if( Input.GetKeyDown( KeyCode.R ) )
+			if( Input.GetKeyDown( KeyCode.R ) || Input.GetMouseButtonDown( 0 ) )
 				resetTime = 0f;
 
-			if( Input.GetKey( KeyCode.R ) )
+			if( Input.GetKey( KeyCode.R ) || Input.GetMouseButton( 0 ) )
 				resetTime += Time.deltaTime;
 
 			if( resetTime > resetDuration )
@@ -123,7 +132,13 @@ public class GameAgent : MonoBehaviour {
 				if( motionBlur )
 					motionBlur.enabled = false;
 
+				FastBloom fastBloom = Camera.main.gameObject.GetComponent<FastBloom>();
+
+				if( fastBloom )
+					fastBloom.enabled = false;
+
 				NetworkAgent.LeaveRoom();
+				ChangeGameState( GameState.Lobby );
 			}
 		}
 	}

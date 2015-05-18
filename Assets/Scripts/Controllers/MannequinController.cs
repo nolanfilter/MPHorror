@@ -10,6 +10,8 @@ public class MannequinController : MonoBehaviour {
 	void Start()
 	{
 		MannequinAgent.RegisterMannequin( gameObject );
+
+		StartCoroutine( "WaitAndEnableCollider" );
 	}
 
 	void OnDisable()
@@ -37,5 +39,26 @@ public class MannequinController : MonoBehaviour {
 	public void SetShouldCount( bool newShouldCount )
 	{
 		shouldCount = newShouldCount;
+	}
+
+	private IEnumerator WaitAndEnableCollider()
+	{
+		CapsuleCollider collider = GetComponent<CapsuleCollider>();
+
+		if( collider == null )
+			yield break;
+
+		collider.enabled = false;
+
+		Vector3 start = transform.position - Vector3.up * collider.height * 0.5f;
+		Vector3 end = transform.position + Vector3.up * collider.height * 0.5f;
+		float radius = collider.radius;
+
+		while( !collider.enabled )
+		{
+			collider.enabled = !Physics.CheckCapsule( start, end, radius );
+
+			yield return null;
+		}
 	}
 }
