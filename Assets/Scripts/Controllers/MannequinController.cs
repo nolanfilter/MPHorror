@@ -9,9 +9,14 @@ public class MannequinController : MonoBehaviour {
 
 	void Start()
 	{
-		MannequinAgent.RegisterMannequin( gameObject );
-
-		StartCoroutine( "WaitAndEnableCollider" );
+		if( GameAgent.GetCurrentGameState() == GameAgent.GameState.Game )
+		{
+			StartCoroutine( "WaitAndEnableCollider" );
+		}
+		else
+		{
+			MannequinAgent.RegisterMannequin( gameObject );
+		}
 	}
 
 	void OnDisable()
@@ -61,6 +66,6 @@ public class MannequinController : MonoBehaviour {
 			yield return null;
 		}
 
-		Debug.Log( "Enabled!" );
+		MannequinAgent.RegisterMannequin( gameObject );
 	}
 }
