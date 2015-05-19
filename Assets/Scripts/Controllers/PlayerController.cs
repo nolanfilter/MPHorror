@@ -974,7 +974,7 @@ public class PlayerController : Photon.MonoBehaviour {
 					xAngleOffset = 290f;
 			}
 
-			if( !viewInputThisFrame )
+			if( !viewInputThisFrame && zoomProgress != 1f )
 				xAngleOffset = Mathf.MoveTowardsAngle( xAngleOffset, 4f, 37.5f * Time.deltaTime );
 
 			cameraRotationOffset.eulerAngles = new Vector3( xAngleOffset, cameraRotationOffset.eulerAngles.y, cameraRotationOffset.eulerAngles.z );
@@ -1328,6 +1328,10 @@ public class PlayerController : Photon.MonoBehaviour {
 					{
 						otherPlayerController.ChangeColor( new Quaternion( 1f, 0.95f, 0.95f, 1f ), false );
 						otherPlayerController.SurvivorReveal();
+					}
+					else if( otherPlayerController.GetCurrentState() == State.Voyeur )
+					{
+						otherPlayerController.ChangeColor( new Quaternion( 0f, 0f, 0f, 0f ), false );
 					}
 				}
 			}

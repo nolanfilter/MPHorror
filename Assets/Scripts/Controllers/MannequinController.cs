@@ -41,6 +41,11 @@ public class MannequinController : MonoBehaviour {
 			animation.Play( pose );
 	}
 
+	public void SetHappyPose()
+	{
+		SetPose( "Pose 1" );
+	}
+
 	public void SetShouldCount( bool newShouldCount )
 	{
 		shouldCount = newShouldCount;
