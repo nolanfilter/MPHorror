@@ -974,7 +974,7 @@ public class PlayerController : Photon.MonoBehaviour {
 					xAngleOffset = 290f;
 			}
 
-			if( !viewInputThisFrame && zoomProgress != 1f )
+			if( !viewInputThisFrame && zoomProgress != 1f && currentState != State.Voyeur )
 				xAngleOffset = Mathf.MoveTowardsAngle( xAngleOffset, 4f, 37.5f * Time.deltaTime );
 
 			cameraRotationOffset.eulerAngles = new Vector3( xAngleOffset, cameraRotationOffset.eulerAngles.y, cameraRotationOffset.eulerAngles.z );
@@ -1233,6 +1233,13 @@ public class PlayerController : Photon.MonoBehaviour {
 		StartCoroutine( "PlayMovementSound" );
 
 		photonView.RPC( "RPCPlayMovementClip", PhotonTargets.OthersBuffered );
+	}
+
+	private void PlayPounceClip()
+	{
+		StartCoroutine( "PlayPounceSound" );
+		
+		photonView.RPC( "RPCPlayPounceClip", PhotonTargets.OthersBuffered );
 	}
 
 	//coroutines
@@ -1635,6 +1642,25 @@ public class PlayerController : Photon.MonoBehaviour {
 		{
 			AudioSource source = gameObject.AddComponent<AudioSource>();
 			source.clip = movementClip;
+			source.loop = false;
+			source.volume = 1f;
+			source.Play();
+			
+			while( source.isPlaying )
+				yield return null;
+			
+			Destroy( source );
+		}
+	}
+
+	private IEnumerator PlayPounceSound()
+	{
+		AudioClip pounceClip = PlayerAgent.GetPounceClip();
+		
+		if( pounceClip )
+		{
+			AudioSource source = gameObject.AddComponent<AudioSource>();
+			source.clip = pounceClip;
 			source.loop = false;
 			source.volume = 1f;
 			source.Play();
@@ -2177,6 +2203,12 @@ public class PlayerController : Photon.MonoBehaviour {
 	private void RPCPlayMovementClip()
 	{
 		StartCoroutine( "PlayMovementSound" );
+	}
+
+	[RPC]
+	private void RPCPlayPounceClip()
+	{
+		StartCoroutine( "PlayPounceSound" );
 	}
 	// end server calls
 
