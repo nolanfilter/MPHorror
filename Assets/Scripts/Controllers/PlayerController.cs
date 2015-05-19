@@ -367,6 +367,9 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		if( photonView.isMine && Input.GetKeyDown( KeyCode.Z ) )
 			cameraTransform.gameObject.AddComponent<ShakeEffect>();
+
+		if( animation && photonView.isMine && Input.GetKeyDown( KeyCode.T ) )
+			animation.gameObject.SetActive( !animation.gameObject.activeSelf );
 	}
 
 	void LateUpdate()
