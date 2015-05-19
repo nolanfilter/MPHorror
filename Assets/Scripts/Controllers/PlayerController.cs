@@ -484,6 +484,8 @@ public class PlayerController : Photon.MonoBehaviour {
 					
 					StopCoroutine( "DoMovementRefocus" );
 					StartCoroutine( "DoMovementRefocus" );
+
+					PlayMovementClip();
 					
 					DrawParticles();
 
@@ -1417,6 +1419,8 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		SetPose( pouncePose );
 
+		PlayPounceClip();
+
 		RageController rageController = null;
 
 		if( photonView.isMine )
@@ -1659,7 +1663,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	private IEnumerator PlayPounceSound()
 	{
 		AudioClip pounceClip = PlayerAgent.GetPounceClip();
-		
+
 		if( pounceClip )
 		{
 			AudioSource source = gameObject.AddComponent<AudioSource>();
