@@ -29,7 +29,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100000}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -.808524132, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -86,15 +86,15 @@ MonoBehaviour:
   numPlayers: 4
   playerPrefab: {fileID: 100000, guid: afb5c7e6a90424178a67485185db9d18, type: 2}
   playerStartPositions:
-  - {x: 3, y: 0, z: 2.79999995}
-  - {x: 1, y: 0, z: -2.20000005}
-  - {x: 5, y: 0, z: -2.20000005}
-  - {x: 3, y: 0, z: -6.19999981}
+  - {x: 2, y: 0, z: 28}
+  - {x: 2, y: 0, z: 24}
+  - {x: 0, y: 0, z: 26}
+  - {x: 4, y: 0, z: 26}
   playerStartRotations:
+  - {x: 0, y: 180, z: 0}
   - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 90, z: 0}
+  - {x: 0, y: -90, z: 0}
 --- !u!114 &11400006
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -129,6 +129,10 @@ MonoBehaviour:
   grainTexture: {fileID: 2800000, guid: ffa9c02760c2b4e8eb9814ec06c4b05b, type: 3}
   scratchTexture: {fileID: 2800000, guid: 6205c27cc031f4e66b8ea90d1bfaa158, type: 3}
   cameraCooldownClip: {fileID: 8300000, guid: 322839415c29940598d698110408f9b0, type: 3}
+  monsterizeClip: {fileID: 8300000, guid: ff6cb84a4e9fd40ec8d36b46b2ac0f47, type: 3}
+  movementClips:
+  - {fileID: 8300000, guid: bef550c42c76645d4afb71369ede3cde, type: 3}
+  - {fileID: 8300000, guid: d63e57939c1b646da8096e41838905ad, type: 3}
   monsterize: 1
   monsterizeMaster: 0
   checkForEnd: 1
@@ -149,11 +153,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mannequinPrefab: {fileID: 128126, guid: e1c40c99d037648028c3fdab455c29ee, type: 2}
-  numMannequinsToGenerate: 1
+  numMannequinsToGenerate: 20
   mannequinHeight: .959999979
   minMannequinDistance: 1
   mannequinAreaRoot: {fileID: 0}
-  maxMonsterMannequins: 100
+  maxMonsterMannequins: 1
 --- !u!114 &11429286
 MonoBehaviour:
   m_ObjectHideFlags: 1
