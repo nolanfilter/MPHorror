@@ -10,12 +10,12 @@ GameObject:
   - 4: {fileID: 482606}
   - 33: {fileID: 3313424}
   - 23: {fileID: 2383344}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: curtain-lowPoly
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &482606
 Transform:
@@ -23,9 +23,9 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 137956}
-  m_LocalRotation: {x: .70710659, y: 0, z: -0, w: .707106948}
-  m_LocalPosition: {x: -4.5999999, y: 10.3400002, z: .810000002}
-  m_LocalScale: {x: .773984849, y: 1, z: 1}
+  m_LocalRotation: {x: .499999911, y: .50000006, z: -.500000119, w: .499999851}
+  m_LocalPosition: {x: -3.84000039, y: 1.42999995, z: -3.43000007}
+  m_LocalScale: {x: 1.06767237, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -39,7 +39,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: a1a47ec07e56f4f599587cfaa88f80ab, type: 2}
+  - {fileID: 2100000, guid: bdb40888c525b49d9b38140ec808fe16, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 1
