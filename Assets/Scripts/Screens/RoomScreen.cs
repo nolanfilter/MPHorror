@@ -123,7 +123,7 @@ public class RoomScreen : MonoBehaviour {
 			case 2:
 			{
 				if( numPlayersText )
-					numPlayersText.text = "11";
+					numPlayersText.text = "2";
 				
 				if( roomText )
 					roomText.text = "players\ncursed";
@@ -138,7 +138,7 @@ public class RoomScreen : MonoBehaviour {
 			case 3:
 			{
 				if( numPlayersText )
-					numPlayersText.text = "111";
+					numPlayersText.text = "3";
 				
 				if( roomText )
 					roomText.text = "players\ncursed";
