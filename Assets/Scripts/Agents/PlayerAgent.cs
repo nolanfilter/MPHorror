@@ -20,6 +20,7 @@ public class PlayerAgent : MonoBehaviour {
 
 	public AudioClip cameraCooldownClip;
 	public AudioClip monsterizeClip;
+	public AudioClip[] movementClips;
 
 	public bool monsterize = true;
 	public bool monsterizeMaster = false;
@@ -329,6 +330,22 @@ public class PlayerAgent : MonoBehaviour {
 	{
 		if( instance )
 			return instance.monsterizeClip;
+
+		return null;
+	}
+
+	public static AudioClip GetMovementClip()
+	{
+		if( instance )
+			return instance.internalGetMovementClip();
+		
+		return null;
+	}
+
+	private AudioClip internalGetMovementClip()
+	{
+		if( movementClips.Length > 0 )
+			return movementClips[ Random.Range( 0, movementClips.Length ) ];
 
 		return null;
 	}

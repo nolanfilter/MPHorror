@@ -110,7 +110,6 @@ public class PlayerController : Photon.MonoBehaviour {
 	public Image camUI;
 	public Image rechargeUI;
 	public Image slashUI;
-	public Image rageUI;
 	public Image frozenUI;
 	public Image compassWheel;
 	public Image compassTriangle;
@@ -130,6 +129,10 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public Light flashlight;
 	public Light flashBulb;
+
+	public GameObject flamesPrefab;
+	private GameObject flamesObject = null;
+	private ParticleSystem[] flameParticleSystems = new ParticleSystem[ 0 ];
 
 	private Color whiteClear = new Color( 1f, 1f, 1f, 0f );
 
@@ -336,6 +339,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		Destroy( UIRootObject );
 
 		Destroy( deathModel );
+
+		Destroy( flamesObject );
 	}
 	
 	void Update()
@@ -534,7 +539,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		Vector3 movement = Vector3.zero;
 
-		if (currentState == State.Voyeur)
+		if( currentState == State.Voyeur)
 		{
 			if( targetDirection != Vector3.zero )
 			{
@@ -586,8 +591,12 @@ public class PlayerController : Photon.MonoBehaviour {
 		{
 			transform.rotation = Quaternion.LookRotation( zoomOffset.normalized );
 
-			if( rageUI && currentState == State.Monster )
-				rageUI.enabled = true;
+			if( currentState == State.Monster )
+			{
+				for( int i = 0; i < flameParticleSystems.Length; i++ )
+					if( !flameParticleSystems[i].isPlaying )
+						flameParticleSystems[i].Play();
+			}
 
 			if( camUI && ( currentState == State.Normal || currentState == State.None ) )
 				camUI.enabled = ( !isWaitingForPhotoFinish && !hasPhoto );
@@ -607,8 +616,14 @@ public class PlayerController : Photon.MonoBehaviour {
 				//	transform.rotation = Quaternion.RotateTowards( transform.rotation, Quaternion.LookRotation( axes ), maxRotationSpeed );
 			}
 
-			if( rageUI )
-				rageUI.enabled = false;
+			for( int i = 0; i < flameParticleSystems.Length; i++ )
+			{
+				if( flameParticleSystems[i].isPlaying )
+				{
+					flameParticleSystems[i].Stop();
+					flameParticleSystems[i].Clear();
+				}
+			}
 			
 			if( camUI )
 				camUI.enabled = false;
@@ -710,6 +725,14 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		if( compassWheel == null )
 			return;
+
+		if( isMonster )
+		{
+			compassWheel.enabled = false;
+
+			if( compassTriangle )
+				compassTriangle.enabled = false;
+		}
 
 		compassWheel.rectTransform.localRotation = Quaternion.AngleAxis( northAngle, Vector3.back );
 
@@ -951,7 +974,7 @@ public class PlayerController : Photon.MonoBehaviour {
 					xAngleOffset = 290f;
 			}
 
-			if( !viewInputThisFrame )
+			if( !viewInputThisFrame && zoomProgress != 1f )
 				xAngleOffset = Mathf.MoveTowardsAngle( xAngleOffset, 4f, 37.5f * Time.deltaTime );
 
 			cameraRotationOffset.eulerAngles = new Vector3( xAngleOffset, cameraRotationOffset.eulerAngles.y, cameraRotationOffset.eulerAngles.z );
@@ -1085,9 +1108,13 @@ public class PlayerController : Photon.MonoBehaviour {
 			slashUI.enabled = false;
 		}
 
-		if( rageUI )
+		for( int i = 0; i < flameParticleSystems.Length; i++ )
 		{
-			rageUI.enabled = false;
+			if( flameParticleSystems[i].isPlaying )
+			{
+				flameParticleSystems[i].Stop();
+				flameParticleSystems[i].Clear();
+			}
 		}
 
 		if( frozenUI )
@@ -1201,6 +1228,13 @@ public class PlayerController : Photon.MonoBehaviour {
 		photonView.RPC( "RPCShake", PhotonTargets.OthersBuffered );
 	}
 
+	private void PlayMovementClip()
+	{
+		StartCoroutine( "PlayMovementSound" );
+
+		photonView.RPC( "RPCPlayMovementClip", PhotonTargets.OthersBuffered );
+	}
+
 	//coroutines
 	private IEnumerator DoDisplayMessage( string messageToDisplay )
 	{
@@ -1210,7 +1244,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		messageString = "";
 	}
-
+	
 	private IEnumerator TakePhoto()
 	{
 		if( ( zoomProgress != 1f ) || hasPhoto )
@@ -1295,6 +1329,10 @@ public class PlayerController : Photon.MonoBehaviour {
 						otherPlayerController.ChangeColor( new Quaternion( 1f, 0.95f, 0.95f, 1f ), false );
 						otherPlayerController.SurvivorReveal();
 					}
+					else if( otherPlayerController.GetCurrentState() == State.Voyeur )
+					{
+						otherPlayerController.ChangeColor( new Quaternion( 0f, 0f, 0f, 0f ), false );
+					}
 				}
 			}
 			else if( photographedObjects[i].tag == "Activatable" )
@@ -1325,8 +1363,7 @@ public class PlayerController : Photon.MonoBehaviour {
 			StartCoroutine( DoRawImageColorFade( screenshotUI, Color.black, Color.white, 1f ) );
 		}
 
-		if( uiFSM )
-			uiFSM.SendEvent( "UI_Screenshot_in" );
+		StartCoroutine( "DoScreenshotIn" );
 
 		//yield return new WaitForSeconds( 0.75f );
 
@@ -1335,8 +1372,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( flashUI )
 			flashUI.enabled = false;
 
-		if( uiFSM )
-			uiFSM.SendEvent( "UI_Screenshot_out" );
+		StartCoroutine( "DoScreenshotOut" );
 
 		yield return new WaitForSeconds( 1f );
 
@@ -1591,6 +1627,25 @@ public class PlayerController : Photon.MonoBehaviour {
 		}
 	}
 
+	private IEnumerator PlayMovementSound()
+	{
+		AudioClip movementClip = PlayerAgent.GetMovementClip();
+		
+		if( movementClip )
+		{
+			AudioSource source = gameObject.AddComponent<AudioSource>();
+			source.clip = movementClip;
+			source.loop = false;
+			source.volume = 1f;
+			source.Play();
+			
+			while( source.isPlaying )
+				yield return null;
+			
+			Destroy( source );
+		}
+	}
+
 	private IEnumerator DoMovementRefocus()
 	{
 		isRefocusing = true;
@@ -1627,7 +1682,7 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private IEnumerator WaitAndShowTutorial( Sprite[] images )
 	{
-		yield return new WaitForSeconds( 3f );
+		yield return new WaitForSeconds( 4f );
 
 		StartCoroutine( "DoTutorial", images );
 	}
@@ -1640,8 +1695,10 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( images == demonTutorialImages )
 			hasShowDemonTutorial = true;
 
-		tutorialUI.enabled = true;
 
+		tutorialUI.sprite = images[0];
+		tutorialUI.enabled = true;
+	
 		yield return null;
 
 		isTutorializing = true;
@@ -1786,6 +1843,62 @@ public class PlayerController : Photon.MonoBehaviour {
 
 			yield return null;
 		}
+	}
+
+	private IEnumerator DoScreenshotIn()
+	{
+		Vector3 fromPosition = new Vector3( -596f, -654f, 0f );
+		Vector3 toPosition = new Vector3( -557f, -207f, 0f );
+
+		if( screenshotUI == null || screenshotUI.rectTransform.localPosition == toPosition )
+			yield break;
+
+		float duration = 0.4f;
+		float currentTime = 0f;
+		float lerp;
+
+		do
+		{
+			currentTime += Time.deltaTime;
+			lerp = Mathf.Clamp01( currentTime / duration );
+
+			lerp = Mathf.Pow( lerp, 2f ) * 3f - Mathf.Pow( lerp, 3f ) * 2f;
+
+			screenshotUI.rectTransform.localPosition = Vector3.Lerp( fromPosition, toPosition, lerp );
+
+			yield return null;
+
+		} while( currentTime < duration );
+
+		screenshotUI.rectTransform.localPosition = toPosition;
+	}
+
+	private IEnumerator DoScreenshotOut()
+	{
+		Vector3 fromPosition = new Vector3( -557f, -207f, 0f );
+		Vector3 toPosition = new Vector3( -596f, -654f, 0f );
+		
+		if( screenshotUI == null || screenshotUI.rectTransform.localPosition == toPosition )
+			yield break;
+		
+		float duration = 1f;
+		float currentTime = 0f;
+		float lerp;
+		
+		do
+		{
+			currentTime += Time.deltaTime;
+			lerp = Mathf.Clamp01( currentTime / duration );
+			
+			lerp = Mathf.Pow( lerp, 2f ) * 3f - Mathf.Pow( lerp, 3f ) * 2f;
+			
+			screenshotUI.rectTransform.localPosition = Vector3.Lerp( fromPosition, toPosition, lerp );
+			
+			yield return null;
+			
+		} while( currentTime < duration );
+		
+		screenshotUI.rectTransform.localPosition = toPosition;
 	}
 	//end coroutines
 
@@ -2059,6 +2172,12 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( photonView.isMine )
 			cameraTransform.gameObject.AddComponent<ShakeEffect>();
 	}
+
+	[RPC]
+	private void RPCPlayMovementClip()
+	{
+		StartCoroutine( "PlayMovementSound" );
+	}
 	// end server calls
 
 	//event handlers
@@ -2303,6 +2422,20 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( camUI )
 			camUI.enabled = false;
 
+		if( flamesPrefab )
+		{
+			flamesObject = Instantiate( flamesPrefab ) as GameObject;
+
+			flamesObject.transform.parent = cameraTransform;
+			flamesObject.transform.localPosition = Vector3.zero;
+			flamesObject.transform.localRotation = Quaternion.identity;
+
+			flameParticleSystems = flamesObject.GetComponentsInChildren<ParticleSystem>();
+		}
+
+		if( compassIndicator )
+			compassIndicator.color = new Color( 0.75f, 0f, 0f );
+
 		//cameraTransform.gameObject.AddComponent<NegativeEffect>();
 		StopCoroutine( "DoStun" );
 		RemoveStunEffect();
@@ -2322,9 +2455,10 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		if( uiFSM )
 		{
-			uiFSM.SendEvent( "UI_Screenshot_out" );
 			uiFSM.SendEvent( "UI_Demonized" );
 		}
+
+		StartCoroutine( "DoScreenshotOut" );
 
 		PlayMonsterizeClip();
 
