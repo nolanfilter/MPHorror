@@ -4488,7 +4488,7 @@ MonoBehaviour:
   fsm:
     usedInTemplate: {fileID: 0}
     name: FSM
-    startState: State 1
+    startState: State 0
     states:
     - name: Demonized
       description: 
@@ -4735,19 +4735,11 @@ MonoBehaviour:
         x: 81.3359375
         y: 347.445312
         width: 100
-        height: 32
+        height: 16
       isBreakpoint: 0
       isSequence: 0
       hideUnused: 0
-      transitions:
-      - fsmEvent:
-          name: FINISHED
-          isSystemEvent: 1
-          isGlobal: 0
-        toState: State 1
-        linkStyle: 0
-        linkConstraint: 0
-        colorIndex: 0
+      transitions: []
       actionData:
         actionNames:
         - HutongGames.PlayMaker.Actions.iTweenScaleTo
@@ -4760,7 +4752,7 @@ MonoBehaviour:
         - 
         - 
         actionEnabled: 01010000
-        actionIsOpen: 00000000
+        actionIsOpen: 01010000
         actionStartIndex: 000000000e0000001d00000036000000
         actionHashCodes: 46319f5f8f305757f0ad926ef0ad926e
         unityObjectParams: []
@@ -4867,7 +4859,7 @@ MonoBehaviour:
           value: 
         fsmObjectParams: []
         fsmVarParams: []
-        byteData: 000000000000000000000000009a99193f00000000000000000000010e0000000000000046494e4953484544010001000100000000000000000000002a43009a99193f00000000000000000000010e000000000000000000000046494e49534845440100010001000080bb440000000000000000009a99993e00000000000000000000010000000015000000000000000000000000000000000000000000010000000001000000000000000000000100000100010001000080bbc40000000000000000009a99993e0000000000000000000001000000001500000000000000000000000000000000000000000001000000000100000000000000000000010000010001000100
+        byteData: 000000000000000000000000009a99193f00000000000000000000010e00000000000000010001000100000000000000000000002a43009a99193f00000000000000000000010e00000000000000000000000100010001000080bb440000000000000000009a99993e00000000000000000000010000000015000000000000000000000000000000000000000000010000000001000000000000000000000100000100010001000080bbc40000000000000000009a99993e0000000000000000000001000000001500000000000000000000000000000000000000000001000000000100000000000000000000010000010001000100
         arrayParamSizes: 00000000000000000000000000000000
         arrayParamTypes:
         - HutongGames.PlayMaker.FsmGameObject
@@ -4957,140 +4949,8 @@ MonoBehaviour:
         - realTime
         - stopOnExit
         - loopDontFinish
-        paramDataPos: 000000000000000000000000000000000d00000012000000170000001c0000002000000024000000240000002c0000002e00000030000000010000000100000001000000320000003f00000044000000490000004e00000052000000560000005a0000005a00000062000000640000006600000002000000020000000200000068000000750000007a0000007f00000084000000880000008c0000009000000003000000920000009f000000a4000000a8000000aa0000000000000001000000af000000b1000000b1000000b1000000b3000000b5000000030000000300000004000000b7000000c4000000c9000000ce000000d3000000d7000000db000000df00000005000000e1000000ee000000f3000000f7000000f90000000200000003000000fe0000000001000000010000000100000201000004010000
-        paramByteDataSize: 0000000000000000000000000d000000050000000500000005000000040000000400000000000000080000000200000002000000020000000000000000000000000000000d00000005000000050000000500000004000000040000000400000000000000080000000200000002000000020000000000000000000000000000000d00000005000000050000000500000004000000040000000400000002000000000000000d0000000500000004000000020000000500000000000000000000000200000000000000000000000200000002000000020000000000000000000000000000000d00000005000000050000000500000004000000040000000400000002000000000000000d000000050000000400000002000000050000000000000000000000020000000000000000000000020000000200000002000000
-    - name: State 1
-      description: 
-      colorIndex: 0
-      position:
-        serializedVersion: 2
-        x: 56.59375
-        y: 104.15625
-        width: 178
-        height: 128
-      isBreakpoint: 0
-      isSequence: 0
-      hideUnused: 0
-      transitions:
-      - fsmEvent:
-          name: UI_Demonized
-          isSystemEvent: 0
-          isGlobal: 0
-        toState: Demonized
-        linkStyle: 0
-        linkConstraint: 0
-        colorIndex: 0
-      - fsmEvent:
-          name: UI_Demon_2toGo
-          isSystemEvent: 0
-          isGlobal: 0
-        toState: Demon 2 to Go
-        linkStyle: 0
-        linkConstraint: 0
-        colorIndex: 0
-      - fsmEvent:
-          name: UI_Demon_1toGo
-          isSystemEvent: 0
-          isGlobal: 0
-        toState: Demon 1 to Go
-        linkStyle: 0
-        linkConstraint: 0
-        colorIndex: 0
-      - fsmEvent:
-          name: UI_People_2PeopleLeft
-          isSystemEvent: 0
-          isGlobal: 0
-        toState: 2 People Left
-        linkStyle: 0
-        linkConstraint: 0
-        colorIndex: 0
-      - fsmEvent:
-          name: UI_People_1PeopleLeft
-          isSystemEvent: 0
-          isGlobal: 0
-        toState: 1 People Left
-        linkStyle: 0
-        linkConstraint: 0
-        colorIndex: 0
-      - fsmEvent:
-          name: UI_People_TrappedFoever
-          isSystemEvent: 0
-          isGlobal: 0
-        toState: Trapped Foever
-        linkStyle: 0
-        linkConstraint: 0
-        colorIndex: 0
-      - fsmEvent:
-          name: UI_Screenshot_in
-          isSystemEvent: 0
-          isGlobal: 0
-        toState: UI_Screenshot_in
-        linkStyle: 0
-        linkConstraint: 0
-        colorIndex: 0
-      actionData:
-        actionNames:
-        - HutongGames.PlayMaker.Actions.GetKeyDown
-        - HutongGames.PlayMaker.Actions.GetKeyDown
-        - HutongGames.PlayMaker.Actions.GetKeyDown
-        - HutongGames.PlayMaker.Actions.GetKeyDown
-        - HutongGames.PlayMaker.Actions.GetKeyDown
-        - HutongGames.PlayMaker.Actions.GetKeyDown
-        - HutongGames.PlayMaker.Actions.GetKeyDown
-        customNames:
-        - 
-        - 
-        - 
-        - 
-        - 
-        - 
-        - 
-        actionEnabled: 01010101010101
-        actionIsOpen: 01010101010101
-        actionStartIndex: 000000000300000006000000090000000c0000000f00000012000000
-        actionHashCodes: 437581ed437581ed437581ed437581ed437581ed437581ed437581ed
-        unityObjectParams: []
-        fsmGameObjectParams: []
-        fsmOwnerDefaultParams: []
-        animationCurveParams: []
-        functionCallParams: []
-        fsmTemplateControlParams: []
-        fsmEventTargetParams: []
-        fsmPropertyParams: []
-        layoutOptionParams: []
-        fsmStringParams: []
-        fsmObjectParams: []
-        fsmVarParams: []
-        byteData: 6500000055495f44656d6f6e697a656400017200000055495f44656d6f6e5f32746f476f00017400000055495f44656d6f6e5f31746f476f00017400000055495f50656f706c655f3250656f706c654c65667400017900000055495f50656f706c655f3150656f706c654c65667400017500000055495f50656f706c655f54726170706564466f6576657200016900000055495f53637265656e73686f745f696e0001
-        arrayParamSizes: 
-        arrayParamTypes: []
-        customTypeSizes: 
-        customTypeNames: []
-        paramDataType: 070000001700000011000000070000001700000011000000070000001700000011000000070000001700000011000000070000001700000011000000070000001700000011000000070000001700000011000000
-        paramName:
-        - key
-        - sendEvent
-        - storeResult
-        - key
-        - sendEvent
-        - storeResult
-        - key
-        - sendEvent
-        - storeResult
-        - key
-        - sendEvent
-        - storeResult
-        - key
-        - sendEvent
-        - storeResult
-        - key
-        - sendEvent
-        - storeResult
-        - key
-        - sendEvent
-        - storeResult
-        paramDataPos: 000000000400000010000000120000001600000024000000260000002a000000380000003a0000003e0000005300000055000000590000006e00000070000000740000008b0000008d00000091000000a1000000
-        paramByteDataSize: 040000000c00000002000000040000000e00000002000000040000000e00000002000000040000001500000002000000040000001500000002000000040000001700000002000000040000001000000002000000
+        paramDataPos: 000000000000000000000000000000000d00000012000000170000001c0000002000000024000000240000002400000026000000280000000100000001000000010000002a000000370000003c00000041000000460000004a0000004e000000520000005200000052000000540000005600000002000000020000000200000058000000650000006a0000006f00000074000000780000007c0000008000000003000000820000008f00000094000000980000009a00000000000000010000009f000000a1000000a1000000a1000000a3000000a5000000030000000300000004000000a7000000b4000000b9000000be000000c3000000c7000000cb000000cf00000005000000d1000000de000000e3000000e7000000e90000000200000003000000ee000000f0000000f0000000f0000000f2000000f4000000
+        paramByteDataSize: 0000000000000000000000000d000000050000000500000005000000040000000400000000000000000000000200000002000000020000000000000000000000000000000d00000005000000050000000500000004000000040000000400000000000000000000000200000002000000020000000000000000000000000000000d00000005000000050000000500000004000000040000000400000002000000000000000d0000000500000004000000020000000500000000000000000000000200000000000000000000000200000002000000020000000000000000000000000000000d00000005000000050000000500000004000000040000000400000002000000000000000d000000050000000400000002000000050000000000000000000000020000000000000000000000020000000200000002000000
     - name: Demon 1 to Go
       description: 
       colorIndex: 0
@@ -5226,19 +5086,11 @@ MonoBehaviour:
         x: 268.085938
         y: 349.390625
         width: 100
-        height: 32
+        height: 16
       isBreakpoint: 0
       isSequence: 0
       hideUnused: 0
-      transitions:
-      - fsmEvent:
-          name: FINISHED
-          isSystemEvent: 1
-          isGlobal: 0
-        toState: State 1
-        linkStyle: 0
-        linkConstraint: 0
-        colorIndex: 0
+      transitions: []
       actionData:
         actionNames:
         - HutongGames.PlayMaker.Actions.iTweenScaleTo
@@ -5302,7 +5154,7 @@ MonoBehaviour:
           value: 
         fsmObjectParams: []
         fsmVarParams: []
-        byteData: 000000000000000000000000009a99193f00000000000000000000010e0000000000000046494e4953484544010001000100000000000000000000002a43009a99193f00000000000000000000010e000000000000000000000046494e4953484544010001000100
+        byteData: 000000000000000000000000009a99193f00000000000000000000010e00000000000000010001000100000000000000000000002a43009a99193f00000000000000000000010e0000000000000000000000010001000100
         arrayParamSizes: 
         arrayParamTypes: []
         customTypeSizes: 
@@ -5338,8 +5190,8 @@ MonoBehaviour:
         - realTime
         - stopOnExit
         - loopDontFinish
-        paramDataPos: 000000000000000000000000000000000d00000012000000170000001c0000002000000024000000240000002c0000002e00000030000000010000000100000001000000320000003f00000044000000490000004e00000052000000560000005a0000005a000000620000006400000066000000
-        paramByteDataSize: 0000000000000000000000000d000000050000000500000005000000040000000400000000000000080000000200000002000000020000000000000000000000000000000d0000000500000005000000050000000400000004000000040000000000000008000000020000000200000002000000
+        paramDataPos: 000000000000000000000000000000000d00000012000000170000001c0000002000000024000000240000002400000026000000280000000100000001000000010000002a000000370000003c00000041000000460000004a0000004e0000005200000052000000520000005400000056000000
+        paramByteDataSize: 0000000000000000000000000d000000050000000500000005000000040000000400000000000000000000000200000002000000020000000000000000000000000000000d0000000500000005000000050000000400000004000000040000000000000000000000020000000200000002000000
     - name: Demon 2 to Go
       description: 
       colorIndex: 0
@@ -5475,19 +5327,11 @@ MonoBehaviour:
         x: 463.226562
         y: 352.742188
         width: 100
-        height: 32
+        height: 16
       isBreakpoint: 0
       isSequence: 0
       hideUnused: 0
-      transitions:
-      - fsmEvent:
-          name: FINISHED
-          isSystemEvent: 1
-          isGlobal: 0
-        toState: State 1
-        linkStyle: 0
-        linkConstraint: 0
-        colorIndex: 0
+      transitions: []
       actionData:
         actionNames:
         - HutongGames.PlayMaker.Actions.iTweenScaleTo
@@ -5496,7 +5340,7 @@ MonoBehaviour:
         - 
         - 
         actionEnabled: 0101
-        actionIsOpen: 0000
+        actionIsOpen: 0001
         actionStartIndex: 000000000e000000
         actionHashCodes: 46319f5f8f305757
         unityObjectParams: []
@@ -5551,7 +5395,7 @@ MonoBehaviour:
           value: 
         fsmObjectParams: []
         fsmVarParams: []
-        byteData: 000000000000000000000000009a99193f00000000000000000000010e0000000000000046494e4953484544010001000100000000000000000000002a43009a99193f00000000000000000000010e000000000000000000000046494e4953484544010001000100
+        byteData: 000000000000000000000000009a99193f00000000000000000000010e00000000000000010001000100000000000000000000002a43009a99193f00000000000000000000010e0000000000000000000000010001000100
         arrayParamSizes: 
         arrayParamTypes: []
         customTypeSizes: 
@@ -5587,8 +5431,8 @@ MonoBehaviour:
         - realTime
         - stopOnExit
         - loopDontFinish
-        paramDataPos: 000000000000000000000000000000000d00000012000000170000001c0000002000000024000000240000002c0000002e00000030000000010000000100000001000000320000003f00000044000000490000004e00000052000000560000005a0000005a000000620000006400000066000000
-        paramByteDataSize: 0000000000000000000000000d000000050000000500000005000000040000000400000000000000080000000200000002000000020000000000000000000000000000000d0000000500000005000000050000000400000004000000040000000000000008000000020000000200000002000000
+        paramDataPos: 000000000000000000000000000000000d00000012000000170000001c0000002000000024000000240000002400000026000000280000000100000001000000010000002a000000370000003c00000041000000460000004a0000004e0000005200000052000000520000005400000056000000
+        paramByteDataSize: 0000000000000000000000000d000000050000000500000005000000040000000400000000000000000000000200000002000000020000000000000000000000000000000d0000000500000005000000050000000400000004000000040000000000000000000000020000000200000002000000
     - name: 2 People Left
       description: 
       colorIndex: 0
@@ -5724,19 +5568,11 @@ MonoBehaviour:
         x: 75.1171875
         y: 499.796875
         width: 100
-        height: 32
+        height: 16
       isBreakpoint: 0
       isSequence: 0
       hideUnused: 0
-      transitions:
-      - fsmEvent:
-          name: FINISHED
-          isSystemEvent: 1
-          isGlobal: 0
-        toState: State 1
-        linkStyle: 0
-        linkConstraint: 0
-        colorIndex: 0
+      transitions: []
       actionData:
         actionNames:
         - HutongGames.PlayMaker.Actions.iTweenScaleTo
@@ -5745,7 +5581,7 @@ MonoBehaviour:
         - 
         - 
         actionEnabled: 0101
-        actionIsOpen: 0000
+        actionIsOpen: 0101
         actionStartIndex: 000000000e000000
         actionHashCodes: 46319f5f8f305757
         unityObjectParams: []
@@ -5800,7 +5636,7 @@ MonoBehaviour:
           value: 
         fsmObjectParams: []
         fsmVarParams: []
-        byteData: 000000000000000000000000009a99193f00000000000000000000010e0000000000000046494e4953484544010001000100000000000000000000002a43009a99193f00000000000000000000010e000000000000000000000046494e4953484544010001000100
+        byteData: 000000000000000000000000009a99193f00000000000000000000010e00000000000000010001000100000000000000000000002a43009a99193f00000000000000000000010e0000000000000000000000010001000100
         arrayParamSizes: 
         arrayParamTypes: []
         customTypeSizes: 
@@ -5836,8 +5672,8 @@ MonoBehaviour:
         - realTime
         - stopOnExit
         - loopDontFinish
-        paramDataPos: 000000000000000000000000000000000d00000012000000170000001c0000002000000024000000240000002c0000002e00000030000000010000000100000001000000320000003f00000044000000490000004e00000052000000560000005a0000005a000000620000006400000066000000
-        paramByteDataSize: 0000000000000000000000000d000000050000000500000005000000040000000400000000000000080000000200000002000000020000000000000000000000000000000d0000000500000005000000050000000400000004000000040000000000000008000000020000000200000002000000
+        paramDataPos: 000000000000000000000000000000000d00000012000000170000001c0000002000000024000000240000002400000026000000280000000100000001000000010000002a000000370000003c00000041000000460000004a0000004e0000005200000052000000520000005400000056000000
+        paramByteDataSize: 0000000000000000000000000d000000050000000500000005000000040000000400000000000000000000000200000002000000020000000000000000000000000000000d0000000500000005000000050000000400000004000000040000000000000000000000020000000200000002000000
     - name: 1 People Left
       description: 
       colorIndex: 0
@@ -5973,19 +5809,11 @@ MonoBehaviour:
         x: 286.445312
         y: 502.359375
         width: 100
-        height: 32
+        height: 16
       isBreakpoint: 0
       isSequence: 0
       hideUnused: 0
-      transitions:
-      - fsmEvent:
-          name: FINISHED
-          isSystemEvent: 1
-          isGlobal: 0
-        toState: State 1
-        linkStyle: 0
-        linkConstraint: 0
-        colorIndex: 0
+      transitions: []
       actionData:
         actionNames:
         - HutongGames.PlayMaker.Actions.iTweenScaleTo
@@ -5994,7 +5822,7 @@ MonoBehaviour:
         - 
         - 
         actionEnabled: 0101
-        actionIsOpen: 0000
+        actionIsOpen: 0101
         actionStartIndex: 000000000e000000
         actionHashCodes: 46319f5f8f305757
         unityObjectParams: []
@@ -6049,7 +5877,7 @@ MonoBehaviour:
           value: 
         fsmObjectParams: []
         fsmVarParams: []
-        byteData: 000000000000000000000000009a99193f00000000000000000000010e0000000000000046494e4953484544010001000100000000000000000000002a43009a99193f00000000000000000000010e000000000000000000000046494e4953484544010001000100
+        byteData: 000000000000000000000000009a99193f00000000000000000000010e00000000000000010001000100000000000000000000002a43009a99193f00000000000000000000010e0000000000000000000000010001000100
         arrayParamSizes: 
         arrayParamTypes: []
         customTypeSizes: 
@@ -6085,8 +5913,8 @@ MonoBehaviour:
         - realTime
         - stopOnExit
         - loopDontFinish
-        paramDataPos: 000000000000000000000000000000000d00000012000000170000001c0000002000000024000000240000002c0000002e00000030000000010000000100000001000000320000003f00000044000000490000004e00000052000000560000005a0000005a000000620000006400000066000000
-        paramByteDataSize: 0000000000000000000000000d000000050000000500000005000000040000000400000000000000080000000200000002000000020000000000000000000000000000000d0000000500000005000000050000000400000004000000040000000000000008000000020000000200000002000000
+        paramDataPos: 000000000000000000000000000000000d00000012000000170000001c0000002000000024000000240000002400000026000000280000000100000001000000010000002a000000370000003c00000041000000460000004a0000004e0000005200000052000000520000005400000056000000
+        paramByteDataSize: 0000000000000000000000000d000000050000000500000005000000040000000400000000000000000000000200000002000000020000000000000000000000000000000d0000000500000005000000050000000400000004000000040000000000000000000000020000000200000002000000
     - name: Trapped Foever
       description: 
       colorIndex: 0
@@ -6222,19 +6050,11 @@ MonoBehaviour:
         x: 496.882812
         y: 507.90625
         width: 100
-        height: 32
+        height: 16
       isBreakpoint: 0
       isSequence: 0
       hideUnused: 0
-      transitions:
-      - fsmEvent:
-          name: FINISHED
-          isSystemEvent: 1
-          isGlobal: 0
-        toState: State 1
-        linkStyle: 0
-        linkConstraint: 0
-        colorIndex: 0
+      transitions: []
       actionData:
         actionNames:
         - HutongGames.PlayMaker.Actions.iTweenScaleTo
@@ -6243,7 +6063,7 @@ MonoBehaviour:
         - 
         - 
         actionEnabled: 0101
-        actionIsOpen: 0000
+        actionIsOpen: 0101
         actionStartIndex: 000000000e000000
         actionHashCodes: 46319f5f8f305757
         unityObjectParams: []
@@ -6298,7 +6118,7 @@ MonoBehaviour:
           value: 
         fsmObjectParams: []
         fsmVarParams: []
-        byteData: 000000000000000000000000009a99193f00000000000000000000010e0000000000000046494e4953484544010001000100000000000000000000002a43009a99193f00000000000000000000010e000000000000000000000046494e4953484544010001000100
+        byteData: 000000000000000000000000009a99193f00000000000000000000010e00000000000000010001000100000000000000000000002a43009a99193f00000000000000000000010e0000000000000000000000010001000100
         arrayParamSizes: 
         arrayParamTypes: []
         customTypeSizes: 
@@ -6334,8 +6154,8 @@ MonoBehaviour:
         - realTime
         - stopOnExit
         - loopDontFinish
-        paramDataPos: 000000000000000000000000000000000d00000012000000170000001c0000002000000024000000240000002c0000002e00000030000000010000000100000001000000320000003f00000044000000490000004e00000052000000560000005a0000005a000000620000006400000066000000
-        paramByteDataSize: 0000000000000000000000000d000000050000000500000005000000040000000400000000000000080000000200000002000000020000000000000000000000000000000d0000000500000005000000050000000400000004000000040000000000000008000000020000000200000002000000
+        paramDataPos: 000000000000000000000000000000000d00000012000000170000001c0000002000000024000000240000002400000026000000280000000100000001000000010000002a000000370000003c00000041000000460000004a0000004e0000005200000052000000520000005400000056000000
+        paramByteDataSize: 0000000000000000000000000d000000050000000500000005000000040000000400000000000000000000000200000002000000020000000000000000000000000000000d0000000500000005000000050000000400000004000000040000000000000000000000020000000200000002000000
     - name: State 0
       description: 
       colorIndex: 0
@@ -6385,151 +6205,11 @@ MonoBehaviour:
         x: 71.0546875
         y: 601.382812
         width: 125
-        height: 32
+        height: 16
       isBreakpoint: 0
       isSequence: 0
       hideUnused: 0
-      transitions:
-      - fsmEvent:
-          name: FINISHED
-          isSystemEvent: 1
-          isGlobal: 0
-        toState: UI_Screenshot_out
-        linkStyle: 0
-        linkConstraint: 0
-        colorIndex: 0
-      actionData:
-        actionNames:
-        - HutongGames.PlayMaker.Actions.iTweenMoveTo
-        - HutongGames.PlayMaker.Actions.Wait
-        - HutongGames.PlayMaker.Actions.PlayAnimation
-        customNames:
-        - 
-        - 
-        - 
-        actionEnabled: 010100
-        actionIsOpen: 010100
-        actionStartIndex: 00000000190000001c000000
-        actionHashCodes: f0ad926e3708ec1a6e06efc0
-        unityObjectParams: []
-        fsmGameObjectParams:
-        - useVariable: 1
-          name: 
-          tooltip: 
-          showInInspector: 0
-          networkSync: 0
-          value: {fileID: 0}
-        - useVariable: 1
-          name: 
-          tooltip: 
-          showInInspector: 0
-          networkSync: 0
-          value: {fileID: 0}
-        fsmOwnerDefaultParams:
-        - ownerOption: 1
-          gameObject:
-            useVariable: 0
-            name: 
-            tooltip: 
-            showInInspector: 0
-            networkSync: 0
-            value: {fileID: 164232}
-        - ownerOption: 1
-          gameObject:
-            useVariable: 0
-            name: 
-            tooltip: 
-            showInInspector: 0
-            networkSync: 0
-            value: {fileID: 164232}
-        animationCurveParams: []
-        functionCallParams: []
-        fsmTemplateControlParams: []
-        fsmEventTargetParams: []
-        fsmPropertyParams: []
-        layoutOptionParams: []
-        fsmStringParams:
-        - useVariable: 1
-          name: 
-          tooltip: 
-          showInInspector: 0
-          networkSync: 0
-          value: 
-        - useVariable: 0
-          name: 
-          tooltip: 
-          showInInspector: 0
-          networkSync: 0
-          value: 
-        fsmObjectParams: []
-        fsmVarParams: []
-        byteData: 00400bc400004fc30000000000cdcccc3e0000000000000000000001010000000e00000000000000000000000000000000000000000001000000000100000000000000000000010000010001000100000040400046494e495348454401040000009a99993e0000
-        arrayParamSizes: 0000000000000000
-        arrayParamTypes:
-        - HutongGames.PlayMaker.FsmGameObject
-        - HutongGames.PlayMaker.FsmVector3
-        customTypeSizes: 
-        customTypeNames: []
-        paramDataType: 1400000012000000130000001c0000000f0000000f0000000f00000007000000070000000700000011000000130000001c0000000f00000007000000110000000f0000000c0000000c0000001100000017000000170000001100000011000000110000000f00000017000000010000001400000012000000070000000f000000170000001700000001000000
-        paramName:
-        - gameObject
-        - id
-        - transformPosition
-        - vectorPosition
-        - time
-        - delay
-        - speed
-        - space
-        - easeType
-        - loopType
-        - orientToPath
-        - lookAtObject
-        - lookAtVector
-        - lookTime
-        - axis
-        - moveToPath
-        - lookAhead
-        - transforms
-        - vectors
-        - reverse
-        - startEvent
-        - finishEvent
-        - realTime
-        - stopOnExit
-        - loopDontFinish
-        - time
-        - finishEvent
-        - realTime
-        - gameObject
-        - animName
-        - playMode
-        - blendTime
-        - finishEvent
-        - loopEvent
-        - stopOnExit
-        paramDataPos: 000000000000000000000000000000000d00000012000000170000001c000000200000002400000028000000010000002a000000370000003c00000040000000420000000000000001000000470000004900000049000000490000004b0000004d0000004f000000540000005c00000001000000010000005d00000061000000660000006600000066000000
-        paramByteDataSize: 0000000000000000000000000d00000005000000050000000500000004000000040000000400000002000000000000000d00000005000000040000000200000005000000000000000000000002000000000000000000000002000000020000000200000005000000080000000100000000000000000000000400000005000000000000000000000001000000
-    - name: UI_Screenshot_out
-      description: 
-      colorIndex: 0
-      position:
-        serializedVersion: 2
-        x: 276.234375
-        y: 601.257812
-        width: 134
-        height: 32
-      isBreakpoint: 0
-      isSequence: 0
-      hideUnused: 0
-      transitions:
-      - fsmEvent:
-          name: FINISHED
-          isSystemEvent: 1
-          isGlobal: 0
-        toState: State 1
-        linkStyle: 0
-        linkConstraint: 0
-        colorIndex: 0
+      transitions: []
       actionData:
         actionNames:
         - HutongGames.PlayMaker.Actions.iTweenMoveTo
@@ -6538,7 +6218,7 @@ MonoBehaviour:
         - 
         - 
         actionEnabled: 0100
-        actionIsOpen: 0100
+        actionIsOpen: 0000
         actionStartIndex: 0000000019000000
         actionHashCodes: f0ad926e6e06efc0
         unityObjectParams: []
@@ -6593,7 +6273,126 @@ MonoBehaviour:
           value: 
         fsmObjectParams: []
         fsmVarParams: []
-        byteData: 00007ac4000025c400000000000000803f0000000000000000000001010000000e00000000000000000000000000000000000000000001000000000100000000000000000000010000010001000100040000009a99993e0000
+        byteData: 00400bc400004fc30000000000cdcccc3e0000000000000000000001010000000e00000000000000000000000000000000000000000001000000000100000000000000000000010000010001000100040000009a99993e0000
+        arrayParamSizes: 0000000000000000
+        arrayParamTypes:
+        - HutongGames.PlayMaker.FsmGameObject
+        - HutongGames.PlayMaker.FsmVector3
+        customTypeSizes: 
+        customTypeNames: []
+        paramDataType: 1400000012000000130000001c0000000f0000000f0000000f00000007000000070000000700000011000000130000001c0000000f00000007000000110000000f0000000c0000000c0000001100000017000000170000001100000011000000110000001400000012000000070000000f000000170000001700000001000000
+        paramName:
+        - gameObject
+        - id
+        - transformPosition
+        - vectorPosition
+        - time
+        - delay
+        - speed
+        - space
+        - easeType
+        - loopType
+        - orientToPath
+        - lookAtObject
+        - lookAtVector
+        - lookTime
+        - axis
+        - moveToPath
+        - lookAhead
+        - transforms
+        - vectors
+        - reverse
+        - startEvent
+        - finishEvent
+        - realTime
+        - stopOnExit
+        - loopDontFinish
+        - gameObject
+        - animName
+        - playMode
+        - blendTime
+        - finishEvent
+        - loopEvent
+        - stopOnExit
+        paramDataPos: 000000000000000000000000000000000d00000012000000170000001c000000200000002400000028000000010000002a000000370000003c00000040000000420000000000000001000000470000004900000049000000490000004b0000004d00000001000000010000004f00000053000000580000005800000058000000
+        paramByteDataSize: 0000000000000000000000000d00000005000000050000000500000004000000040000000400000002000000000000000d00000005000000040000000200000005000000000000000000000002000000000000000000000002000000020000000200000000000000000000000400000005000000000000000000000001000000
+    - name: UI_Screenshot_out
+      description: 
+      colorIndex: 0
+      position:
+        serializedVersion: 2
+        x: 276.234375
+        y: 601.257812
+        width: 134
+        height: 16
+      isBreakpoint: 0
+      isSequence: 0
+      hideUnused: 0
+      transitions: []
+      actionData:
+        actionNames:
+        - HutongGames.PlayMaker.Actions.iTweenMoveTo
+        - HutongGames.PlayMaker.Actions.PlayAnimation
+        customNames:
+        - 
+        - 
+        actionEnabled: 0100
+        actionIsOpen: 0000
+        actionStartIndex: 0000000019000000
+        actionHashCodes: f0ad926e6e06efc0
+        unityObjectParams: []
+        fsmGameObjectParams:
+        - useVariable: 1
+          name: 
+          tooltip: 
+          showInInspector: 0
+          networkSync: 0
+          value: {fileID: 0}
+        - useVariable: 1
+          name: 
+          tooltip: 
+          showInInspector: 0
+          networkSync: 0
+          value: {fileID: 0}
+        fsmOwnerDefaultParams:
+        - ownerOption: 1
+          gameObject:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: {fileID: 164232}
+        - ownerOption: 1
+          gameObject:
+            useVariable: 0
+            name: 
+            tooltip: 
+            showInInspector: 0
+            networkSync: 0
+            value: {fileID: 164232}
+        animationCurveParams: []
+        functionCallParams: []
+        fsmTemplateControlParams: []
+        fsmEventTargetParams: []
+        fsmPropertyParams: []
+        layoutOptionParams: []
+        fsmStringParams:
+        - useVariable: 1
+          name: 
+          tooltip: 
+          showInInspector: 0
+          networkSync: 0
+          value: 
+        - useVariable: 0
+          name: 
+          tooltip: 
+          showInInspector: 0
+          networkSync: 0
+          value: 
+        fsmObjectParams: []
+        fsmVarParams: []
+        byteData: 000015c4008023c400000000000000803f0000000000000000000001010000000e00000000000000000000000000000000000000000001000000000100000000000000000000010000010001000100040000009a99993e0000
         arrayParamSizes: 0000000000000000
         arrayParamTypes:
         - HutongGames.PlayMaker.FsmGameObject
@@ -9579,7 +9378,7 @@ RectTransform:
   m_RootOrder: 7
   m_AnchorMin: {x: .5, y: .5}
   m_AnchorMax: {x: .5, y: .5}
-  m_AnchoredPosition: {x: -1000, y: -660}
+  m_AnchoredPosition: {x: -596, y: -654}
   m_SizeDelta: {x: 450, y: 337.5}
   m_Pivot: {x: .5, y: .5}
 --- !u!224 &22421348
