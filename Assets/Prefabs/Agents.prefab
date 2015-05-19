@@ -133,6 +133,7 @@ MonoBehaviour:
   movementClips:
   - {fileID: 8300000, guid: bef550c42c76645d4afb71369ede3cde, type: 3}
   - {fileID: 8300000, guid: d63e57939c1b646da8096e41838905ad, type: 3}
+  pounceClip: {fileID: 8300000, guid: 5c669a453b4b44cbc805d47a424bf6cd, type: 3}
   monsterize: 1
   monsterizeMaster: 0
   checkForEnd: 1
