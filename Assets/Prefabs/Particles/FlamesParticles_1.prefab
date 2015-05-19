@@ -59,8 +59,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 457678}
   - {fileID: 462932}
+  - {fileID: 457678}
   m_Father: {fileID: 0}
   m_RootOrder: 0
 --- !u!4 &457678
@@ -69,24 +69,24 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 149374}
-  m_LocalRotation: {x: .00522655388, y: -.672104895, z: -.209948808, w: -.710048795}
-  m_LocalPosition: {x: 1.78999996, y: 3.78999996, z: 16.1599998}
+  m_LocalRotation: {x: .167135462, y: .13404572, z: -.127167448, w: -.968465805}
+  m_LocalPosition: {x: -1.96084285, y: -.110000134, z: 7.71732426}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 420576}
-  m_RootOrder: 0
+  m_RootOrder: 1
 --- !u!4 &462932
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 163814}
-  m_LocalRotation: {x: -.827436924, y: .409410834, z: -.13627705, w: .359387755}
-  m_LocalPosition: {x: 1.8599999, y: 3.80999994, z: 12.7299995}
+  m_LocalRotation: {x: -.410895467, y: -.0245694518, z: -.731018662, w: .544217885}
+  m_LocalPosition: {x: 1.37106025, y: -.0900001526, z: 8.53476906}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 420576}
-  m_RootOrder: 1
+  m_RootOrder: 0
 --- !u!198 &19844388
 ParticleSystem:
   m_ObjectHideFlags: 1
@@ -99,7 +99,7 @@ ParticleSystem:
   randomSeed: 0
   looping: 1
   prewarm: 1
-  playOnAwake: 1
+  playOnAwake: 0
   moveWithTransform: 1
   InitialModule:
     enabled: 1
@@ -345,7 +345,7 @@ ParticleSystem:
     enabled: 1
     m_Type: 0
     rate:
-      scalar: 20
+      scalar: 40
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -1132,7 +1132,7 @@ ParticleSystem:
   randomSeed: 0
   looping: 1
   prewarm: 1
-  playOnAwake: 1
+  playOnAwake: 0
   moveWithTransform: 1
   InitialModule:
     enabled: 1
@@ -1378,7 +1378,7 @@ ParticleSystem:
     enabled: 1
     m_Type: 0
     rate:
-      scalar: 20
+      scalar: 40
       maxCurve:
         serializedVersion: 2
         m_Curve:
