@@ -1161,6 +1161,9 @@ public class PlayerController : Photon.MonoBehaviour {
 		DisplayMessage( "Your friend destroyed you" );
 		ChangeColor( new Quaternion( 0f, 0f, 0f, 0f ) );
 
+		if( frozenUI )
+			frozenUI.enabled = false;
+
 		if( uiFSM )
 			uiFSM.SendEvent( "UI_People_TrappedFoever" );
 
@@ -2217,6 +2220,58 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		StartCoroutine( "PlayPounceSound" );
 	}
+
+	[RPC]
+	public void RPCMonsterize()
+	{
+		if( !photonView.isMine || GameAgent.GetCurrentGameState() != GameAgent.GameState.Game || currentState == State.Monster || currentState == State.Dead )
+			return;
+		
+		if( camUI )
+			camUI.enabled = false;
+		
+		if( flamesPrefab )
+		{
+			flamesObject = Instantiate( flamesPrefab ) as GameObject;
+			
+			flamesObject.transform.parent = cameraTransform;
+			flamesObject.transform.localPosition = Vector3.zero;
+			flamesObject.transform.localRotation = Quaternion.identity;
+			
+			flameParticleSystems = flamesObject.GetComponentsInChildren<ParticleSystem>();
+		}
+		
+		if( compassIndicator )
+			compassIndicator.color = new Color( 0.75f, 0f, 0f );
+		
+		//cameraTransform.gameObject.AddComponent<NegativeEffect>();
+		StopCoroutine( "DoStun" );
+		RemoveStunEffect();
+		ChangeState( (int)State.Monster );
+		//DisplayMessage( "Attack your friends" );
+		
+		ZoomSurvivorController zoomSurvivorController = gameObject.GetComponent<ZoomSurvivorController>();
+		
+		if( zoomSurvivorController )
+			Destroy( zoomSurvivorController );
+		
+		ZoomKillerController zoomKillerController = gameObject.AddComponent<ZoomKillerController>();
+		
+		zoomKillerController.playerController = this;
+		
+		PlayerAgent.CheckForEnd();
+		
+		if( uiFSM )
+		{
+			uiFSM.SendEvent( "UI_Demonized" );
+		}
+		
+		StartCoroutine( "DoScreenshotOut" );
+		
+		PlayMonsterizeClip();
+		
+		StartCoroutine( "WaitAndShowTutorial", demonTutorialImages );
+	}
 	// end server calls
 
 	//event handlers
@@ -2455,6 +2510,8 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	public void Monsterize()
 	{
+		photonView.RPC( "RPCMonsterize", PhotonTargets.OthersBuffered );
+
 		if( !photonView.isMine || GameAgent.GetCurrentGameState() != GameAgent.GameState.Game || currentState == State.Monster || currentState == State.Dead )
 			return;
 
