@@ -10,6 +10,7 @@ public class EndScreen : MonoBehaviour {
 	public Sprite byeBye;
 	public Sprite soulCollector;
 	public Sprite soulless;
+	public Sprite defeatMonster;
 
 	private static EndScreen mInstance = null;
 	public static EndScreen instance
@@ -36,8 +37,16 @@ public class EndScreen : MonoBehaviour {
 			{
 				case PlayerController.State.Monster:
 				{
-					if( soulCollector != null )
-						background.sprite = soulCollector;
+					if( MannequinAgent.GetAllMannequinsDisabled() )
+					{
+						if( defeatMonster != null )
+							background.sprite = defeatMonster;
+					}
+					else
+					{
+						if( soulCollector != null )
+							background.sprite = soulCollector;
+					}
 				} break;
 
 				case PlayerController.State.Voyeur:
@@ -56,15 +65,32 @@ public class EndScreen : MonoBehaviour {
 				
 				case PlayerController.State.None:
 				{
-					if( Random.value < 0.5f )
+					if( MannequinAgent.GetAllMannequinsDisabled() )
 					{
-						if( bestVacation != null )
-							background.sprite = bestVacation;
+
+						if( Random.value < 0.5f )
+						{
+							if( bestVacation != null )
+								background.sprite = bestVacation;
+						}
+						else
+						{
+							if( byeBye != null )
+								background.sprite = byeBye;
+						}
 					}
 					else
 					{
-						if( byeBye != null )
-							background.sprite = byeBye;
+						if( Random.value < 0.5f )
+						{
+							if( betrayed != null )
+								background.sprite = betrayed;
+						}
+						else
+						{
+							if( soulless != null )
+								background.sprite = soulless;
+						}
 					}
 				} break;
 			}
