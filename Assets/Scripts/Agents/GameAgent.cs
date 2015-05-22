@@ -91,7 +91,7 @@ public class GameAgent : MonoBehaviour {
 		if( darkQuadPrefab )
 			darkQuad = Instantiate( darkQuadPrefab ) as GameObject; 
 
-		PushGameState( GameState.Intro );
+		PushGameState( GameState.Start );
 	}
 
 	void Update()

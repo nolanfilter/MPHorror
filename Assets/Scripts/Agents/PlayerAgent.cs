@@ -541,6 +541,19 @@ public class PlayerAgent : MonoBehaviour {
 				playerControllers[i].DisplayMessage( messageToDisplay );
 	}
 
+	public static void DisplayMonsterMessageForHeroes()
+	{
+		if( instance )
+			instance.internalDisplayMonsterMessageForHeroes();
+	}
+
+	private void internalDisplayMonsterMessageForHeroes()
+	{
+		for( int i = 0; i < playerControllers.Count; i++ )
+			if( i != monsterID )
+				playerControllers[i].DisplayMonsterForHeroes();
+	}
+
 	private IEnumerator WaitAndMonsterizeMaster()
 	{
 		monsterID = 0;
@@ -572,10 +585,27 @@ public class PlayerAgent : MonoBehaviour {
 
 		isEnding = true;
 
+		bool heroesWon = MannequinAgent.GetAllMannequinsDisabled();
+
+		for( int i = 0; i < playerControllers.Count; i++ )
+		{
+			if( heroesWon )
+				playerControllers[i].DisplayHeroVictory();
+			else
+				playerControllers[i].DisplayMonsterVictory();
+		}
+
+		/*
 		if( MannequinAgent.GetAllMannequinsDisabled() )
-			GlobalMessageDisplay( "The healing is complete" );
+		{
+
+			//GlobalMessageDisplay( "The healing is complete" );
+		}
 		else
-			GlobalMessageDisplay( "There are no heroes left" );
+		{
+			//GlobalMessageDisplay( "There are no heroes left" );
+		}
+		*/
 
 		yield return new WaitForSeconds( endBuffer );
 

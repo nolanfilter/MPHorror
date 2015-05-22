@@ -1250,6 +1250,29 @@ public class PlayerController : Photon.MonoBehaviour {
 		photonView.RPC( "RPCPlayPounceClip", PhotonTargets.OthersBuffered );
 	}
 
+	public void DisplayMonsterVictory()
+	{
+		if( uiFSM )
+			uiFSM.SendEvent( "UI_ThreatEliminated" );
+
+		photonView.RPC( "RPCDisplayMonsterVictory", PhotonTargets.OthersBuffered );
+	}
+	
+	public void DisplayHeroVictory()
+	{
+		if( uiFSM )
+			uiFSM.SendEvent( "UI_CurseLifted" );
+
+		photonView.RPC( "RPCDisplayHeroVictory", PhotonTargets.OthersBuffered );
+	}
+
+	public void DisplayMonsterForHeroes()
+	{
+		if( uiFSM )
+			uiFSM.SendEvent( "UI_ChaseIsOn" );
+
+		//photonView.RPC( "RPCDisplayMonsterForHeroes", PhotonTargets.OthersBuffered );
+	}
 	//coroutines
 	private IEnumerator DoDisplayMessage( string messageToDisplay )
 	{
@@ -2265,12 +2288,35 @@ public class PlayerController : Photon.MonoBehaviour {
 		{
 			uiFSM.SendEvent( "UI_Demonized" );
 		}
+
+		PlayerAgent.DisplayMonsterMessageForHeroes();
 		
 		StartCoroutine( "DoScreenshotOut" );
 		
 		PlayMonsterizeClip();
 		
 		StartCoroutine( "WaitAndShowTutorial", demonTutorialImages );
+	}
+
+	[RPC]
+	private void RPCDisplayMonsterVictory()
+	{
+		if( uiFSM )
+			uiFSM.SendEvent( "UI_ThreatEliminated" );
+	}
+
+	[RPC]
+	private void RPCDisplayHeroVictory()
+	{
+		if( uiFSM )
+			uiFSM.SendEvent( "UI_CurseLifted" );
+	}
+
+	[RPC]
+	private void RPCDisplayMonsterForHeroes()
+	{
+		if( uiFSM )
+			uiFSM.SendEvent( "UI_ChaseIsOn" );
 	}
 	// end server calls
 
@@ -2553,6 +2599,8 @@ public class PlayerController : Photon.MonoBehaviour {
 		{
 			uiFSM.SendEvent( "UI_Demonized" );
 		}
+
+		PlayerAgent.DisplayMonsterMessageForHeroes();
 
 		StartCoroutine( "DoScreenshotOut" );
 
