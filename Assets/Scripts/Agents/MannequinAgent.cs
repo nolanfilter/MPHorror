@@ -269,6 +269,19 @@ public class MannequinAgent : MonoBehaviour {
 		return numActiveMannequins;
 	}
 
+	public static float GetProgressPercent()
+	{
+		if( instance )
+			return instance.internalGetProgressPercent();
+
+		return 0f;
+	}
+
+	private float internalGetProgressPercent()
+	{
+		return 1f - ( (float)GetNumActiveMannequins() / (float)mannequins.Count );
+	}
+
 	public static bool GetShouldMonsterize()
 	{
 		if( instance )

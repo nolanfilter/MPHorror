@@ -114,6 +114,8 @@ public class PlayerController : Photon.MonoBehaviour {
 	public Image compassWheel;
 	public Image compassTriangle;
 	public Image compassIndicator;
+	public Image soulsStartUI;
+	public Image soulsEndUI;
 	public Image motionBlindUI;
 	public Image tutorialUI;
 	public Image demonizedUI;
@@ -122,6 +124,13 @@ public class PlayerController : Photon.MonoBehaviour {
 	public Image gatherer2LeftUI;
 	public Image gatherer1LeftUI;
 	public Image gathererTrappedForever;
+
+	public Image[] playerStatuses;
+
+	public Sprite normalStatusSprite;
+	public Sprite stunnedStatusSprite;
+	public Sprite demonStatusSprite;
+	public Sprite deadStatusSprite;
 
 	public PlayMakerFSM uiFSM;
 
@@ -274,7 +283,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	
 	void Start()
 	{
-		messageRect = new Rect( 0f, 0f, Screen.width, Screen.height * 0.1f );
+		messageRect = new Rect( 0f, Screen.height * 0.1f, Screen.width, Screen.height * 0.1f );
 
 		textStyle = new GUIStyle();
 		textStyle.font = FontAgent.GetNotificationFont();
@@ -361,7 +370,9 @@ public class PlayerController : Photon.MonoBehaviour {
 			transform.position = new Vector3( transform.position.x, height, transform.position.z );
 
 		UpdateCompass();
+		UpdateStatusUI();
 
+		/*
 		if( photonView.isMine && Input.GetKeyDown( KeyCode.K ) )
 			KillPlayer();
 
@@ -370,6 +381,16 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		if( animation && photonView.isMine && Input.GetKeyDown( KeyCode.T ) )
 			animation.gameObject.SetActive( !animation.gameObject.activeSelf );
+
+		if( photonView.isMine && Input.GetKeyDown( KeyCode.F ) )
+			Freeze();
+
+		if( photonView.isMine && Input.GetKeyDown( KeyCode.M ) )
+			DisplayMessage( "This is a test" );
+
+		if( photonView.isMine && Input.GetKeyDown( KeyCode.S ) )
+			Stun();
+		*/
 	}
 
 	void LateUpdate()
@@ -673,7 +694,8 @@ public class PlayerController : Photon.MonoBehaviour {
 	{
 		bool isMonster = PlayerAgent.GetIsPlayerMonster( this );
 
-		if( photonView.isMine && zoomProgress == 1f && GameAgent.GetCurrentGameState() == GameAgent.GameState.Game && ( !isMonster || hasShowDemonTutorial ) )
+		//if( photonView.isMine && zoomProgress == 1f && GameAgent.GetCurrentGameState() == GameAgent.GameState.Game && ( !isMonster || hasShowDemonTutorial ) )
+		if( photonView && GameAgent.GetCurrentGameState() == GameAgent.GameState.Game )
 		{
 			if( !isCompassActive )
 			{
@@ -731,21 +753,37 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( compassWheel == null )
 			return;
 
-		if( isMonster )
-		{
-			compassWheel.enabled = false;
-
-			if( compassTriangle )
-				compassTriangle.enabled = false;
-		}
-
 		compassWheel.rectTransform.localRotation = Quaternion.AngleAxis( northAngle, Vector3.back );
 
 		if( compassIndicator )
 		{
 			compassIndicator.enabled = ( closestMannequinVector != Vector3.up * -1f );
 
+			if( isMonster )
+			{
+				compassWheel.enabled = compassIndicator.enabled;
+				
+				if( compassTriangle )
+					compassTriangle.enabled = compassIndicator.enabled;
+			}
+
 			compassIndicator.rectTransform.localPosition = compassWheel.rectTransform.localPosition + new Vector3( Mathf.Sin( soulAngle ), Mathf.Cos( soulAngle ), 0f ) * 960f;
+		}
+	}
+
+	private void UpdateStatusUI()
+	{
+		if( soulsEndUI )
+			soulsEndUI.rectTransform.sizeDelta = new Vector2( Mathf.Lerp( 460f, 1600f, MannequinAgent.GetProgressPercent() ), soulsEndUI.rectTransform.sizeDelta.y );
+
+		List<State> states = PlayerAgent.GetPlayerStates();
+
+		for( int i = 0; i < playerStatuses.Length; i++ )
+		{
+			if( states.Count > i )
+				SetStatusSprite( playerStatuses[i], states[i] );
+			else
+				SetStatusSprite( playerStatuses[i], State.Invalid );
 		}
 	}
 
@@ -1142,6 +1180,22 @@ public class PlayerController : Photon.MonoBehaviour {
 			compassIndicator.enabled = false;
 		}
 
+		if( soulsStartUI )
+		{
+			soulsStartUI.enabled = false;
+		}
+
+		if( soulsEndUI )
+		{
+			soulsEndUI.enabled = false;
+		}
+
+		for( int i = 0; i < playerStatuses.Length; i++ )
+		{
+			if( playerStatuses[i] != null )
+				playerStatuses[i].enabled = false;
+		}
+
 		if( motionBlindUI )
 		{
 			motionBlindUI.enabled = false;
@@ -1250,10 +1304,50 @@ public class PlayerController : Photon.MonoBehaviour {
 		photonView.RPC( "RPCPlayPounceClip", PhotonTargets.OthersBuffered );
 	}
 
+	private void SetStatusSprite( Image statusImage, State status )
+	{
+		if( statusImage == null )
+			return;
+		
+		switch( status )
+		{
+			case State.None:
+			{
+				if( normalStatusSprite )
+					statusImage.sprite = normalStatusSprite;
+			} break;
+				
+			case State.Stunned: case State.Frozen:
+			{
+				if( stunnedStatusSprite )
+					statusImage.sprite = stunnedStatusSprite;
+			} break;
+				
+			case State.Monster: 
+			{
+				if( demonStatusSprite )
+					statusImage.sprite = demonStatusSprite;
+			} break;
+				
+			case State.Voyeur: 
+			{
+				if( deadStatusSprite )
+					statusImage.sprite = deadStatusSprite;
+			} break;
+		}
+
+		statusImage.enabled = ( status != State.Invalid );
+	}
+
 	public void DisplayMonsterVictory()
 	{
 		if( uiFSM )
-			uiFSM.SendEvent( "UI_ThreatEliminated" );
+		{
+			if( PlayerAgent.GetIsPlayerMonster( this ) )
+				uiFSM.SendEvent( "UI_ThreatEliminated" );
+			else
+				uiFSM.SendEvent( "UI_People_TrappedFoever" );
+		}
 
 		photonView.RPC( "RPCDisplayMonsterVictory", PhotonTargets.OthersBuffered );
 	}
@@ -1271,7 +1365,7 @@ public class PlayerController : Photon.MonoBehaviour {
 		if( uiFSM )
 			uiFSM.SendEvent( "UI_ChaseIsOn" );
 
-		//photonView.RPC( "RPCDisplayMonsterForHeroes", PhotonTargets.OthersBuffered );
+		photonView.RPC( "RPCDisplayMonsterForHeroes", PhotonTargets.OthersBuffered );
 	}
 	//coroutines
 	private IEnumerator DoDisplayMessage( string messageToDisplay )
@@ -1536,12 +1630,39 @@ public class PlayerController : Photon.MonoBehaviour {
 
 	private IEnumerator DoFreeze()
 	{
-		float beginTime = Time.time;
+		//float beginTime = Time.time;
+
+		float currentTime = 0f;
+		float lerp;
+		
+		Vector3 fromScale = Vector3.one;
+		Vector3 toScale = new Vector3( 2f, 2f, 1f );
+		
+		if( frozenUI )
+			frozenUI.rectTransform.localScale = fromScale;
 
 		if( frozenUI )
 			frozenUI.enabled = true;
 
-		yield return new WaitForSeconds( freezeDuration );
+		//yield return new WaitForSeconds( freezeDuration );
+
+		if( frozenUI )
+			frozenUI.rectTransform.localScale = fromScale;
+
+		do
+		{
+			currentTime += Time.deltaTime;
+			lerp = currentTime / freezeDuration;
+
+			if( frozenUI )
+				frozenUI.rectTransform.localScale = Vector3.Lerp( fromScale, toScale, lerp );
+
+			yield return null;
+
+		} while( currentTime < freezeDuration );
+
+		if( frozenUI )
+			frozenUI.rectTransform.localScale = toScale;
 
 		/*
 		//DisplayMessage( "You've been frozen in place" );
@@ -2063,6 +2184,18 @@ public class PlayerController : Photon.MonoBehaviour {
 		GameAgent.ChangeGameState( GameAgent.GameState.Game );
 
 		StartCoroutine( "DoTutorial", everyoneTutorialImages );
+
+		if( soulsStartUI )
+			soulsStartUI.enabled = true;
+
+		if( soulsEndUI )
+			soulsEndUI.enabled = true;
+
+		for( int i = 0; i < playerStatuses.Length; i++ )
+		{
+			if( playerStatuses[i] != null )
+				playerStatuses[i].enabled = true;
+		}
 	}
 
 	[RPC]
@@ -2263,9 +2396,17 @@ public class PlayerController : Photon.MonoBehaviour {
 			
 			flameParticleSystems = flamesObject.GetComponentsInChildren<ParticleSystem>();
 		}
-		
+
+		Color demonColor = new Color( 0.75f, 0f, 0f );
+
 		if( compassIndicator )
-			compassIndicator.color = new Color( 0.75f, 0f, 0f );
+			compassIndicator.color = demonColor;
+
+		if( compassWheel )
+			compassWheel.color = demonColor;
+
+		if (compassTriangle)
+			compassTriangle.color = demonColor;
 		
 		//cameraTransform.gameObject.AddComponent<NegativeEffect>();
 		StopCoroutine( "DoStun" );
@@ -2302,7 +2443,12 @@ public class PlayerController : Photon.MonoBehaviour {
 	private void RPCDisplayMonsterVictory()
 	{
 		if( uiFSM )
-			uiFSM.SendEvent( "UI_ThreatEliminated" );
+		{
+			if( PlayerAgent.GetIsPlayerMonster( this ) )
+				uiFSM.SendEvent( "UI_ThreatEliminated" );
+			else
+				uiFSM.SendEvent( "UI_People_TrappedFoever" );
+		}
 	}
 
 	[RPC]
@@ -2714,6 +2860,18 @@ public class PlayerController : Photon.MonoBehaviour {
 
 		StartCoroutine( "DoTutorial", everyoneTutorialImages );
 
+		if( soulsStartUI )
+			soulsStartUI.enabled = true;
+		
+		if( soulsEndUI )
+			soulsEndUI.enabled = true;
+
+		for( int i = 0; i < playerStatuses.Length; i++ )
+		{
+			if( playerStatuses[i] != null )
+				playerStatuses[i].enabled = true;
+		}
+
 		photonView.RPC( "RPCStartGame", PhotonTargets.OthersBuffered );
 	}
 
@@ -2797,7 +2955,7 @@ public class PlayerController : Photon.MonoBehaviour {
 	public void Freeze()
 	{
 		photonView.RPC( "RPCFreeze", PhotonTargets.OthersBuffered );
-		
+
 		StartCoroutine( "DoFreeze" );
 	}
 

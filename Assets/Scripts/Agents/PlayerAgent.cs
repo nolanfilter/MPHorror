@@ -160,6 +160,22 @@ public class PlayerAgent : MonoBehaviour {
 			monsterID = -1;
 	}
 
+	public static bool GetShouldHost()
+	{
+		if( instance )
+			return instance.internalGetShouldHost();
+
+		return false;
+	}
+
+	private bool internalGetShouldHost()
+	{
+		if( playerControllers.Count > 0 )
+			return client == playerControllers[0];
+
+		return false;
+	}
+
 	public static int GetMonsterizingMannequinNumber()
 	{
 		if( instance )
@@ -484,6 +500,29 @@ public class PlayerAgent : MonoBehaviour {
 		}
 
 		return closestDistance;
+	}
+
+	public static List<PlayerController.State> GetPlayerStates()
+	{
+		if( instance )
+			return instance.internalGetPlayerStates();
+
+		return new List<PlayerController.State>();
+	}
+
+	private List<PlayerController.State> internalGetPlayerStates()
+	{
+		List<PlayerController.State> states = new List<PlayerController.State>();
+
+		for( int i = 0; i < playerControllers.Count; i++ )
+		{
+			if( i == monsterID )
+				states.Add( PlayerController.State.Monster );
+			else
+				states.Add( playerControllers[i].GetCurrentState() );
+		}
+
+		return states;
 	}
 
 	public static void MessagePlayersLeft()

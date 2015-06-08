@@ -83,6 +83,8 @@ public class NetworkAgent : MonoBehaviour {
 			MannequinAgent.Reset();
 			FSMAgent.Reset();
 		}
+
+		StartCoroutine( "CheckForHost" );
 	}
 
 	public static void LeaveRoom()
@@ -193,6 +195,27 @@ public class NetworkAgent : MonoBehaviour {
 		{
 			room.open = false;
 			room.visible = false;
+		}
+	}
+
+	private IEnumerator CheckForHost()
+	{
+		yield return null;
+
+		while( GameAgent.GetCurrentGameState() == GameAgent.GameState.Room && PhotonNetwork.room != null )
+		{
+			//Debug.Log( PhotonNetwork.room.playerCount + ", " + isHost );
+
+			if( PhotonNetwork.room.playerCount == 1 || PlayerAgent.GetShouldHost() )
+			{
+				if( !isHost )
+				{
+					isHost = true;
+					RoomScreen.UpdateText();
+				}
+			}
+
+			yield return null;
 		}
 	}
 }

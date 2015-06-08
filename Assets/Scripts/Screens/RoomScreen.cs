@@ -10,9 +10,7 @@ public class RoomScreen : MonoBehaviour {
 	public Text roomText;
 	public Image aButton;
 	public Text startText;
-
-	private bool isHost;
-
+	
 	private static RoomScreen mInstance = null;
 	public static RoomScreen instance
 	{
@@ -32,9 +30,7 @@ public class RoomScreen : MonoBehaviour {
 		
 		mInstance = this;
 
-		isHost = NetworkAgent.GetIsHost();
-
-		if( isHost )
+		if( NetworkAgent.GetIsHost() )
 			HighlightHost();
 		else
 			HighlightJoin();
@@ -95,13 +91,26 @@ public class RoomScreen : MonoBehaviour {
 
 	private void internalActivate()
 	{
-		if( isHost )// && aButton && aButton.enabled )
+		if( NetworkAgent.GetIsHost() && aButton && aButton.enabled )
 			PlayerAgent.StartGame();
 	}
 
-	private void UpdateText()
+	public static void UpdateText()
+	{
+		if( instance )
+			instance.internalUpdateText();
+	}
+
+	private void internalUpdateText()
 	{
 		int connectedPlayers = PhotonNetwork.playerList.Length;
+
+		bool isHost = NetworkAgent.GetIsHost();
+
+		if( isHost )
+			HighlightHost();
+		else
+			HighlightJoin();
 
 		switch( connectedPlayers )
 		{
